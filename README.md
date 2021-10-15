@@ -1,6 +1,6 @@
 # tr-lang
 
-Made with ❤️ in 🇹🇷
+### Made with ❤️ in 🇹🇷
 
 tr-lang is a language that aims to bring programming language syntax closer to Turkish.
 tr-lang is a stack based language and uses reverse-polish notation for maths.
