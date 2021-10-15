@@ -12,3 +12,4 @@ tr-lang is a stack based language and uses reverse-polish notation for maths.
 #### ❌ tr-lang runtime is not implemented [Issue #5](https://github.com/kaiserthe13th/tr-lang/issues/5#issue-1027665033)<br>
 
 # [Specification](https://github.com/kaiserthe13th/tr-lang/wiki/Specification-EN)
+# [See the Wiki](https://github.com/kaiserthe13th/tr-lang/wiki)
