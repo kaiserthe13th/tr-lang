@@ -54,19 +54,21 @@ Hello, World!
 
 ### ise
 if statement in tr-lang
+check conditions!
 ```py
 10 0 > ise
-  "Hello" de
+  "Hello\n" de
 son
 ```
 
 ### yoksa
 else statement in tr-lang
+What dould you do if `if` was wrong?
 ```py
 10 0 < ise
-  "How did we get here?" de
+  "How did we get here?\n" de
 yoksa
-  "The universe still works!" de
+  "The universe still works!\n" de
 son
 ```
 
