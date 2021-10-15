@@ -11,4 +11,4 @@ tr-lang küme(stack) orantılı bir dil ve matematik için ters leh notasyonu ku
 #### ❌ tr-lang bytecode okuyucu tamamlanmadı [İssue #4](https://github.com/kaiserthe13th/tr-lang/issues/4#issue-1027663331)<br>
 #### ❌ tr-lang çalışma zamanı tamamlanmadı [İssue #5](https://github.com/kaiserthe13th/tr-lang/issues/5#issue-1027665033)<br>
 
-# [Dil Spesifikasyonu]()
+# [Dil Spesifikasyonu](https://github.com/kaiserthe13th/tr-lang/wiki/Dil-Spesifikasyonu-TR)
