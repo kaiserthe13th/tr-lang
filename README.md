@@ -5,13 +5,15 @@ tr-lang is a stack based language and uses reverse-polish notation for maths.
 
 # What has been Implemented?
 
-#### :x: tr-lang lexer is not implemented<br>
-#### :x: tr-lang parser is not implemented<br>
-#### :x: tr-lang bytecode is not implemented<br>
-#### :x: tr-lang bytecode reader is not implemented<br>
-#### :x: tr-lang runtime is not implemented<br>
+#### ❌ tr-lang lexer is not implemented<br>
+#### ❌ tr-lang parser is not implemented<br>
+#### ❌ tr-lang bytecode is not implemented<br>
+#### ❌ tr-lang bytecode reader is not implemented<br>
+#### ❌ tr-lang runtime is not implemented<br>
 
 # Specification
+
+#### ❕ All of the below have not yet been implemented
 
 ## Datatypes
 
