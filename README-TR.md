@@ -1,5 +1,7 @@
 # tr-lang
 
+### ❤️ ile 🇹🇷 de yapılmıştır
+
 tr-lang programlama dili sözdizimini Türkçeye yaklaştırmayı amaçlayan bir programlama dilidir.
 tr-lang küme(stack) orantılı bir dil ve matematik için ters leh notasyonu kullanıyor.
 
