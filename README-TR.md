@@ -5,7 +5,7 @@ tr-lang küme(stack) orantılı bir dil ve matematik için ters leh notasyonu ku
 
 # Dilin hangi parçaları tamamlandı?
 
-#### ❌ tr-lang lexer'ı tamamlanmadı<br>
+#### ❌ tr-lang lexer'ı çalışma altında ![#1](https://github.com/kaiserthe13th/tr-lang/issues/1#issue-1027652152)<br>
 #### ❌ tr-lang parser'ı tamamlanmadı<br>
 #### ❌ tr-lang bytecode tamamlanmadı<br>
 #### ❌ tr-lang bytecode okuyucu tamamlanmadı<br>
