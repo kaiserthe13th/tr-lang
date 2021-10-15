@@ -5,7 +5,7 @@ tr-lang is a stack based language and uses reverse-polish notation for maths.
 
 # What has been Implemented?
 
-#### 🕘 tr-lang lexer is in progress ![#1](https://github.com/kaiserthe13th/tr-lang/issues/1#issue-1027652152)<br>
+#### 🕘 tr-lang lexer is in progress [#1](https://github.com/kaiserthe13th/tr-lang/issues/1#issue-1027652152)<br>
 #### ❌ tr-lang parser is not implemented<br>
 #### ❌ tr-lang bytecode is not implemented<br>
 #### ❌ tr-lang bytecode reader is not implemented<br>
