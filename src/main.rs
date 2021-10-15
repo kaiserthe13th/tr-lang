@@ -27,6 +27,8 @@ enum TokenType {
     Yoksa,
     Identifier,
     Son,
+    Doğru,
+    Yanlış,
     Artı,
     ArtıArtı,
     Eksi,
@@ -175,8 +177,10 @@ impl Lexer {
                 _ => {
                     let mut buf = String::new();
 
-                    while self.source.len() > self.current && self.currentc() != ' ' {
+                    while self.source.len() > self.current && !char_in_str(self.currentc(), "\t\r \n\"'") {
                         buf.push(self.currentc());
+                        self.current += 1;
+                        self.col += 1;
                     }
 
                     match buf.as_str() {
@@ -185,6 +189,8 @@ impl Lexer {
                         "son" => tokens.push(Token::new(TokenType::Son, "son".to_string(), self.line, self.col)),
                         "iken" => tokens.push(Token::new(TokenType::İken, "iken".to_string(), self.line, self.col)),
                         "yoksa" => tokens.push(Token::new(TokenType::Yoksa, "yoksa".to_string(), self.line, self.col)),
+                        "doğru" => tokens.push(Token::new(TokenType::Doğru, "doğru".to_string(), self.line, self.col)),
+                        "yanlış" => tokens.push(Token::new(TokenType::Yanlış, "yanlış".to_string(), self.line, self.col)),
                         a => tokens.push(Token::new(TokenType::Identifier, a.to_string(), self.line, self.col))
                     }
 
@@ -209,5 +215,5 @@ fn main() {
     let cont = cont;
     let mut lexer = Lexer::new(cont);
     let lexed = lexer.lex();
-    println!("{:?}", lexed);
+    println!("{:#?}", lexed);
 }
