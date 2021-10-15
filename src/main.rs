@@ -25,6 +25,7 @@ enum TokenType {
     İken,
     İse,
     Yoksa,
+    Identifier,
     Son,
     Artı,
     ArtıArtı,
@@ -82,11 +83,14 @@ impl Lexer {
                         } else {
                             self.current += 1;
                             match self.currentc() {
+                                't' => buf.push('\t'),
                                 'n' => buf.push('\n'),
                                 'r' => buf.push('\r'),
                                 '"' => buf.push('"'),
                                 '\'' => buf.push('\''),
                                 '\\' => buf.push('\\'),
+                                '\n' => (),
+                                '\t' => (),
                                 _ => {
                                     buf.push('\\');
                                     buf.push(self.currentc())
@@ -119,6 +123,7 @@ impl Lexer {
                     tokens.push(Token::new(TokenType::Sayı, buf, self.line, self.col));
                 },
                 '\n' => {
+                    self.current += 1;
                     self.line += 1;
                     self.col  =  1;
                 },
@@ -168,6 +173,21 @@ impl Lexer {
                     self.col += 1;
                 },
                 _ => {
+                    let mut buf = String::new();
+
+                    while self.source.len() > self.current && self.currentc() != ' ' {
+                        buf.push(self.currentc());
+                    }
+
+                    match buf.as_str() {
+                        "de" => tokens.push(Token::new(TokenType::De, "de".to_string(), self.line, self.col)),
+                        "ise" => tokens.push(Token::new(TokenType::İse, "ise".to_string(), self.line, self.col)),
+                        "son" => tokens.push(Token::new(TokenType::Son, "son".to_string(), self.line, self.col)),
+                        "iken" => tokens.push(Token::new(TokenType::İken, "iken".to_string(), self.line, self.col)),
+                        "yoksa" => tokens.push(Token::new(TokenType::Yoksa, "yoksa".to_string(), self.line, self.col)),
+                        a => tokens.push(Token::new(TokenType::Identifier, a.to_string(), self.line, self.col))
+                    }
+
                     self.current += 1;
                     self.col += 1;
                 },
