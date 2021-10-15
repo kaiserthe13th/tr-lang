@@ -12,3 +12,4 @@ tr-lang küme(stack) orantılı bir dil ve matematik için ters leh notasyonu ku
 #### ❌ tr-lang çalışma zamanı tamamlanmadı [İssue #5](https://github.com/kaiserthe13th/tr-lang/issues/5#issue-1027665033)<br>
 
 # [Dil Spesifikasyonu](https://github.com/kaiserthe13th/tr-lang/wiki/Dil-Spesifikasyonu-TR)
+# [Vikiye bak](https://github.com/kaiserthe13th/tr-lang/wiki/Anasayfa---TR)
