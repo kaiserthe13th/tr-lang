@@ -1,5 +1,7 @@
 use std::fs;
 use std::env;
+use std::process::exit;
+use std::io::prelude::*;
 
 pub mod lexer;
 use lexer::Lexer;
@@ -7,14 +9,28 @@ use lexer::Lexer;
 pub mod token;
 pub mod util;
 
+fn error_print<T>(error_name: &str, error_explanation: T)
+where
+    T: std::fmt::Debug
+{
+    eprintln!("{}: {:?}", error_name, error_explanation);
+    exit(1);
+}
+
 fn main() {
     let args: Vec<String> = env::args().collect();
     let mut cont = String::new();
     if args.len() > 1 {
-        cont = fs::read_to_string(args.get(1).unwrap()).unwrap();
+        let a = fs::read_to_string(args.get(1).unwrap());
+        match a {
+            Ok(s) => cont = s,
+            Err(e) => error_print("error reading file", format!("{}", e)),
+        }
     }
     let cont = cont;
     let mut lexer = Lexer::new(cont);
     let lexed = lexer.lex();
-    println!("{:#?}", lexed);
+    if util::item_in_vec(&["--debug".to_string(), "-d".to_string()], &args) {
+        println!("{:#?}", lexed);
+    }
 }
