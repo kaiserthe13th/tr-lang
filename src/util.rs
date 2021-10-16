@@ -37,7 +37,7 @@ where T: Eq
 }
 
 pub fn print_help(exit_code: i32, prog_name: String) -> ! {
-    println!("tr-lang version {} released at {}", VERSION, RELEASE);
+    println!("{} version {} released at {}", prog_name, VERSION, RELEASE);
     println!("");
     println!("USAGE:");
     println!("  {} <FILE> [options]", prog_name);
