@@ -107,6 +107,30 @@ impl Lexer {
                             self.current += 1;
                             self.col     += 1;
                             tokens.push(Token::new(TokenType::EksiEksi, "--".to_string(), self.line, self.col))
+                        } else if self.currentc() == '*' {
+                            loop {
+                                self.current += 1;
+                                self.col     += 1;
+                                if self.current > self.source.len() {
+                                    panic!("unterminated comment");
+                                }
+                                if self.currentc() == '\n' {
+                                    self.line += 1;
+                                    self.col = 1;
+                                } else if self.currentc() == '*' {
+                                    self.current += 1;
+                                    self.col += 1;
+                                    if self.source.len() > self.current {
+                                        if self.currentc() == '-' {
+                                            self.current += 1;
+                                            self.col     += 1;
+                                            break;
+                                        }
+                                    } else {
+                                        panic!("unterminated comment");
+                                    }
+                                }
+                            }
                         } else {
                             tokens.push(Token::new(TokenType::Eksi, "-".to_string(), self.line, self.col))
                         }
