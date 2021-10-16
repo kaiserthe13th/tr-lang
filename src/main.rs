@@ -33,7 +33,7 @@ fn main() {
             Err(e) => error_print("error reading file", format!("{}", e)),
         }
     } else {
-        util::print_help(0, args[0].clone());
+        util::print_help(1, args[0].clone());
     }
     let cont = cont;
     let mut lexer = Lexer::new(cont);
