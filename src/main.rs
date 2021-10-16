@@ -1,7 +1,6 @@
 use std::fs;
 use std::env;
 use std::process::exit;
-use std::io::prelude::*;
 
 pub mod lexer;
 use lexer::Lexer;
