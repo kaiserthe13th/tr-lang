@@ -249,6 +249,8 @@ impl Lexer {
                         "kpy" => tokens.push(Token::new(TokenType::Kopya, "kpy".to_string(), self.line, self.col)),
                         "tks" => tokens.push(Token::new(TokenType::Takas, "tks".to_string(), self.line, self.col)),
                         "üst" => tokens.push(Token::new(TokenType::Üst, "üst".to_string(), self.line, self.col)),
+                        "veya" => tokens.push(Token::new(TokenType::Veya, "veya".to_string(), self.line, self.col)),
+                        "ve" => tokens.push(Token::new(TokenType::Ve, "ve".to_string(), self.line, self.col)),
                         "dön" => tokens.push(Token::new(TokenType::Döndür, "dön".to_string(), self.line, self.col)),
                         "girdi" => tokens.push(Token::new(TokenType::Girdi, "girdi".to_string(), self.line, self.col)),
                         a => tokens.push(Token::new(TokenType::Identifier, a.to_string(), self.line, self.col)),
