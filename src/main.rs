@@ -38,7 +38,7 @@ fn main() {
     let cont = cont;
     let mut lexer = Lexer::new(cont);
     let lexed = lexer.lex();
-    if util::item_in_vec(&["--debug".to_string(), "-d".to_string()], &args) {
+    if util::item_in_vec(&["--show-lex-result".to_string(), "-l".to_string()], &args) {
         println!("{:#?}", lexed);
     }
 }

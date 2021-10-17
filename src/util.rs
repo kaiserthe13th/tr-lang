@@ -43,12 +43,13 @@ pub fn print_help(exit_code: i32, prog_name: String) -> ! {
     println!("  {} <FILE> [options]", prog_name);
     println!("");
     println!("OPTIONS:");
-    println!("  -h --help     print help and exit");
-    println!("  -v --version  print version and exit");
+    println!("  -h --help             print help and exit");
+    println!("  -v --version          print version and exit");
+    println!("  -l --show-lex-result  show the lexer output after lexing");
     crate::exit(exit_code);
 }
 
 pub fn print_version(prog_name: String) -> ! {
-    println!("{} cersion {} released at {}", prog_name, VERSION, RELEASE);
+    println!("{} version {} released at {}", prog_name, VERSION, RELEASE);
     crate::exit(0);
 }
