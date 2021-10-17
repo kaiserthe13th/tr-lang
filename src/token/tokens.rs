@@ -30,6 +30,12 @@ pub mod tokentypes {
         Sor,
         SorYoksa,
         SorSon,
+        Takas,
+        Üst,
+        Döndür,
+        Ve,
+        Veya,
+        Girdi,
     }
 }
 
