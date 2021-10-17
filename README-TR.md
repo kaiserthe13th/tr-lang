@@ -27,8 +27,9 @@ gereksinimler: `rust, cargo`
 ```sh
 git clone https://github.com/kaiserthe13th/tr-lang
 cd tr-lang
-cargo build
+cargo build --release
 ```
+dosyanız `target/release/tr-lang`'da bulunacaktır
 
 # [Dil Spesifikasyonu](https://github.com/kaiserthe13th/tr-lang/wiki/Dil-Spesifikasyonu-TR)
 # [Vikiye bak](https://github.com/kaiserthe13th/tr-lang/wiki/Anasayfa---TR)
