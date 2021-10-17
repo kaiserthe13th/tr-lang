@@ -21,6 +21,11 @@ brew tap kaiserthe13th/tr-lang
 brew install tr-lang
 ```
 
+## Cargo
+```sh
+cargo install tr-lang
+```
+
 ## Build from source
 dependencies: `rust, cargo`
 
