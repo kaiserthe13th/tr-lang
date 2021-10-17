@@ -27,8 +27,9 @@ dependencies: `rust, cargo`
 ```sh
 git clone https://github.com/kaiserthe13th/tr-lang
 cd tr-lang
-cargo build
+cargo build --release
 ```
+your file will be in target/release/tr-lang
 
 # [Specification](https://github.com/kaiserthe13th/tr-lang/wiki/Specification-EN)
 # [See the Wiki](https://github.com/kaiserthe13th/tr-lang/wiki)
