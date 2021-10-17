@@ -27,7 +27,7 @@ dependencies: `rust, cargo`
 ```sh
 git clone https://github.com/kaiserthe13th/tr-lang
 cd tr-lang
-cargo run
+cargo build
 ```
 
 # [Specification](https://github.com/kaiserthe13th/tr-lang/wiki/Specification-EN)
