@@ -1,5 +1,5 @@
-use crate::token::Token;
-use crate::token::tokentypes::TokenType;
+use crate::token::LexerToken as Token;
+use crate::token::tokentypes::LexerTokenType as TokenType;
 use crate::util::char_in_str;
 
 pub struct Lexer {
@@ -131,6 +131,10 @@ impl Lexer {
                                     }
                                 }
                             }
+                        } else if self.currentc() == '>' {
+                            self.current += 1;
+                            self.col     += 1;
+                            tokens.push(Token::new(TokenType::Koy, "->".to_string(), self.line, self.col));
                         } else {
                             tokens.push(Token::new(TokenType::Eksi, "-".to_string(), self.line, self.col))
                         }
@@ -195,7 +199,7 @@ impl Lexer {
                     self.current += 1;
                     if self.source.len() > self.current {
                         if self.currentc() == '?' {
-                            tokens.push(Token::new(TokenType::SorSon, "=?".to_string(), self.line, self.col));
+                            tokens.push(Token::new(TokenType::Son, "=?".to_string(), self.line, self.col));
                             self.col += 1;
                             self.current += 1;
                         } else {
@@ -212,7 +216,7 @@ impl Lexer {
                             self.col += 1;
                             self.current += 1;
                         } else if self.currentc() == '?' {
-                            tokens.push(Token::new(TokenType::SorYoksa, ":?".to_string(), self.line, self.col));
+                            tokens.push(Token::new(TokenType::Yoksa, ":?".to_string(), self.line, self.col));
                             self.col += 1;
                             self.current += 1;
                         } else {
@@ -223,7 +227,7 @@ impl Lexer {
                 '?' => {
                     self.current += 1;
                     self.col += 1;
-                    tokens.push(Token::new(TokenType::Sor, "?".to_string(), self.line, self.col));
+                    tokens.push(Token::new(TokenType::İse, "?".to_string(), self.line, self.col));
                 },
                 ' ' => {
                     self.current += 1;
@@ -258,6 +262,7 @@ impl Lexer {
                 },
             }
         }
+        tokens.push(Token::new(TokenType::EOF, "".to_string(), self.line, self.col));
         tokens
     }
     fn currentc(&self) -> char {
