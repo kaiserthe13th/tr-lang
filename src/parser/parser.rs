@@ -6,6 +6,7 @@ use crate::token::tokentypes::LexerTokenType as LexTokenType;
 use crate::token::ParserToken as Token;
 use crate::token::tokentypes::ParserTokenType as TokenType;
 
+#[derive(Debug)]
 enum BlockToken {
     İse(usize),
     İken(usize),
@@ -35,7 +36,7 @@ impl Parser {
         let mut blocktokens: Vec<BlockToken> = vec![];
 
         for (ip, ptoken) in self.tokens.iter().enumerate() {
-            #[allow(unused)]
+            // #[allow(unused)]
             match ptoken.typ {
                 LexTokenType::Sayı => {
                     parsed.push(Token::new(
@@ -76,7 +77,7 @@ impl Parser {
                     };
                     blocktokens.push(BlockToken::İken(tp));
                     parsed.push(Token::new(
-                        TokenType::İken { yoksa: None },
+                        TokenType::İken(None),
                         ptoken.line,
                         ptoken.col,
                     ))
@@ -84,7 +85,7 @@ impl Parser {
                 LexTokenType::İse => {
                     blocktokens.push(BlockToken::İse(ip));
                     parsed.push(Token::new(
-                        TokenType::İse { yoksa: None },
+                        TokenType::İse( None ),
                         ptoken.line,
                         ptoken.col,
                     ))
@@ -93,9 +94,12 @@ impl Parser {
                     let last_blocktoken = blocktokens.pop().unwrap();
                     let tp = match last_blocktoken {
                         BlockToken::İse(bip) => {
-                            let ise = parsed.get_mut(bip).unwrap();
-                            if let TokenType::İse { mut yoksa } = ise.typ {
-                                yoksa = Some(ip + 1);
+                            let ise = &mut parsed[bip];
+                            match ise.typ {
+                                TokenType::İse ( mut yoksa ) => {
+                                    yoksa = Some(ip + 1);
+                                },
+                                _ => unreachable!(),
                             }
                             ip + 1
                         },
@@ -103,32 +107,34 @@ impl Parser {
                     };
                     blocktokens.push(BlockToken::İse(ip));
                     parsed.push(Token::new(
-                        TokenType::Yoksa { tp: None },
+                        TokenType::Yoksa(None),
                         ptoken.line,
                         ptoken.col,
                     ))
                 },
                 LexTokenType::Son => {
-                    println!("reached son");
                     let last_blocktoken = blocktokens.pop().unwrap();
                     let tp = match last_blocktoken {
                         BlockToken::İse(bip) => {
-                            let ise = parsed.get_mut(bip).unwrap();
-                            println!("reached son:ise");
-                            println!("ise.typ = {:?}", ise.typ);
-                            if let TokenType::İse { mut yoksa } = ise.typ {
-                                yoksa = Some(ip);
-                                println!("{:?}", ise);
-                            } else if let TokenType::Yoksa { mut tp } = ise.typ {
-                                tp = Some(ip);
-                                println!("{:?}", ise);
+                            let ise = &mut parsed[bip];
+                            match ise.typ {
+                                TokenType::İse ( mut yoksa ) => {
+                                    yoksa = Some(ip);
+                                },
+                                TokenType::Yoksa ( mut tp ) => {
+                                    tp = Some(ip);
+                                },
+                                _ => unreachable!(),
                             }
                             ip + 1
                         },
                         BlockToken::İken(bip) => {
                             let iken = parsed.get_mut(bip).unwrap();
-                            if let TokenType::İken { mut yoksa } = iken.typ {
-                                yoksa = Some(ip + 1);
+                            match iken.typ {
+                                TokenType::İken ( mut yoksa ) => {
+                                    yoksa = Some(ip + 1);
+                                },
+                                _ => unreachable!(),
                             }
                             bip
                         },
