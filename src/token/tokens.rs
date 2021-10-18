@@ -2,7 +2,7 @@
 //! 
 //! these tokentypes are used when generating Tokens
 pub mod tokentypes {
-    #[derive(Debug)]
+    #[derive(Debug, Clone)]
     pub enum ParserTokenType {
         Yazı { val: String },
         Artı,
@@ -33,13 +33,13 @@ pub mod tokentypes {
         Bool { val: bool },
         İse { yoksa: Option<usize> },
         Yoksa { tp: Option<usize> },
-        Son { tp: Option<usize> },
+        Son { tp: usize },
         Identifier { id: String },
         Koy,
         EOF,
     }
     
-    #[derive(Debug)]
+    #[derive(Debug, Clone)]
     pub enum LexerTokenType {
         Yazı,
         Sayı,
@@ -85,12 +85,12 @@ pub mod tokentypes {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct LexerToken {
-    typ:    tokentypes::LexerTokenType,
-    lexeme: String,
-    line:   usize,
-    col:    usize,
+    pub typ:    tokentypes::LexerTokenType,
+    pub lexeme: String,
+    pub line:   usize,
+    pub col:    usize,
 }
 
 impl LexerToken {
@@ -99,11 +99,11 @@ impl LexerToken {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ParserToken {
-    typ:  tokentypes::ParserTokenType,
-    line: usize,
-    col:  usize,
+    pub typ:  tokentypes::ParserTokenType,
+    pub line: usize,
+    pub col:  usize,
 }
 
 impl ParserToken {

@@ -43,9 +43,10 @@ pub fn print_help(exit_code: i32, prog_name: String) -> ! {
     println!("  {} <FILE> [options]", prog_name);
     println!("");
     println!("OPTIONS:");
-    println!("  -h --help             print help and exit");
-    println!("  -v --version          print version and exit");
-    println!("  -l --show-lex-result  show the lexer output after lexing");
+    println!("  -h --help               print help and exit");
+    println!("  -v --version            print version and exit");
+    println!("  -l --show-lex-result    show the lexer output after lexing");
+    println!("  -p --show-parse-result  show the parser output after parsing");
     crate::exit(exit_code);
 }
 

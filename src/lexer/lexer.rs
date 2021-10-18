@@ -2,6 +2,7 @@ use crate::token::LexerToken as Token;
 use crate::token::tokentypes::LexerTokenType as TokenType;
 use crate::util::char_in_str;
 
+#[derive(Clone)]
 pub struct Lexer {
     source: Vec<char>,
     current:    usize,
