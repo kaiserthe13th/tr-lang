@@ -38,3 +38,8 @@ dosyanız `target/release/tr-lang`'da bulunacaktır
 
 # [Dil Spesifikasyonu](https://github.com/kaiserthe13th/tr-lang/wiki/Dil-Spesifikasyonu-TR)
 # [Vikiye bak](https://github.com/kaiserthe13th/tr-lang/wiki/Anasayfa---TR)
+
+# Teşekkürler
+
+stackoverflow.com'dan [Netwave](https://stackoverflow.com/users/1695172/netwave) adlı kullanıcıya parser yapım sürecinde yaşanan bir [bug'ın](https://stackoverflow.com/questions/69635458/pattern-matching-does-not-allow-me-to-change-values/69636181#69636181) çözümündeki yardımından dolayı teşekkürlerimi sunarım.
+

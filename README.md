@@ -38,3 +38,7 @@ your file will be in target/release/tr-lang
 
 # [Specification](https://github.com/kaiserthe13th/tr-lang/wiki/Specification-EN)
 # [See the Wiki](https://github.com/kaiserthe13th/tr-lang/wiki)
+
+# Thanks
+
+I give my thanks to user [Netwave](https://stackoverflow.com/users/1695172/netwave) from stackoverflow.com for helping fix a [bug](https://stackoverflow.com/questions/69635458/pattern-matching-does-not-allow-me-to-change-values/69636181#69636181) during the creation of the parser.

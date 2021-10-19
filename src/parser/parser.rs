@@ -80,7 +80,7 @@ impl Parser {
                         TokenType::İken(None),
                         ptoken.line,
                         ptoken.col,
-                    ))
+                    ));
                 },
                 LexTokenType::İse => {
                     blocktokens.push(BlockToken::İse(ip));
@@ -88,7 +88,7 @@ impl Parser {
                         TokenType::İse( None ),
                         ptoken.line,
                         ptoken.col,
-                    ))
+                    ));
                 },
                 LexTokenType::Yoksa => {
                     let last_blocktoken = blocktokens.pop().unwrap();
@@ -96,8 +96,8 @@ impl Parser {
                         BlockToken::İse(bip) => {
                             let ise = &mut parsed[bip];
                             match ise.typ {
-                                TokenType::İse ( mut yoksa ) => {
-                                    yoksa = Some(ip + 1);
+                                TokenType::İse ( ref mut yoksa ) => {
+                                    yoksa.replace(bip + 1);
                                 },
                                 _ => unreachable!(),
                             }
@@ -110,7 +110,7 @@ impl Parser {
                         TokenType::Yoksa(None),
                         ptoken.line,
                         ptoken.col,
-                    ))
+                    ));
                 },
                 LexTokenType::Son => {
                     let last_blocktoken = blocktokens.pop().unwrap();
@@ -118,11 +118,11 @@ impl Parser {
                         BlockToken::İse(bip) => {
                             let ise = &mut parsed[bip];
                             match ise.typ {
-                                TokenType::İse ( mut yoksa ) => {
-                                    yoksa = Some(ip);
+                                TokenType::İse ( ref mut yoksa ) => {
+                                    yoksa.replace(ip);
                                 },
-                                TokenType::Yoksa ( mut tp ) => {
-                                    tp = Some(ip);
+                                TokenType::Yoksa ( ref mut tp ) => {
+                                    tp.replace(ip);
                                 },
                                 _ => unreachable!(),
                             }
@@ -131,8 +131,8 @@ impl Parser {
                         BlockToken::İken(bip) => {
                             let iken = parsed.get_mut(bip).unwrap();
                             match iken.typ {
-                                TokenType::İken ( mut yoksa ) => {
-                                    yoksa = Some(ip + 1);
+                                TokenType::İken ( ref mut yoksa ) => {
+                                    yoksa.replace(ip + 1);
                                 },
                                 _ => unreachable!(),
                             }
