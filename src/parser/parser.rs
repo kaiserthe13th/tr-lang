@@ -92,7 +92,7 @@ impl Parser {
                 },
                 LexTokenType::Yoksa => {
                     let last_blocktoken = blocktokens.pop().unwrap();
-                    let tp = match last_blocktoken {
+                    match last_blocktoken {
                         BlockToken::İse(bip) => {
                             let ise = &mut parsed[bip];
                             match ise.typ {
