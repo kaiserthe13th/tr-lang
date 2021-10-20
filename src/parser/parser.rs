@@ -97,7 +97,7 @@ impl Parser {
                             let ise = &mut parsed[bip];
                             match ise.typ {
                                 TokenType::İse ( ref mut yoksa ) => {
-                                    yoksa.replace(bip + 1);
+                                    yoksa.replace(ip + 1);
                                 },
                                 _ => unreachable!(),
                             }
