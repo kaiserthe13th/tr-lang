@@ -139,6 +139,8 @@ impl Lexer {
                         } else {
                             tokens.push(Token::new(TokenType::Eksi, "-".to_string(), self.line, self.col))
                         }
+                    } else {
+                        tokens.push(Token::new(TokenType::Eksi, "-".to_string(), self.line, self.col))
                     }
                 },
                 '*' => {
@@ -167,6 +169,8 @@ impl Lexer {
                         } else {
                             tokens.push(Token::new(TokenType::Büyüktür, ">".to_string(), self.line, self.col));
                         }
+                    } else {
+                        tokens.push(Token::new(TokenType::Büyüktür, ">".to_string(), self.line, self.col));
                     }
                 },
                 '<' => {
@@ -180,6 +184,8 @@ impl Lexer {
                         } else {
                             tokens.push(Token::new(TokenType::Küçüktür, "<".to_string(), self.line, self.col));
                         }
+                    } else {
+                        tokens.push(Token::new(TokenType::Küçüktür, "<".to_string(), self.line, self.col));
                     }
                 },
                 '!' => {
@@ -193,6 +199,8 @@ impl Lexer {
                         } else {
                             tokens.push(Token::new(TokenType::Değildir, "!".to_string(), self.line, self.col));
                         }
+                    } else {
+                        tokens.push(Token::new(TokenType::Değildir, "!".to_string(), self.line, self.col));
                     }
                 },
                 '=' => {
@@ -206,6 +214,8 @@ impl Lexer {
                         } else {
                             tokens.push(Token::new(TokenType::Eşittir, "=".to_string(), self.line, self.col));
                         }
+                    } else {
+                        tokens.push(Token::new(TokenType::Eşittir, "=".to_string(), self.line, self.col));
                     }
                 },
                 ':' => {
