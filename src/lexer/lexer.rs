@@ -204,7 +204,7 @@ impl Lexer {
                             self.col += 1;
                             self.current += 1;
                         } else {
-                            tokens.push(Token::new(TokenType::Eşittir, "=".to_string(), self.line, self.col))
+                            tokens.push(Token::new(TokenType::Eşittir, "=".to_string(), self.line, self.col));
                         }
                     }
                 },
