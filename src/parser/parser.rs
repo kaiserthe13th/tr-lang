@@ -36,7 +36,6 @@ impl Parser {
         let mut blocktokens: Vec<BlockToken> = vec![];
 
         for (ip, ptoken) in self.tokens.iter().enumerate() {
-            // #[allow(unused)]
             match ptoken.typ {
                 LexTokenType::Sayı => {
                     parsed.push(Token::new(
