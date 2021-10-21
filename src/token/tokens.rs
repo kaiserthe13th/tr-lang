@@ -1,8 +1,9 @@
-//! a module that holds tokentypes as its name shows
-//! 
-//! these tokentypes are used when generating Tokens
+use serde::{ Serialize, Deserialize };
+
 pub mod tokentypes {
-    #[derive(Debug, Clone)]
+    use serde::{ Serialize, Deserialize };
+
+    #[derive(Debug, Clone, Serialize, Deserialize)]
     pub enum ParserTokenType {
         Yazı { val: String },
         Artı,
@@ -99,7 +100,7 @@ impl LexerToken {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ParserToken {
     pub typ:  tokentypes::ParserTokenType,
     pub line: usize,
