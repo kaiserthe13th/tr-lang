@@ -1,5 +1,7 @@
 use std::fs;
-use std::env;
+use std::io::Write;
+use std::io::Read;
+
 pub use std::process::exit;
 
 pub mod lexer;
@@ -11,8 +13,11 @@ use parser::Parser;
 pub mod token;
 pub mod store;
 pub mod util;
+pub mod bytecode;
 
-fn error_print<T>(error_name: &str, error_explanation: T)
+mod argsparser;
+
+pub fn error_print<T>(error_name: &str, error_explanation: T) -> !
 where
     T: std::fmt::Debug
 {
@@ -21,32 +26,48 @@ where
 }
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
-    if util::item_in_vec(&["--help".to_string(), "-h".to_string()], &args) {
-        util::print_help(0, args[0].clone());
+    let args = argsparser::parse_args();
+    
+    let mut lexer = Lexer::new("cont".to_string());
+    let lexed = lexer.lex();
+    if args.lex_out {
+        println!("{:?}", &lexed);
     }
-    if util::item_in_vec(&["--version".to_string(), "-v".to_string()], &args) {
-        util::print_version(args[0].clone());
-    }
-    let mut cont = String::new();
-    if args.len() > 1 {
-        let a = fs::read_to_string(args.get(1).unwrap());
-        match a {
-            Ok(s) => cont = s,
-            Err(e) => error_print("error reading file", format!("{}", e)),
-        }
-    } else {
-        util::print_help(1, args[0].clone());
-    }
-    let cont = cont;
-    let mut lexer = Lexer::new(cont);
-    let lexed = lexer.clone().lex();
-    if util::item_in_vec(&["--show-lex-result".to_string(), "-l".to_string()], &args) {
-        println!("{:#?}", lexed);
-    }
+
     let mut parser = Parser::from_lexer(&mut lexer);
-    let parsed = parser/* .clone() */.parse(); // reserved for future when our parsed token vector are put into bytecode::creator
-    if util::item_in_vec(&["--show-parse-result".to_string(), "-p".to_string()], &args) {
-        println!("{:#?}", parsed);
+    let parsed = parser.parse();
+    if args.prs_out {
+        println!("{:?}", &lexed);
     }
+
+    match args.sub_cmd {
+        argsparser::Subcommands::Byt => {
+            let encoded = bytecode::to_bytecode(parsed);
+            {
+                let mut bytecode_src = fs::File::create(&match args.outfile {
+                    Some(f) => f,
+                    None => format!("{}.trbyt", args.file),
+                }).unwrap();
+        
+                bytecode_src.write_all(&encoded[..]).unwrap();
+            }
+        },
+        argsparser::Subcommands::Run => {
+            // Run when runtime implemented
+        },
+        argsparser::Subcommands::RunBytes => {
+            let mut bytecode_src = match fs::File::open(&args.file) {
+                Err(e) => error_print("could not open file", format!("{}: {}", e, args.file)),
+                Ok(f) => f,
+            };
+
+            let mut con: Vec<u8> = vec![];
+            bytecode_src.read_to_end(&mut con).unwrap();
+
+            // let parsed = bytecode::from_bytecode(&con[..]);
+
+            // Run when runtime implemented
+        },
+    }
+    
 }
