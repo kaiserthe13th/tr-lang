@@ -11,10 +11,11 @@ pub enum Subcommands {
 pub struct Options {
     pub name   :         String,
     pub file   :         String,
-    pub outfile: Option<String>,
-    pub prd_out:           bool,
-    pub sub_cmd:    Subcommands,
-    pub help   :           bool,
+    pub outfile   : Option<String>,
+    pub prd_out   :        bool,
+    pub sub_cmd   : Subcommands,
+    pub help      :        bool,
+    pub help_exitc:         i32,
     pub version:           bool,
     pub lex_out:           bool,
     pub prs_out:           bool,
@@ -24,18 +25,10 @@ pub struct Options {
 pub fn parse_args() -> Options {
     let mut args: Vec<String> = env::args().collect();
 
-    if args.len() < 3 {
-        crate::error_print("not enough arguments", "you didn't provide enough arguments")
-    }
-
     let name = args.get(0).unwrap().to_string();
-    let sub_cmd = match args.get(1).unwrap().as_str() {
-        "y" | "yürüt" => Subcommands::Run,
-        "b" | "byt" => Subcommands::Byt,
-        "yb"| "yürbyt" => Subcommands::RunBytes,
-        a => crate::error_print("unknown subcommand", format!("{}", a)),
-    };
-    args.remove(0); args.remove(0);
+    args.remove(0);
+
+    let mut help_exitc = 0;
 
     let mut argv_m = false;
     let mut argv: Vec<String> = vec![];
@@ -44,6 +37,29 @@ pub fn parse_args() -> Options {
 
     let (mut lex_out, mut prs_out) = (false, false);
     let (mut prd_out, mut outfile) = (false, None);
+
+    if args.len() < 2 {
+        help_exitc = 1;
+        return Options {
+            name, help, version, argv, lex_out, prs_out, prd_out, outfile, file: "".to_string(), sub_cmd: Subcommands::Run, help_exitc
+        }
+    }
+
+    let sub_cmd = match args.get(0).unwrap().as_str() {
+        "y" | "yürüt" => Subcommands::Run,
+        "b" | "byt" => Subcommands::Byt,
+        "yb"| "yürbyt" => Subcommands::RunBytes,
+        "-h" | "-y" | "--yardım" => {
+            help = true;
+            Subcommands::Run
+        },
+        "-V" | "-s" | "--sürüm" => {
+            version = true;
+            Subcommands::Run
+        },
+        a => crate::error_print("unknown subcommand", format!("{}", a)),
+    };
+    args.remove(0);
 
     let mut outs = false;
 
@@ -71,6 +87,6 @@ pub fn parse_args() -> Options {
     }
 
     Options {
-        name, help, version, argv, lex_out, prs_out, prd_out, outfile, file, sub_cmd
+        name, help, version, argv, lex_out, prs_out, prd_out, outfile, file, sub_cmd, help_exitc
     }
 }
