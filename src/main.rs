@@ -27,32 +27,67 @@ where
 
 fn main() {
     let args = argsparser::parse_args();
+    if args.help {
+        util::print_help(args.help_exitc, args.name);
+    }
+    if args.version {
+        util::print_version(args.name);
+    }
     
-    let mut lexer = Lexer::new("cont".to_string());
-    let lexed = lexer.lex();
-    if args.lex_out {
-        println!("{:?}", &lexed);
-    }
-
-    let mut parser = Parser::from_lexer(&mut lexer);
-    let parsed = parser.parse();
-    if args.prs_out {
-        println!("{:?}", &lexed);
-    }
-
+    
     match args.sub_cmd {
         argsparser::Subcommands::Byt => {
+            let mut lexer = Lexer::new({
+                let mut my_file = fs::File::open(&match &args.outfile {
+                    Some(f) => f,
+                    None => unreachable!(),
+                }).unwrap();
+
+                let mut buf = String::new();
+                my_file.read_to_string(&mut buf).unwrap();
+                buf
+            });
+            let lexed = lexer.lex();
+            if args.lex_out {
+                println!("{:#?}", &lexed);
+            }
+        
+            let mut parser = Parser::from_lexer(&mut lexer);
+            let parsed = parser.parse();
+            if args.prs_out {
+                println!("{:#?}", &parsed);
+            }
+
             let encoded = bytecode::to_bytecode(parsed);
             {
-                let mut bytecode_src = fs::File::create(&match args.outfile {
-                    Some(f) => f,
+                let mut bytecode_src = fs::File::create(&match &args.outfile {
+                    Some(f) => f.clone(),
                     None => format!("{}.trbyt", args.file),
                 }).unwrap();
-        
+                
                 bytecode_src.write_all(&encoded[..]).unwrap();
             }
         },
         argsparser::Subcommands::Run => {
+            // TODO: if specified accept args.outfile
+            let mut lexer = Lexer::new({
+                let mut my_file = fs::File::open(&args.file).unwrap();
+
+                let mut buf = String::new();
+                my_file.read_to_string(&mut buf).unwrap();
+                buf
+            });
+            let lexed = lexer.clone().lex();
+            if args.lex_out {
+                println!("{:#?}", lexed);
+            }
+        
+            let mut parser = Parser::from_lexer(&mut lexer);
+            let parsed = parser/* .clone() */.parse();
+            if args.prs_out {
+                println!("{:#?}", parsed);
+            }
+
             // Run when runtime implemented
         },
         argsparser::Subcommands::RunBytes => {

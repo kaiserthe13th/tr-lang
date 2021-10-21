@@ -37,20 +37,27 @@ where T: Eq
 }
 
 pub fn print_help(exit_code: i32, prog_name: String) -> ! {
-    println!("{} version {} released at {}", prog_name, VERSION, RELEASE);
+    println!("{} sürüm {}, {} tarihinde yayınlandı", prog_name, VERSION, RELEASE);
     println!("");
-    println!("USAGE:");
-    println!("  {} <FILE> [options]", prog_name);
+    println!("KULLANIM:");
+    println!("  {} <ALTKOMUT> <DOSYA> [SEÇENEKLER]", prog_name);
     println!("");
-    println!("OPTIONS:");
-    println!("  -h --help               print help and exit");
-    println!("  -v --version            print version and exit");
-    println!("  -l --show-lex-result    show the lexer output after lexing");
-    println!("  -p --show-parse-result  show the parser output after parsing");
+    println!("ALTKOMUTLAR:");
+    println!("    y yürüt    DOSYA'yı yürüt");
+    println!("    b byt      DOSYA'yı bytecode'a dönüstür");
+    println!("    yb yürbyt  bytecode DOSYA'sını yürüt");
+    println!("");
+    println!("SEÇENEKLER:");
+    println!("  -h -y --yardım         yardım göster ve çık");
+    println!("  -V -s --sürüm          sürümü göster ve çık");
+    println!("  -o -ç --çıkış <DOSYA>  çıkışta buraya bytecode yaz");
+    println!("  -l --lexer-çıktısı     lex süreci bittikten sonra lexer'ın çıktısını göster");
+    println!("  -p --parser-çıktısı    parse süreci bittikten sonra parser'ın çıktısını göster");
+    println!("  --                     bundan sonra argv ekleyin");
     crate::exit(exit_code);
 }
 
 pub fn print_version(prog_name: String) -> ! {
-    println!("{} version {} released at {}", prog_name, VERSION, RELEASE);
+    println!("{} sürüm {}, {} tarihinde yayınlandı", prog_name, VERSION, RELEASE);
     crate::exit(0);
 }
