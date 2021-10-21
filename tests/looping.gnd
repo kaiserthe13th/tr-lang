@@ -1,0 +1,6 @@
+-* A simple test to test loops *-
+
+10
+:. kpy 0 > iken
+    kpy de --
+son
