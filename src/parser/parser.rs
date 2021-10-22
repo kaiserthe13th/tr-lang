@@ -67,14 +67,12 @@ impl Parser {
                     ))
                 },
                 LexTokenType::İken => {
-                    let last_blocktoken = blocktokens.pop().unwrap();
-                    let tp = match last_blocktoken {
-                        BlockToken::İkiNoktaNokta(bip) => {
-                            bip
-                        },
-                        _ => unimplemented!(),
+                    let last_blocktoken = blocktokens.last().unwrap();
+                    match last_blocktoken {
+                        BlockToken::İkiNoktaNokta(_) => (),
+                        _ => unimplemented!(), // SyntaxError
                     };
-                    blocktokens.push(BlockToken::İken(tp));
+                    blocktokens.push(BlockToken::İken(ip));
                     parsed.push(Token::new(
                         TokenType::İken(None),
                         ptoken.line,
@@ -130,12 +128,24 @@ impl Parser {
                         BlockToken::İken(bip) => {
                             let iken = parsed.get_mut(bip).unwrap();
                             match iken.typ {
-                                TokenType::İken ( ref mut yoksa ) => {
-                                    yoksa.replace(ip + 1);
+                                TokenType::İken(ref mut tp) => {
+                                    tp.replace(ip + 1);
+                                    let blkiknk = blocktokens.pop().unwrap();
+                                    match blkiknk {
+                                        BlockToken::İkiNoktaNokta(iknkip) => {
+                                            let iknk = parsed.get_mut(iknkip).unwrap();
+                                            match iknk.typ {
+                                                TokenType::İkiNoktaNokta => {
+                                                    iknkip
+                                                },
+                                                _ => unimplemented!(), // SyntaxError
+                                            }
+                                        },
+                                        _ => unreachable!(), // SyntaxError
+                                    }
                                 },
-                                _ => unreachable!(),
+                                _ => unimplemented!(), // SyntaxError
                             }
-                            bip
                         },
                         _ => unimplemented!(),
                     };

@@ -1,25 +1,28 @@
 use std::env;
+use crate::util;
 
 #[derive(Debug)]
 pub enum Subcommands {
     Run,
     Byt,
     RunBytes,
+    Help,
+    Version,
 }
 
 #[derive(Debug)]
 pub struct Options {
-    pub name   :         String,
-    pub file   :         String,
+    pub name      :         String,
+    pub file      :         String,
     pub outfile   : Option<String>,
-    pub prd_out   :        bool,
-    pub sub_cmd   : Subcommands,
-    pub help      :        bool,
-    pub help_exitc:         i32,
-    pub version:           bool,
-    pub lex_out:           bool,
-    pub prs_out:           bool,
-    pub argv   :    Vec<String>,
+    pub prd_out   :           bool,
+    pub sub_cmd   :    Subcommands,
+    pub help      :           bool,
+    pub help_exitc:            i32, // I am too lazy to remove this from everywhere
+    pub version   :           bool,
+    pub lex_out   :           bool,
+    pub prs_out   :           bool,
+    pub argv      :    Vec<String>,
 }
 
 pub fn parse_args() -> Options {
@@ -27,8 +30,6 @@ pub fn parse_args() -> Options {
 
     let name = args.get(0).unwrap().to_string();
     args.remove(0);
-
-    let mut help_exitc = 0;
 
     let mut argv_m = false;
     let mut argv: Vec<String> = vec![];
@@ -39,10 +40,18 @@ pub fn parse_args() -> Options {
     let (mut prd_out, mut outfile) = (false, None);
 
     if args.len() < 2 {
-        help_exitc = 1;
-        return Options {
-            name, help, version, argv, lex_out, prs_out, prd_out, outfile, file: "".to_string(), sub_cmd: Subcommands::Run, help_exitc
+        if args.len() > 0 {
+            for arg in &args {
+                match arg.as_str() {
+                    "-V" | "-s" | "--sürüm" => {
+                        util::print_version(name);
+                    },
+                    "-h" | "-y" | "--yardım" => util::print_help(0, name),
+                    _ => (),
+                }
+            }
         }
+        util::print_help(1, name)
     }
 
     let sub_cmd = match args.get(0).unwrap().as_str() {
@@ -50,12 +59,10 @@ pub fn parse_args() -> Options {
         "b" | "byt" => Subcommands::Byt,
         "yb"| "yürbyt" => Subcommands::RunBytes,
         "-h" | "-y" | "--yardım" => {
-            help = true;
-            Subcommands::Run
+            util::print_help(0, name);
         },
         "-V" | "-s" | "--sürüm" => {
-            version = true;
-            Subcommands::Run
+            util::print_version(name);
         },
         a => crate::error_print("unknown subcommand", format!("{}", a)),
     };
@@ -87,6 +94,6 @@ pub fn parse_args() -> Options {
     }
 
     Options {
-        name, help, version, argv, lex_out, prs_out, prd_out, outfile, file, sub_cmd, help_exitc
+        name, help, version, argv, lex_out, prs_out, prd_out, outfile, file, sub_cmd, help_exitc: 0
     }
 }
