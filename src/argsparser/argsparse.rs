@@ -6,8 +6,6 @@ pub enum Subcommands {
     Run,
     Byt,
     RunBytes,
-    Help,
-    Version,
 }
 
 #[derive(Debug)]
