@@ -1,0 +1,61 @@
+-* tr-lang'da sterilize edilmemiş faktoriyel implementasyonu *-
+
+-* 1 factorial *-
+1 kpy 1-kpy dön *tks
+kpy 0 > ise
+    :. kpy 1 > iken
+        1-kpy dön *tks
+    son at
+yoksa
+    at 1
+son "1! = " de de "\n" de
+
+-* 2 factorial *-
+2 kpy 1-kpy dön *tks
+kpy 0 > ise
+    :. kpy 1 > iken
+        1-kpy dön *tks
+    son at
+yoksa
+    at 1
+son "2! = " de de "\n" de
+
+-* 3 factorial *-
+3 kpy 1-kpy dön *tks
+kpy 0 > ise
+    :. kpy 1 > iken
+        1-kpy dön *tks
+    son at
+yoksa
+    at 1
+son "3! = " de de "\n" de
+
+-* 4 factorial *-
+4 kpy 1-kpy dön *tks
+kpy 0 > ise
+    :. kpy 1 > iken
+        1-kpy dön *tks
+    son at
+yoksa
+    at 1
+son "4! = " de de "\n" de
+
+-* 5 factorial *-
+5 kpy 1-kpy dön *tks
+kpy 0 > ise
+    :. kpy 1 > iken
+        1-kpy dön *tks
+    son at
+yoksa
+    at 1
+son "5! = " de de "\n" de
+
+-* 100 factorial *-
+100 kpy 1-kpy dön *tks
+kpy 0 > ise
+    :. kpy 1 > iken
+        1-kpy dön *tks
+    son at
+yoksa
+    at 1
+son "100! = " de de "\n" de
