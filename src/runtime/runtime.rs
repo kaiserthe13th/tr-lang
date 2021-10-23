@@ -139,7 +139,7 @@ impl Object {
             b => panic!("{:?} `<=` operatörünü desteklemiyor", b),
         }
     }
-    fn değildir(&self, a: Self) -> Self {
+    fn değildir(&self) -> Self {
         match self {
             Self::Bool(f) => Self::Bool(!f),
             b => panic!("{:?} `<` operatörünü desteklemiyor", b),
@@ -373,6 +373,11 @@ impl Run {
                     let a = stack.pop().unwrap();
                     let b = stack.pop().unwrap();
                     stack.push(b.eşit_değildir(a));
+                    self.current += 1;
+                },
+                TokenType::Değildir => {
+                    let a = stack.pop().unwrap();
+                    stack.push(a.değildir());
                     self.current += 1;
                 },
                 TokenType::Son { tp } => {
