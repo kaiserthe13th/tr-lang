@@ -425,7 +425,8 @@ impl Run {
                     io::stdin().read_to_string(&mut buf).unwrap();
                     stack.push(Object::Yazı(buf.trim_end().to_string()));
                 },
-                _ => self.current += 1,
+                TokenType::İkiNoktaNokta | TokenType::EOF => self.current += 1,
+                TokenType::Koy | TokenType::Ve | TokenType::Veya | TokenType::Identifier {..} => unimplemented!(),
             }
         }
     }
