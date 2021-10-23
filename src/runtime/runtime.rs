@@ -139,6 +139,12 @@ impl Object {
             b => panic!("{:?} `<=` operatörünü desteklemiyor", b),
         }
     }
+    fn değildir(&self, a: Self) -> Self {
+        match self {
+            Self::Bool(f) => Self::Bool(!f),
+            b => panic!("{:?} `<` operatörünü desteklemiyor", b),
+        }
+    }
     // Matematik
     fn ekle(&self, a: Self) -> Self {
         match self {
