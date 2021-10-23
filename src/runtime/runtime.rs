@@ -230,6 +230,19 @@ impl Object {
             b => panic!("{:?} `/` operatörünü desteklemiyor", b),
         }
     }
+    fn modulo(&self, a: Self) -> Self {
+        match self {
+            Self::Sayı(f) => {
+                match a {
+                    Self::Sayı(a) => {
+                        Self::Sayı(f%a)
+                    },
+                    b => panic!("{:?} `/` {:?} operatörü desteklemiyor", f, b),
+                }
+            },
+            b => panic!("{:?} `/` operatörünü desteklemiyor", b),
+        }
+    }
 }
 
 pub type Stack = Vec<Object>;
@@ -364,6 +377,12 @@ impl Run {
                         self.current = tp;
                     } else { unreachable!() }
                 },
+                TokenType::Modulo => {
+                    let a = stack.pop().unwrap();
+                    let b = stack.pop().unwrap();
+                    stack.push(b.modulo(a));
+                    self.current += 1;
+                }
                 _ => self.current += 1,
             }
         }
