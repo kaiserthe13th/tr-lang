@@ -15,6 +15,8 @@ pub mod store;
 pub mod util;
 pub mod bytecode;
 
+pub mod runtime;
+
 mod argsparser;
 
 pub fn error_print<T>(error_name: &str, error_explanation: T) -> !
@@ -83,12 +85,13 @@ fn main() {
             }
         
             let mut parser = Parser::from_lexer(&mut lexer);
-            let parsed = parser/* .clone() */.parse();
+            let parsed = parser.clone().parse();
             if args.prs_out {
                 println!("{:#?}", parsed);
             }
 
-            // Run when runtime implemented
+            let mut run = runtime::Run::new(parser.parse());
+            run.run();
         },
         argsparser::Subcommands::RunBytes => {
             let mut bytecode_src = match fs::File::open(&args.file) {
@@ -99,15 +102,10 @@ fn main() {
             let mut con: Vec<u8> = vec![];
             bytecode_src.read_to_end(&mut con).unwrap();
 
-            // let parsed = bytecode::from_bytecode(&con[..]);
+            let parsed = bytecode::from_bytecode(&con[..]);
 
-            // Run when runtime implemented
-        },
-        argsparser::Subcommands::Help => {
-            util::print_help(args.help_exitc, args.name);
-        },
-        argsparser::Subcommands::Version => {
-            util::print_version(args.name);
+            let mut run = runtime::Run::new(parsed);
+            run.run();
         },
     }
 }
