@@ -6,6 +6,7 @@ pub struct Run {
     current: usize,
 }
 
+#[derive(Clone)]
 pub enum Object {
     Sayı(f64),
     Yazı(String),
@@ -15,7 +16,13 @@ pub enum Object {
 impl std::fmt::Debug for Object {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Sayı(n) => write!(f, "{:?}", n),
+            Self::Sayı(n) => {
+                if n == &((*n as usize) as f64) {
+                    write!(f, "{:.0?}", n)
+                } else {
+                    write!(f, "{:?}", n)
+                }
+            },
             Self::Bool(b) => write!(f, "{:?}", b),
             Self::Yazı(s) => write!(f, "{}", s),
         }
@@ -23,6 +30,88 @@ impl std::fmt::Debug for Object {
 }
 
 impl Object {
+    // Karşılaştırma
+    fn eşittir(&self, a: Self) -> Self {
+        match self {
+            Self::Sayı(f) => {
+                match a {
+                    Self::Sayı(a) => {
+                        Self::Bool(f==&a)
+                    },
+                    b => panic!("{:?} `=` {:?} operatörü desteklemiyor", f, b),
+                }
+            },
+            Self::Bool(b) => {
+                match a {
+                    Self::Bool(a) => {
+                        Self::Bool(b==&a)
+                    },
+                    c => panic!("{:?} `=` {:?} operatörü desteklemiyor", b, c),
+                }
+            },
+            Self::Yazı(s) => {
+                match a {
+                    Self::Yazı(a) => {
+                        Self::Bool(s==&a)
+                    },
+                    c => panic!("{:?} `=` {:?} operatörü desteklemiyor", s, c),
+                }
+            },
+        }
+    }
+    fn büyüktür(&self, a: Self) -> Self {
+        match self {
+            Self::Sayı(f) => {
+                match a {
+                    Self::Sayı(a) => {
+                        Self::Bool(f>&a)
+                    },
+                    b => panic!("{:?} `>` {:?} operatörü desteklemiyor", f, b),
+                }
+            },
+            b => panic!("{:?} `>` operatörünü desteklemiyor", b),
+        }
+    }
+    fn büyük_eşittir(&self, a: Self) -> Self {
+        match self {
+            Self::Sayı(f) => {
+                match a {
+                    Self::Sayı(a) => {
+                        Self::Bool(f>=&a)
+                    },
+                    b => panic!("{:?} `>=` {:?} operatörü desteklemiyor", f, b),
+                }
+            },
+            b => panic!("{:?} `>=` operatörünü desteklemiyor", b),
+        }
+    }
+    fn küçüktür(&self, a: Self) -> Self {
+        match self {
+            Self::Sayı(f) => {
+                match a {
+                    Self::Sayı(a) => {
+                        Self::Bool(f<&a)
+                    },
+                    b => panic!("{:?} `<` {:?} operatörü desteklemiyor", f, b),
+                }
+            },
+            b => panic!("{:?} `<` operatörünü desteklemiyor", b),
+        }
+    }
+    fn küçük_eşittir(&self, a: Self) -> Self {
+        match self {
+            Self::Sayı(f) => {
+                match a {
+                    Self::Sayı(a) => {
+                        Self::Bool(f<=&a)
+                    },
+                    b => panic!("{:?} `<=` {:?} operatörü desteklemiyor", f, b),
+                }
+            },
+            b => panic!("{:?} `<=` operatörünü desteklemiyor", b),
+        }
+    }
+    // Matematik
     fn ekle(&self, a: Self) -> Self {
         match self {
             Self::Sayı(f) => {
@@ -126,7 +215,7 @@ impl Run {
         let mut stack: Stack = vec![];
         while self.program.len() > self.current {
             let token = self.program.get(self.current).unwrap();
-
+            
             match token.typ.clone() {
                 TokenType::De => {
                     print!("{:?}", stack.pop().unwrap());
@@ -139,10 +228,21 @@ impl Run {
                     stack.push(a.ekle(b));
                     self.current += 1;
                 },
+                TokenType::ArtıArtı => {
+                    let a = stack.pop().unwrap();
+                    stack.push(a.ekle(Object::Sayı(1.0)));
+                    self.current += 1;
+                },
                 TokenType::Eksi => {
                     let a = stack.pop().unwrap();
                     let b = stack.pop().unwrap();
                     stack.push(b.çıkar(a));
+                    self.current += 1;
+                },
+                TokenType::EksiEksi => {
+                    let a = stack.pop().unwrap();
+                    stack.push(a.çıkar(Object::Sayı(1.0)));
+                    self.current += 1;
                 },
                 TokenType::Çarpı => {
                     let a = stack.pop().unwrap();
@@ -171,7 +271,7 @@ impl Run {
                     stack.push(b);
                     self.current += 1;
                 },
-                TokenType::İse ( yoksa ) => {
+                TokenType::İse ( yoksa ) | TokenType::İken ( yoksa ) => {
                     if let Some(tp) = yoksa {
                         let a = stack.pop().unwrap();
                         match a {
@@ -185,6 +285,42 @@ impl Run {
                             a => panic!("ise'den önce stackte bir boolean olması lazım; şu anda {:?} var", a),
                         }
                     } else { unreachable!() }
+                },
+                TokenType::Kopya => {
+                    let last = stack.pop().unwrap();
+                    stack.push(last.clone());
+                    stack.push(last);
+                    self.current += 1;
+                },
+                TokenType::Büyüktür => {
+                    let a = stack.pop().unwrap();
+                    let b = stack.pop().unwrap();
+                    stack.push(b.büyüktür(a));
+                    self.current += 1;
+                },
+                TokenType::BüyükEşittir => {
+                    let a = stack.pop().unwrap();
+                    let b = stack.pop().unwrap();
+                    stack.push(b.büyük_eşittir(a));
+                    self.current += 1;
+                },
+                TokenType::Küçüktür => {
+                    let a = stack.pop().unwrap();
+                    let b = stack.pop().unwrap();
+                    stack.push(b.küçüktür(a));
+                    self.current += 1;
+                },
+                TokenType::KüçükEşittir => {
+                    let a = stack.pop().unwrap();
+                    let b = stack.pop().unwrap();
+                    stack.push(b.küçük_eşittir(a));
+                    self.current += 1;
+                },
+                TokenType::Eşittir => {
+                    let a = stack.pop().unwrap();
+                    let b = stack.pop().unwrap();
+                    stack.push(b.eşittir(a));
+                    self.current += 1;
                 },
                 TokenType::Son { tp } => {
                     self.current = tp;
