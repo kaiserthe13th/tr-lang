@@ -1,2 +1,2 @@
-pub const VERSION: &str = "0.2.2";
-pub const RELEASE: &str = "22 Ekim 2021";
+pub const VERSION: &str = "0.2.3";
+pub const RELEASE: &str = "23 Ekim 2021";
