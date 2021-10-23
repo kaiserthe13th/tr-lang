@@ -254,6 +254,7 @@ impl Lexer {
                     }
 
                     match buf.as_str() {
+                        "at" => tokens.push(Token::new(TokenType::At, "at".to_string(), self.line, self.col)),
                         "de" => tokens.push(Token::new(TokenType::De, "de".to_string(), self.line, self.col)),
                         "ise" => tokens.push(Token::new(TokenType::İse, "ise".to_string(), self.line, self.col)),
                         "son" => tokens.push(Token::new(TokenType::Son, "son".to_string(), self.line, self.col)),

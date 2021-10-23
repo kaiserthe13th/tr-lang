@@ -37,6 +37,13 @@ impl Parser {
 
         for (ip, ptoken) in self.tokens.iter().enumerate() {
             match ptoken.typ {
+                LexTokenType::At => {
+                    parsed.push(Token::new(
+                        TokenType::At,
+                        ptoken.line,
+                        ptoken.col,
+                    ))
+                },
                 LexTokenType::Sayı => {
                     parsed.push(Token::new(
                         TokenType::Sayı { val: ptoken.lexeme.as_str().parse().unwrap() },

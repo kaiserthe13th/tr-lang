@@ -393,6 +393,25 @@ impl Run {
                     let b = stack.pop().unwrap();
                     stack.push(b.modulo(a));
                     self.current += 1;
+                },
+                TokenType::Takas => {
+                    let a = stack.pop().unwrap();
+                    let b = stack.pop().unwrap();
+                    stack.push(a);
+                    stack.push(b);
+                    self.current += 1;
+                },
+                TokenType::Döndür => {
+                    let a = stack.pop().unwrap();
+                    let b = stack.pop().unwrap();
+                    let c = stack.pop().unwrap();
+                    stack.push(a);
+                    stack.push(b);
+                    stack.push(c);
+                    self.current += 1;
+                },
+                TokenType::At => {
+                    stack.pop().unwrap();
                 }
                 _ => self.current += 1,
             }

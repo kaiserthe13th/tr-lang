@@ -37,6 +37,7 @@ pub mod tokentypes {
         Son { tp: usize },
         Identifier { id: String },
         Koy,
+        At,
         EOF,
     }
     
@@ -82,6 +83,7 @@ pub mod tokentypes {
         Veya,
         Girdi,
         Koy,
+        At,
         EOF,
     }
 }
