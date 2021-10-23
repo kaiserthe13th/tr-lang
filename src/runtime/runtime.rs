@@ -413,6 +413,18 @@ impl Run {
                 TokenType::At => {
                     stack.pop().unwrap();
                 }
+                TokenType::Üst => {
+                    let a = stack.pop().unwrap();
+                    let b = stack.pop().unwrap();
+                    stack.push(b.clone());
+                    stack.push(a);
+                    stack.push(b);
+                },
+                TokenType::Girdi => {
+                    let mut buf = String::new();
+                    io::stdin().read_to_string(&mut buf).unwrap();
+                    stack.push(Object::Yazı(buf.trim_end().to_string()));
+                },
                 _ => self.current += 1,
             }
         }
