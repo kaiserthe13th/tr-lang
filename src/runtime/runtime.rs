@@ -59,6 +59,34 @@ impl Object {
             },
         }
     }
+    fn eşit_değildir(&self, a: Self) -> Self {
+        match self {
+            Self::Sayı(f) => {
+                match a {
+                    Self::Sayı(a) => {
+                        Self::Bool(f!=&a)
+                    },
+                    b => panic!("{:?} `!=` {:?} operatörü desteklemiyor", f, b),
+                }
+            },
+            Self::Bool(b) => {
+                match a {
+                    Self::Bool(a) => {
+                        Self::Bool(b!=&a)
+                    },
+                    c => panic!("{:?} `!=` {:?} operatörü desteklemiyor", b, c),
+                }
+            },
+            Self::Yazı(s) => {
+                match a {
+                    Self::Yazı(a) => {
+                        Self::Bool(s!=&a)
+                    },
+                    c => panic!("{:?} `!=` {:?} operatörü desteklemiyor", s, c),
+                }
+            },
+        }
+    }
     fn büyüktür(&self, a: Self) -> Self {
         match self {
             Self::Sayı(f) => {
@@ -320,6 +348,12 @@ impl Run {
                     let a = stack.pop().unwrap();
                     let b = stack.pop().unwrap();
                     stack.push(b.eşittir(a));
+                    self.current += 1;
+                },
+                TokenType::EşitDeğildir => {
+                    let a = stack.pop().unwrap();
+                    let b = stack.pop().unwrap();
+                    stack.push(b.eşit_değildir(a));
                     self.current += 1;
                 },
                 TokenType::Son { tp } => {
