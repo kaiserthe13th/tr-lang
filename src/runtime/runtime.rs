@@ -412,6 +412,7 @@ impl Run {
                 },
                 TokenType::At => {
                     stack.pop().unwrap();
+                    self.current += 1;
                 }
                 TokenType::Üst => {
                     let a = stack.pop().unwrap();
