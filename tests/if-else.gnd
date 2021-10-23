@@ -1,5 +1,5 @@
 doğru ise
-    "do something" de
+    "true\n" de
 yoksa
-    "do something" de
+    "false\n" de
 son

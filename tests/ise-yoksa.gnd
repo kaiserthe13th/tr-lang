@@ -1,5 +1,5 @@
 doğru ise
-    "bir şeyler yap" de
+    "doğru\n" de
 yoksa
-    "bir şeyler yap" de
+    "yanlış\n" de
 son
