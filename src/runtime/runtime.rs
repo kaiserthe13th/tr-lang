@@ -17,7 +17,7 @@ impl std::fmt::Debug for Object {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Sayı(n) => {
-                if n == &((*n as usize) as f64) {
+                if n == &((*n as i128) as f64) {
                     write!(f, "{:.0?}", n)
                 } else {
                     write!(f, "{:?}", n)
@@ -189,8 +189,8 @@ impl Object {
                 match a {
                     Self::Sayı(a) => {
                         let mut buf = String::new();
-                        if a == (a as usize) as f64 {
-                            for _ in 0..(a as usize) {
+                        if a == (a as i128) as f64 {
+                            for _ in 0..(a as i128) {
                                 buf.push_str(s.as_str())
                             }
                         } else {
@@ -208,8 +208,8 @@ impl Object {
                     },
                     Self::Yazı(s) => {
                         let mut buf = String::new();
-                        if f == &((*f as usize) as f64) {
-                            for _ in 0..(*f as usize) {
+                        if f == &((*f as i128) as f64) {
+                            for _ in 0..(*f as i128) {
                                 buf.push_str(s.as_str())
                             }
                         } else {
