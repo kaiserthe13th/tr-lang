@@ -11,6 +11,7 @@ enum BlockToken {
     İse(usize),
     İken(usize),
     İkiNoktaNokta(usize),
+    İşlev(usize),
 }
 
 #[derive(Clone)]
@@ -37,19 +38,26 @@ impl Parser {
 
         for (ip, ptoken) in self.tokens.iter().enumerate() {
             match ptoken.typ {
+                LexTokenType::İşlev => {
+                    blocktokens.push(BlockToken::İşlev(ip));
+                    parsed.push(Token::new(
+                        TokenType::İşlev { sonloc: None },
+                        ptoken.line, ptoken.col
+                    ));
+                },
                 LexTokenType::At => {
                     parsed.push(Token::new(
                         TokenType::At,
                         ptoken.line,
                         ptoken.col,
-                    ))
+                    ));
                 },
                 LexTokenType::Sayı => {
                     parsed.push(Token::new(
                         TokenType::Sayı { val: ptoken.lexeme.as_str().parse().unwrap() },
                         ptoken.line,
                         ptoken.col,
-                    ))
+                    ));
                 },
                 LexTokenType::Yazı => {
                     parsed.push(Token::new(
@@ -118,7 +126,7 @@ impl Parser {
                 },
                 LexTokenType::Son => {
                     let last_blocktoken = blocktokens.pop().unwrap();
-                    let tp = match last_blocktoken {
+                    match last_blocktoken {
                         BlockToken::İse(bip) => {
                             let ise = &mut parsed[bip];
                             match ise.typ {
@@ -130,11 +138,16 @@ impl Parser {
                                 },
                                 _ => unreachable!(),
                             }
-                            ip + 1
+                            let tp = ip + 1;
+                            parsed.push(Token::new(
+                                TokenType::Son { tp },
+                                ptoken.line,
+                                ptoken.col,
+                            ));
                         },
                         BlockToken::İken(bip) => {
                             let iken = parsed.get_mut(bip).unwrap();
-                            match iken.typ {
+                            let tp: usize = match iken.typ {
                                 TokenType::İken(ref mut tp) => {
                                     tp.replace(ip + 1);
                                     let blkiknk = blocktokens.pop().unwrap();
@@ -152,15 +165,28 @@ impl Parser {
                                     }
                                 },
                                 _ => unimplemented!(), // SyntaxError
+                            };
+                            parsed.push(Token::new(
+                                TokenType::Son { tp },
+                                ptoken.line,
+                                ptoken.col,
+                            ));
+                        },
+                        BlockToken::İşlev(bip) => {
+                            let işlev = parsed.get_mut(bip).unwrap();
+                            match işlev.typ {
+                                TokenType::İşlev { ref mut sonloc } => {
+                                    sonloc.replace(ip);
+                                },
+                                _ => unreachable!(),
                             }
+                            parsed.push(Token::new(
+                                TokenType::İşlevSonlandır { tp: vec![] },
+                                ptoken.line, ptoken.col
+                            ));
                         },
                         _ => unimplemented!(),
                     };
-                    parsed.push(Token::new(
-                        TokenType::Son { tp },
-                        ptoken.line,
-                        ptoken.col,
-                    ))
                 },
                 LexTokenType::Doğru => {
                     parsed.push(Token::new(
