@@ -247,7 +247,7 @@ impl Lexer {
                 _ => {
                     let mut buf = String::new();
 
-                    while self.source.len() > self.current && !char_in_str(self.currentc(), "\t\r \n\"':?=<>!/%+-*") {
+                    while self.source.len() > self.current && !char_in_str(self.currentc(), "\t\r \n\"':?=<>!/%*") {
                         buf.push(self.currentc());
                         self.current += 1;
                         self.col += 1;
@@ -269,6 +269,7 @@ impl Lexer {
                         "ve" => tokens.push(Token::new(TokenType::Ve, "ve".to_string(), self.line, self.col)),
                         "dön" => tokens.push(Token::new(TokenType::Döndür, "dön".to_string(), self.line, self.col)),
                         "girdi" => tokens.push(Token::new(TokenType::Girdi, "girdi".to_string(), self.line, self.col)),
+                        "işlev" => tokens.push(Token::new(TokenType::İşlev, "işlev".to_string(), self.line, self.col)),
                         a => tokens.push(Token::new(TokenType::Identifier, a.to_string(), self.line, self.col)),
                     }
                 },
