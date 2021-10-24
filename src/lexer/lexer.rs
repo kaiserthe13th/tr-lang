@@ -2,6 +2,9 @@ use crate::token::LexerToken as Token;
 use crate::token::tokentypes::LexerTokenType as TokenType;
 use crate::util::char_in_str;
 
+use std::fs;
+use std::io::Read;
+
 #[derive(Clone)]
 pub struct Lexer {
     source: Vec<char>,
@@ -19,7 +22,48 @@ impl Lexer {
             col:     1,
         }
     }
-    pub fn lex(&mut self) -> Vec<Token> {
+    fn post_proc(&self, prog: Vec<Token>, visited: &mut Vec<String>, folder: String) -> Vec<Token> {
+        let mut tokens: Vec<Token> = vec![];
+        let mut current: usize = 0;
+
+        while current < prog.len() - 1 {
+            let c: Token = prog.get(current).unwrap().clone();
+            
+            match c.typ {
+                TokenType::Yükle => {
+                    let next_tok = prog.get(current + 1).unwrap().clone();
+                    match next_tok.typ {
+                        TokenType::Yazı => {
+                            let abs_path = match fs::canonicalize(folder.clone() + &"/".to_string() + &next_tok.lexeme.clone()) {
+                                Ok(a) => a.as_path().display().to_string(),
+                                Err(e) => panic!("couldn't load file `{}`: {}", next_tok.lexeme, e)
+                            };
+                            let mut file = match fs::File::open(abs_path.clone()) {
+                                Ok(f) => f,
+                                Err(e) => panic!("couldn't load file `{}`: {}", abs_path, e),
+                            };
+                            let mut buf = String::new();
+                            file.read_to_string(&mut buf).unwrap();
+
+                            let mut nl = Lexer::new(buf);
+                            if !crate::util::in_vec(&abs_path, visited) {
+                                tokens.append(&mut nl.lex(visited, folder.clone()));
+                            }
+                        },
+                        TokenType::Identifier => unimplemented!(),
+                        _ => panic!("yüklenecek dosya sadece bir yazıdan veya addan çıkarılabilir"),
+                    }
+                    current += 2;
+                },
+                _ => {
+                    tokens.push(c);
+                    current += 1;
+                },
+            }
+        }
+        tokens
+    }
+    pub fn lex(&mut self, visited: &mut Vec<String>, folder: String) -> Vec<Token> {
         let mut tokens: Vec<Token> = vec![];
 
         while self.current < self.source.len() {
@@ -270,13 +314,14 @@ impl Lexer {
                         "dön" => tokens.push(Token::new(TokenType::Döndür, "dön".to_string(), self.line, self.col)),
                         "girdi" => tokens.push(Token::new(TokenType::Girdi, "girdi".to_string(), self.line, self.col)),
                         "işlev" => tokens.push(Token::new(TokenType::İşlev, "işlev".to_string(), self.line, self.col)),
+                        "yükle" => tokens.push(Token::new(TokenType::Yükle, "yükle".to_string(), self.line, self.col)),
                         a => tokens.push(Token::new(TokenType::Identifier, a.to_string(), self.line, self.col)),
                     }
                 },
             }
         }
         tokens.push(Token::new(TokenType::EOF, "".to_string(), self.line, self.col));
-        tokens
+        self.post_proc(tokens, visited, folder)
     }
     fn currentc(&self) -> char {
         *self.source.get(self.current).unwrap()

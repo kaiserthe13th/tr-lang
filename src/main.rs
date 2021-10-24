@@ -39,19 +39,21 @@ fn main() {
     
     match args.sub_cmd {
         argsparser::Subcommands::Byt => {
+            let mut path = std::path::PathBuf::from(&args.file);
             let mut lexer = Lexer::new({
-                let mut my_file = fs::File::open(&args.file).unwrap();
+                let mut my_file = fs::File::open(path.clone()).unwrap();
 
                 let mut buf = String::new();
                 my_file.read_to_string(&mut buf).unwrap();
                 buf
             });
-            let lexed = lexer.clone().lex();
+            path.pop();
+            let lexed = lexer.clone().lex(&mut vec![], path.as_path().display().to_string());
             if args.lex_out {
                 println!("{:#?}", &lexed);
             }
         
-            let mut parser = Parser::from_lexer(&mut lexer);
+            let mut parser = Parser::from_lexer(&mut lexer, path.as_path().display().to_string());
             let parsed = parser.parse();
             if args.prs_out {
                 println!("{:#?}", parsed.clone());
@@ -69,8 +71,9 @@ fn main() {
         },
         argsparser::Subcommands::Run => {
             // TODO: if specified accept args.outfile
+            let mut path = std::path::PathBuf::from(&args.file);
             let mut lexer = Lexer::new({
-                let mut my_file = match fs::File::open(&args.file) {
+                let mut my_file = match fs::File::open(path.clone()) {
                     Err(e) => error_print("error opening file", format!("{}: {}", e, &args.file)),
                     Ok(f) => f,
                 };
@@ -79,12 +82,13 @@ fn main() {
                 my_file.read_to_string(&mut buf).unwrap();
                 buf
             });
-            let lexed = lexer.clone().lex();
+            path.pop();
+            let lexed = lexer.clone().lex(&mut vec![], path.as_path().display().to_string());
             if args.lex_out {
                 println!("{:#?}", lexed);
             }
         
-            let mut parser = Parser::from_lexer(&mut lexer);
+            let mut parser = Parser::from_lexer(&mut lexer, path.as_path().display().to_string());
             let parsed = parser.clone().parse();
             if args.prs_out {
                 println!("{:#?}", parsed);

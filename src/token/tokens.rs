@@ -87,6 +87,7 @@ pub mod tokentypes {
         Girdi,
         Koy,
         At,
+        Yükle,
         EOF,
     }
 }

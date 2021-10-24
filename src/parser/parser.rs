@@ -26,9 +26,9 @@ impl Parser {
         }
     }
 
-    pub fn from_lexer(lexer: &mut lexer::Lexer) -> Self {
+    pub fn from_lexer(lexer: &mut lexer::Lexer, folder: String) -> Self {
         Self {
-            tokens: lexer.lex(),
+            tokens: lexer.lex(&mut vec![], folder),
         }
     }
 
@@ -38,6 +38,7 @@ impl Parser {
 
         for (ip, ptoken) in self.tokens.iter().enumerate() {
             match ptoken.typ {
+                LexTokenType::Yükle => unreachable!(),
                 LexTokenType::İşlev => {
                     blocktokens.push(BlockToken::İşlev(ip));
                     parsed.push(Token::new(
