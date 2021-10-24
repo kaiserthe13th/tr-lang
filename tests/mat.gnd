@@ -1,0 +1,13 @@
+-* mat modülü *-
+
+işlev faktoriyel
+    kpy 1-kpy dön *tks
+    kpy 0 > ise
+        :. kpy 1 > iken
+            1-kpy dön *tks
+        son at
+    yoksa
+        at 1
+    son
+son
+
