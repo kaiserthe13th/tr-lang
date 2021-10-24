@@ -1,5 +1,6 @@
 use crate::token::{ ParserToken as Token, tokentypes::ParserTokenType as TokenType };
 use std::io::{ self, prelude::* };
+use std::collections::HashMap;
 
 pub struct Run {
     program: Vec<Token>,
@@ -11,6 +12,7 @@ pub enum Object {
     Sayı(f64),
     Yazı(String),
     Bool(bool),
+    İşlev(usize),
 }
 
 impl std::fmt::Debug for Object {
@@ -25,6 +27,7 @@ impl std::fmt::Debug for Object {
             },
             Self::Bool(b) => write!(f, "{:?}", b),
             Self::Yazı(s) => write!(f, "{}", s),
+            Self::İşlev(loc) => write!(f, "<işlev: {:?}>", loc),
         }
     }
 }
@@ -57,6 +60,7 @@ impl Object {
                     c => panic!("{:?} `=` {:?} operatörü desteklemiyor", s, c),
                 }
             },
+            Self::İşlev(_) => unreachable!(),
         }
     }
     fn eşit_değildir(&self, a: Self) -> Self {
@@ -85,6 +89,7 @@ impl Object {
                     c => panic!("{:?} `!=` {:?} operatörü desteklemiyor", s, c),
                 }
             },
+            Self::İşlev(_) => unreachable!(),
         }
     }
     fn büyüktür(&self, a: Self) -> Self {
@@ -168,6 +173,7 @@ impl Object {
                 }
             },
             Self::Bool(b) => panic!("{:?} `+` operatörünü desteklemiyor", b),
+            Self::İşlev(_) => unreachable!(),
         }
     }
     fn çıkar(&self, a: Self) -> Self {
@@ -243,10 +249,37 @@ impl Object {
                     Self::Sayı(a) => {
                         Self::Sayı(f%a)
                     },
-                    b => panic!("{:?} `/` {:?} operatörü desteklemiyor", f, b),
+                    b => panic!("{:?} `/` {:?} desteklenmiyor", f, b),
                 }
             },
             b => panic!("{:?} `/` operatörünü desteklemiyor", b),
+        }
+    }
+    // Mantık
+    fn ve(&self, a: Self) -> Self {
+        match self {
+            Self::Bool(f) => {
+                match a {
+                    Self::Bool(a) => {
+                        Self::Bool(*f&&a)
+                    },
+                    b => panic!("{:?} `ve` {:?} desteklenmiyor", f, b),
+                }
+            },
+            b => panic!("{:?} `ve` anahtar kelimesini desteklemiyor", b),
+        }
+    }
+    fn veya(&self, a: Self) -> Self {
+        match self {
+            Self::Bool(f) => {
+                match a {
+                    Self::Bool(a) => {
+                        Self::Bool(*f||a)
+                    },
+                    b => panic!("{:?} `ve` {:?} desteklenmiyor", f, b),
+                }
+            },
+            b => panic!("{:?} `ve` anahtar kelimesini desteklemiyor", b),
         }
     }
 }
@@ -260,174 +293,320 @@ impl Run {
 
     pub fn run(&mut self) {
         let mut stack: Stack = vec![];
+        let mut hashs: HashMap<String, Object> = HashMap::new();
+        let mut işlev_derinliği: usize = 0;
+
         while self.program.len() > self.current {
             let token = self.program.get(self.current).unwrap();
             
             match token.typ.clone() {
+                TokenType::İşlev { sonloc } => {
+                    let id = self.program.get(self.current + 1).unwrap();
+                    match id.typ.clone() {
+                        TokenType::Identifier { id : ident } => {
+                            hashs.insert(ident, Object::İşlev(self.current));
+                        },
+                        _ => unimplemented!(), // SyntaxError
+                    }
+                    let loc = match sonloc {
+                        Some(a) => a,
+                        None => unreachable!(),
+                    };
+                    match self.program.get_mut(loc).unwrap().typ {
+                        TokenType::İşlevSonlandır { ref mut tp } => {
+                            tp.push(loc);
+                        },
+                        _ => unreachable!(),
+                    }
+                    
+                    işlev_derinliği += 1;
+                    self.current = loc + 1;
+                },
+                TokenType::İşlevSonlandır { ref mut tp } => {
+                    if işlev_derinliği < 1 {
+                        let loc = tp.pop().unwrap();
+                        self.current = loc;
+                    } else {
+                        işlev_derinliği -= 1;
+                    }
+                    self.current += 1;
+                },
                 TokenType::De => {
-                    print!("{:?}", stack.pop().unwrap());
-                    io::stdout().flush().unwrap();
+                    if işlev_derinliği < 1 {
+                        print!("{:?}", stack.pop().unwrap());
+                        io::stdout().flush().unwrap();
+                    }
                     self.current += 1;
                 },
                 TokenType::Artı => {
-                    let a = stack.pop().unwrap();
-                    let b = stack.pop().unwrap();
-                    stack.push(a.ekle(b));
+                    if işlev_derinliği < 1 {
+                        let b = stack.pop().unwrap();
+                        let a = stack.pop().unwrap();
+                        stack.push(a.ekle(b));
+                    }
                     self.current += 1;
                 },
                 TokenType::ArtıArtı => {
-                    let a = stack.pop().unwrap();
-                    stack.push(a.ekle(Object::Sayı(1.0)));
+                    if işlev_derinliği < 1 {
+                        let a = stack.pop().unwrap();
+                        stack.push(a.ekle(Object::Sayı(1.0)));
+                    }
                     self.current += 1;
                 },
                 TokenType::Eksi => {
-                    let a = stack.pop().unwrap();
-                    let b = stack.pop().unwrap();
-                    stack.push(b.çıkar(a));
+                    if işlev_derinliği < 1 {
+                        let a = stack.pop().unwrap();
+                        let b = stack.pop().unwrap();
+                        stack.push(b.çıkar(a));
+                    }
                     self.current += 1;
                 },
                 TokenType::EksiEksi => {
-                    let a = stack.pop().unwrap();
-                    stack.push(a.çıkar(Object::Sayı(1.0)));
+                    if işlev_derinliği < 1 {
+                        let a = stack.pop().unwrap();
+                        stack.push(a.çıkar(Object::Sayı(1.0)));
+                    }
                     self.current += 1;
                 },
                 TokenType::Çarpı => {
-                    let a = stack.pop().unwrap();
-                    let b = stack.pop().unwrap();
-                    stack.push(a.çarp(b));
+                    if işlev_derinliği < 1 {
+                        let b = stack.pop().unwrap();
+                        let a = stack.pop().unwrap();
+                        stack.push(a.çarp(b));
+                    }
                     self.current += 1;
                 },
                 TokenType::Bölü => {
-                    let a = stack.pop().unwrap();
-                    let b = stack.pop().unwrap();
-                    stack.push(b.böl(a));
+                    if işlev_derinliği < 1 {
+                        let a = stack.pop().unwrap();
+                        let b = stack.pop().unwrap();
+                        stack.push(b.böl(a));
+                    }
                     self.current += 1;
                 },
                 TokenType::Sayı { val } => {
-                    let n = Object::Sayı(val);
-                    stack.push(n);
+                    if işlev_derinliği < 1 {
+                        let n = Object::Sayı(val);
+                        stack.push(n);
+                    }
                     self.current += 1;
                 },
                 TokenType::Yazı { val } => {
-                    let s = Object::Yazı(val);
-                    stack.push(s);
+                    if işlev_derinliği < 1 {
+                        let s = Object::Yazı(val);
+                        stack.push(s);
+                    }
                     self.current += 1;
                 },
                 TokenType::Bool { val } => {
-                    let b = Object::Bool(val);
-                    stack.push(b);
-                    self.current += 1;
+                    if işlev_derinliği < 1 {
+                        let b = Object::Bool(val);
+                        stack.push(b);
+                        self.current += 1;
+                    }
                 },
                 TokenType::İse ( yoksa ) | TokenType::İken ( yoksa ) => {
-                    if let Some(tp) = yoksa {
-                        let a = stack.pop().unwrap();
-                        match a {
-                            Object::Bool(b) => {
-                                if b {
-                                    self.current += 1;
-                                } else {
-                                    self.current = tp;
-                                }
-                            },
-                            a => panic!("ise'den önce stackte bir boolean olması lazım; şu anda {:?} var", a),
-                        }
-                    } else { unreachable!() }
+                    if işlev_derinliği < 1 {
+                        if let Some(tp) = yoksa {
+                            let a = stack.pop().unwrap();
+                            match a {
+                                Object::Bool(b) => {
+                                    if b {
+                                        self.current += 1;
+                                    } else {
+                                        self.current = tp;
+                                    }
+                                },
+                                a => panic!("ise'den önce stackte bir boolean olması lazım; şu anda {:?} var", a),
+                            }
+                        } else { unreachable!() }
+                } else { self.current += 1; }
                 },
                 TokenType::Kopya => {
-                    let last = stack.pop().unwrap();
-                    stack.push(last.clone());
-                    stack.push(last);
+                    if işlev_derinliği < 1 {
+                        let last = stack.pop().unwrap();
+                        stack.push(last.clone());
+                        stack.push(last);
+                    }
                     self.current += 1;
                 },
                 TokenType::Büyüktür => {
-                    let a = stack.pop().unwrap();
-                    let b = stack.pop().unwrap();
-                    stack.push(b.büyüktür(a));
+                    if işlev_derinliği < 1 {
+                        let a = stack.pop().unwrap();
+                        let b = stack.pop().unwrap();
+                        stack.push(b.büyüktür(a));
+                    }
                     self.current += 1;
                 },
                 TokenType::BüyükEşittir => {
-                    let a = stack.pop().unwrap();
-                    let b = stack.pop().unwrap();
-                    stack.push(b.büyük_eşittir(a));
+                    if işlev_derinliği < 1 {
+                        let a = stack.pop().unwrap();
+                        let b = stack.pop().unwrap();
+                        stack.push(b.büyük_eşittir(a));
+                    }
                     self.current += 1;
                 },
                 TokenType::Küçüktür => {
-                    let a = stack.pop().unwrap();
-                    let b = stack.pop().unwrap();
-                    stack.push(b.küçüktür(a));
+                    if işlev_derinliği < 1 {
+                        let a = stack.pop().unwrap();
+                        let b = stack.pop().unwrap();
+                        stack.push(b.küçüktür(a));
+                    }
                     self.current += 1;
                 },
                 TokenType::KüçükEşittir => {
-                    let a = stack.pop().unwrap();
-                    let b = stack.pop().unwrap();
-                    stack.push(b.küçük_eşittir(a));
+                    if işlev_derinliği < 1 {
+                        let a = stack.pop().unwrap();
+                        let b = stack.pop().unwrap();
+                        stack.push(b.küçük_eşittir(a));
+                    }
                     self.current += 1;
                 },
                 TokenType::Eşittir => {
-                    let a = stack.pop().unwrap();
-                    let b = stack.pop().unwrap();
-                    stack.push(b.eşittir(a));
+                    if işlev_derinliği < 1 {
+                        let a = stack.pop().unwrap();
+                        let b = stack.pop().unwrap();
+                        stack.push(b.eşittir(a));
+                    }
                     self.current += 1;
                 },
                 TokenType::EşitDeğildir => {
-                    let a = stack.pop().unwrap();
-                    let b = stack.pop().unwrap();
-                    stack.push(b.eşit_değildir(a));
+                    if işlev_derinliği < 1 {
+                        let a = stack.pop().unwrap();
+                        let b = stack.pop().unwrap();
+                        stack.push(b.eşit_değildir(a));
+                    }
                     self.current += 1;
                 },
                 TokenType::Değildir => {
-                    let a = stack.pop().unwrap();
-                    stack.push(a.değildir());
+                    if işlev_derinliği < 1 {
+                        let a = stack.pop().unwrap();
+                        stack.push(a.değildir());
+                    }
                     self.current += 1;
                 },
                 TokenType::Son { tp } => {
-                    self.current = tp;
+                    if işlev_derinliği < 1 {
+                        self.current = tp;
+                    } else { self.current += 1; }
                 },
                 TokenType::Yoksa ( yoksa ) => {
-                    if let Some(tp) = yoksa {
-                        self.current = tp;
-                    } else { unreachable!() }
+                    if işlev_derinliği < 1 {
+                        if let Some(tp) = yoksa {
+                            self.current = tp;
+                        } else { unreachable!() }
+                    } else { self.current += 1; }
                 },
                 TokenType::Modulo => {
-                    let a = stack.pop().unwrap();
-                    let b = stack.pop().unwrap();
-                    stack.push(b.modulo(a));
+                    if işlev_derinliği < 1 {
+                        let a = stack.pop().unwrap();
+                        let b = stack.pop().unwrap();
+                        stack.push(b.modulo(a));
+                    }
                     self.current += 1;
                 },
                 TokenType::Takas => {
-                    let a = stack.pop().unwrap();
-                    let b = stack.pop().unwrap();
-                    stack.push(a);
-                    stack.push(b);
+                    if işlev_derinliği < 1 {
+                        let a = stack.pop().unwrap();
+                        let b = stack.pop().unwrap();
+                        stack.push(a);
+                        stack.push(b);
+                    }
                     self.current += 1;
                 },
                 TokenType::Döndür => {
-                    let a = stack.pop().unwrap();
-                    let b = stack.pop().unwrap();
-                    let c = stack.pop().unwrap();
-                    stack.push(a);
-                    stack.push(b);
-                    stack.push(c);
+                    if işlev_derinliği < 1 {
+                        let a = stack.pop().unwrap();
+                        let b = stack.pop().unwrap();
+                        let c = stack.pop().unwrap();
+                        stack.push(a);
+                        stack.push(b);
+                        stack.push(c);
+                    }
                     self.current += 1;
                 },
                 TokenType::At => {
-                    stack.pop().unwrap();
+                    if işlev_derinliği < 1 {
+                        stack.pop().unwrap();
+                    }
                     self.current += 1;
                 }
                 TokenType::Üst => {
-                    let a = stack.pop().unwrap();
-                    let b = stack.pop().unwrap();
-                    stack.push(b.clone());
-                    stack.push(a);
-                    stack.push(b);
+                    if işlev_derinliği < 1 {
+                        let a = stack.pop().unwrap();
+                        let b = stack.pop().unwrap();
+                        stack.push(b.clone());
+                        stack.push(a);
+                        stack.push(b);
+                    }
+                    self.current += 1;
                 },
                 TokenType::Girdi => {
-                    let mut buf = String::new();
-                    io::stdin().read_to_string(&mut buf).unwrap();
-                    stack.push(Object::Yazı(buf.trim_end().to_string()));
+                    if işlev_derinliği < 1 {
+                        let mut buf = String::new();
+                        io::stdin().read_to_string(&mut buf).unwrap();
+                        stack.push(Object::Yazı(buf.trim_end().to_string()));
+                    }
+                    self.current += 1;
                 },
                 TokenType::İkiNoktaNokta | TokenType::EOF => self.current += 1,
-                TokenType::Koy | TokenType::Ve | TokenType::Veya | TokenType::Identifier {..} => unimplemented!(),
+                TokenType::Identifier { id } => {
+                    match hashs.get_mut(&id) {
+                        Some(val) => {
+                            match val {
+                                Object::Bool(_) | Object::Sayı(_) | Object::Yazı(_) => {
+                                    stack.push(val.clone());
+                                    self.current += 1;
+                                },
+                                Object::İşlev(tp) => {
+                                    let işlev = self.program.get(*tp).unwrap();
+                                    match işlev.typ {
+                                        TokenType::İşlev { sonloc : tpi } => {
+                                            let loc = match tpi {
+                                                Some(i) => i,
+                                                None => unreachable!(),
+                                            };
+                                            let işlevson = self.program.get_mut(loc).unwrap();
+                                            match &mut işlevson.typ {
+                                                TokenType::İşlevSonlandır { tp : ref mut tps } => {
+                                                    tps.push(self.current);
+                                                },
+                                                _ => unreachable!(),
+                                            }
+                                            self.current = *tp + 2;
+                                        },
+                                        _ => unreachable!(),
+                                    }
+                                },
+                            }
+                        },
+                        None => {
+                            println!("bilinen değişkenler: {:?}", hashs);
+                            panic!("{} bulunamadı.", id);
+                        },
+                    }
+                },
+                TokenType::Koy => {
+                    let a = stack.pop().unwrap();
+                    let id = self.program.get(self.current+1).unwrap();
+                    hashs.insert(match id.typ.clone() {
+                        TokenType::Identifier { id } => id,
+                        _ => unimplemented!(), // SyntaxError
+                    }, a);
+                    self.current += 2;
+                },
+                TokenType::Ve => {
+                    let a = stack.pop().unwrap();
+                    let b = stack.pop().unwrap();
+                    stack.push(b.ve(a));
+                    self.current += 1;
+                },
+                TokenType::Veya => {
+                    let a = stack.pop().unwrap();
+                    let b = stack.pop().unwrap();
+                    stack.push(b.veya(a));
+                    self.current += 1;
+                },
             }
         }
     }
