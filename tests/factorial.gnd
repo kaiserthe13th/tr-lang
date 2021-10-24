@@ -1,15 +1,6 @@
 -* unsanitized factorial implementation in tr-lang *-
 
-işlev factorial
-    kpy 1-kpy dön *tks
-    kpy 0 > ise
-        :. kpy 1 > iken
-            1-kpy dön *tks
-        son at
-    yoksa
-        at 1
-    son
-son
+yükle "math.gnd"
 
 -* 1 factorial *-
 1 factorial
