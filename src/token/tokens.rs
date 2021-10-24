@@ -36,6 +36,8 @@ pub mod tokentypes {
         Yoksa ( Option<usize> ),
         Son { tp: usize },
         Identifier { id: String },
+        İşlev { sonloc: Option<usize> },
+        İşlevSonlandır { tp: Vec<usize> },
         Koy,
         At,
         EOF,
@@ -43,6 +45,7 @@ pub mod tokentypes {
     
     #[derive(Debug, Clone)]
     pub enum LexerTokenType {
+        İşlev,
         Yazı,
         Sayı,
         De,
