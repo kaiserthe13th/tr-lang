@@ -544,7 +544,7 @@ impl Run {
                 TokenType::Girdi => {
                     if işlev_derinliği < 1 {
                         let mut buf = String::new();
-                        io::stdin().read_to_string(&mut buf).unwrap();
+                        io::stdin().read_line(&mut buf).unwrap();
                         stack.push(Object::Yazı(buf.trim_end().to_string()));
                     }
                     self.current += 1;

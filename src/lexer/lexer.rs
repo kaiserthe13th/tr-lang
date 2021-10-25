@@ -3,6 +3,7 @@ use crate::token::tokentypes::LexerTokenType as TokenType;
 use crate::util::char_in_str;
 
 use std::fs;
+use std::path;
 use std::io::Read;
 
 #[derive(Clone)]
@@ -34,9 +35,17 @@ impl Lexer {
                     let next_tok = prog.get(current + 1).unwrap().clone();
                     match next_tok.typ {
                         TokenType::Yazı => {
-                            let abs_path = match fs::canonicalize(folder.clone() + &"/".to_string() + &next_tok.lexeme.clone()) {
-                                Ok(a) => a.as_path().display().to_string(),
-                                Err(e) => panic!("couldn't load file `{}`: {}", next_tok.lexeme, e)
+                            let path = path::Path::new(&folder);
+                            let abs_path = if path.has_root() {
+                                match fs::canonicalize(&folder) {
+                                    Ok(a) => a.as_path().display().to_string(),
+                                    Err(e) => panic!("couldn't load file `{}`: `{}`", next_tok.lexeme, e),
+                                }
+                            } else {
+                                match fs::canonicalize(folder.clone() + &"/".to_string() + &next_tok.lexeme) {
+                                    Ok(a) => a.as_path().display().to_string(),
+                                    Err(e) => panic!("couldn't load file `{}`: {}", next_tok.lexeme, e),
+                                }
                             };
                             let mut file = match fs::File::open(abs_path.clone()) {
                                 Ok(f) => f,
