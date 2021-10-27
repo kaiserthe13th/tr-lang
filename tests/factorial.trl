@@ -1,6 +1,6 @@
 -* unsanitized factorial implementation in tr-lang *-
 
-yükle "math.gnd"
+yükle "math.trl"
 
 -* 1 factorial *-
 1 factorial
