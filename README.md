@@ -1,10 +1,3 @@
-<style>
-    .tag {
-        padding: 0 4px;
-        margin: 0 4px;
-    }
-</style>
-
 # ![tr-lang](./img/logo/logo.png)
 #### <center>Fast and Easy</center>
 <hr style="width: 50%;">
