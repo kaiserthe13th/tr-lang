@@ -8,7 +8,7 @@
 tr-lang programlama dili sözdizimini Türkçeye yaklaştırmayı amaçlayan bir programlama dilidir.
 tr-lang küme(stack) orantılı bir dil ve matematik için ters leh notasyonu kullanıyor.
 
-# İçindekiler
+# :triangular_flag_on_post: İçindekiler
 - [Dilin Hangi Parçaları Tamamlandı?](#dilin-hangi-parçaları-tamamlandı)
 - [İndirme](#indirme)
 - [Vikiye Bak](#vikiye-bak)
