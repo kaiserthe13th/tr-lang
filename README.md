@@ -14,7 +14,7 @@ tr-lang is a stack based language and uses reverse-polish notation for maths.
 - [Contributing](#contributing)
 - [Thanks](#thanks)
 
-# What Has Been Implemented?
+# :rocket: What Has Been Implemented?
 
 ## ✔️ All parts of the language seems like they are done!
 
