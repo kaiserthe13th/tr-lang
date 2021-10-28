@@ -9,13 +9,13 @@ tr-lang programlama dili sözdizimini Türkçeye yaklaştırmayı amaçlayan bir
 tr-lang küme(stack) orantılı bir dil ve matematik için ters leh notasyonu kullanıyor.
 
 # :triangular_flag_on_post: İçindekiler
-- [Dilin Hangi Parçaları Tamamlandı?](#dilin-hangi-parçaları-tamamlandı)
+- [:trophy: Dilin Hangi Parçaları Tamamlandı?](#trophy-dilin-hangi-parçaları-tamamlandı)
 - [:rocket: İndirme](#rocket-i̇ndirme)
 - [:book: Vikiye Bak](#book-vikiye-bak)
 - [:handshake: Katkıda Bulunma](#handshake-katkıda-bulunma)
 - [Teşekkürler](#teşekkürler)
 
-# Dilin Hangi Parçaları Tamamlandı?
+# :trophy: Dilin Hangi Parçaları Tamamlandı?
 
 
 ## ✔️ Dilin tüm parçaları tamamlanmış gözüküyor!

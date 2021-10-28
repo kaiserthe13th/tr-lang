@@ -8,13 +8,13 @@ tr-lang is a language that aims to bring programming language syntax closer to T
 tr-lang is a stack based language and uses reverse-polish notation for maths.
 
 # :triangular_flag_on_post: İçindekiler
-- [What Has Been Implemented?](#what-has-been-implemented)
+- [:trophy: What Has Been Implemented?](#trophy-what-has-been-implemented)
 - [:rocket: Installation](#rocket-installation)
 - [:book: See the Wiki](#book-see-the-wiki)
 - [:handshake: Contributing](#handshake-contributing)
 - [Thanks](#thanks)
 
-# What Has Been Implemented?
+# :trophy: What Has Been Implemented?
 
 ## ✔️ All parts of the language seems like they are done!
 
