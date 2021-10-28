@@ -9,7 +9,7 @@ tr-lang is a stack based language and uses reverse-polish notation for maths.
 
 # :triangular_flag_on_post: İçindekiler
 - [What Has Been Implemented?](#what-has-been-implemented)
-- [Installation](#installation)
+- [Installation](#rocket-installation)
 - [See the Wiki](#see-the-wiki)
 - [Contributing](#contributing)
 - [Thanks](#thanks)
