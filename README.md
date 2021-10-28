@@ -29,23 +29,23 @@ View in [Turkish](README-TR.md)
 # :rocket: Installation
 
 ## Homebrew
-```sh
-brew tap kaiserthe13th/tr-lang
-brew install tr-lang
+```console
+$ brew tap kaiserthe13th/tr-lang
+$ brew install tr-lang
 ```
 
 ## Cargo
-```sh
-cargo install tr-lang
+```console
+$ cargo install tr-lang
 ```
 
 ## Build from source
 dependencies: `rust, cargo`
 
-```sh
-git clone https://github.com/kaiserthe13th/tr-lang
-cd tr-lang
-cargo build --release
+```console
+$ git clone https://github.com/kaiserthe13th/tr-lang
+$ cd tr-lang
+$ cargo build --release
 ```
 your file will be in target/release/tr-lang
 
