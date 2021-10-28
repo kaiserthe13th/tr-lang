@@ -10,7 +10,7 @@ tr-lang is a stack based language and uses reverse-polish notation for maths.
 # :triangular_flag_on_post: İçindekiler
 - [What Has Been Implemented?](#what-has-been-implemented)
 - [Installation](#rocket-installation)
-- [See the Wiki](#see-the-wiki)
+- [See the Wiki](#book-see-the-wiki)
 - [Contributing](#contributing)
 - [Thanks](#thanks)
 
@@ -47,7 +47,7 @@ cargo build --release
 ```
 your file will be in target/release/tr-lang
 
-# [See the Wiki](https://github.com/kaiserthe13th/tr-lang/wiki)
+# [:book: See the Wiki](https://github.com/kaiserthe13th/tr-lang/wiki)
 - [Specification](https://github.com/kaiserthe13th/tr-lang/wiki/Specification-EN)
 
 # Contributing

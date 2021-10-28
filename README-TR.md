@@ -11,7 +11,7 @@ tr-lang küme(stack) orantılı bir dil ve matematik için ters leh notasyonu ku
 # :triangular_flag_on_post: İçindekiler
 - [Dilin Hangi Parçaları Tamamlandı?](#dilin-hangi-parçaları-tamamlandı)
 - [İndirme](#rocket-i̇ndirme)
-- [Vikiye Bak](#vikiye-bak)
+- [Vikiye Bak](#book-vikiye-bak)
 - [Katkıda Bulunma](#katkıda-bulunma)
 - [Teşekkürler](#teşekkürler)
 
@@ -49,7 +49,7 @@ cargo build --release
 ```
 dosyanız `target/release/tr-lang`'da bulunacaktır
 
-# [Vikiye Bak](https://github.com/kaiserthe13th/tr-lang/wiki/Anasayfa---TR)
+# [:book: Vikiye Bak](https://github.com/kaiserthe13th/tr-lang/wiki/Anasayfa---TR)
 - [Dil Spesifikasyonu](https://github.com/kaiserthe13th/tr-lang/wiki/Dil-Spesifikasyonu-TR)
 
 # Katkıda Bulunma
