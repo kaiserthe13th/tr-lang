@@ -7,6 +7,8 @@
 tr-lang is a language that aims to bring programming language syntax closer to Turkish.
 tr-lang is a stack based language and uses reverse-polish notation for maths.
 
+View in [Turkish](README-TR.md)
+
 # :triangular_flag_on_post: İçindekiler
 - [:trophy: What Has Been Implemented?](#trophy-what-has-been-implemented)
 - [:rocket: Installation](#rocket-installation)
