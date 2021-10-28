@@ -14,7 +14,7 @@ tr-lang is a stack based language and uses reverse-polish notation for maths.
 - [Contributing](#contributing)
 - [Thanks](#thanks)
 
-# :rocket: What Has Been Implemented?
+# What Has Been Implemented?
 
 ## ✔️ All parts of the language seems like they are done!
 
@@ -24,7 +24,7 @@ tr-lang is a stack based language and uses reverse-polish notation for maths.
 #### ✔️ tr-lang bytecode reader seems like its done [Issue #4](https://github.com/kaiserthe13th/tr-lang/issues/4#issue-1027663331)<br>
 #### ✔️ tr-lang runtime seems like its done [Issue #5](https://github.com/kaiserthe13th/tr-lang/issues/5#issue-1027665033)<br>
 
-# Installation
+# :rocket: Installation
 
 ## Homebrew
 ```sh
