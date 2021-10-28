@@ -12,7 +12,7 @@ tr-lang is a stack based language and uses reverse-polish notation for maths.
 - [:rocket: Installation](#rocket-installation)
 - [:book: See the Wiki](#book-see-the-wiki)
 - [:handshake: Contributing](#handshake-contributing)
-- [Thanks](#thanks)
+- [:scroll: Thanks](#scroll-thanks)
 
 # :trophy: What Has Been Implemented?
 
@@ -57,6 +57,6 @@ for features use <span class="tag">`(enhancement | yükseltme)`</span> tag, for 
 
 :+1: Bugfix PR's are welcome!
 
-# Thanks
+# :scroll: Thanks
 
 I give my thanks to user [Netwave](https://stackoverflow.com/users/1695172/netwave) from stackoverflow.com for helping fix a [bug](https://stackoverflow.com/questions/69635458/pattern-matching-does-not-allow-me-to-change-values/69636181#69636181) during the creation of the parser.

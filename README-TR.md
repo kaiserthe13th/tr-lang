@@ -13,7 +13,7 @@ tr-lang küme(stack) orantılı bir dil ve matematik için ters leh notasyonu ku
 - [:rocket: İndirme](#rocket-i̇ndirme)
 - [:book: Vikiye Bak](#book-vikiye-bak)
 - [:handshake: Katkıda Bulunma](#handshake-katkıda-bulunma)
-- [Teşekkürler](#teşekkürler)
+- [:scroll: Teşekkürler](#scroll-teşekkürler)
 
 # :trophy: Dilin Hangi Parçaları Tamamlandı?
 
@@ -59,7 +59,7 @@ bug raporlamak, yeni özellik tavsiye etmek veya dokümantasyonu güncellemek i�
 
 :+1: Bugfix PR'lerine açığız!
 
-# Teşekkürler
+# :scroll: Teşekkürler
 
 stackoverflow.com'dan [Netwave](https://stackoverflow.com/users/1695172/netwave) adlı kullanıcıya parser yapım sürecinde yaşanan bir [bug'ın](https://stackoverflow.com/questions/69635458/pattern-matching-does-not-allow-me-to-change-values/69636181#69636181) çözümündeki yardımından dolayı teşekkürlerimi sunarım.
 
