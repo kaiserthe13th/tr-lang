@@ -1,11 +1,27 @@
-# tr-lang
+<style>
+    .tag {
+        padding: 0 4px;
+        margin: 0 4px;
+    }
+</style>
+
+# ![tr-lang](./img/logo/logo.png)
+#### <center>Fast and Easy</center>
+<hr style="width: 50%;">
 
 ### Made with ❤️ in 🇹🇷
 
 tr-lang is a language that aims to bring programming language syntax closer to Turkish.
 tr-lang is a stack based language and uses reverse-polish notation for maths.
 
-# What has been Implemented?
+# İçindekiler
+- [What Has Been Implemented?](#what-has-been-implemented)
+- [Installation](#installation)
+- [See the Wiki](#see-the-wiki)
+- [Contributing](#contributing)
+- [Thanks](#thanks)
+
+# What Has Been Implemented?
 
 ## ✔️ All parts of the language seems like they are done!
 
@@ -38,8 +54,15 @@ cargo build --release
 ```
 your file will be in target/release/tr-lang
 
-# [Specification](https://github.com/kaiserthe13th/tr-lang/wiki/Specification-EN)
 # [See the Wiki](https://github.com/kaiserthe13th/tr-lang/wiki)
+- [Specification](https://github.com/kaiserthe13th/tr-lang/wiki/Specification-EN)
+
+# Contributing
+To report bugs, suggest new features or update documentation use the [issue tracker](https://github.com/kaiserthe13th/tr-lang/issues)
+
+for features use <span class="tag">`(enhancement | yükseltme)`</span> tag, for bugs use <span class="tag">`(bug)`</span> tag and for documentation updates use <span class="tag">`(documentation | dökümantasyon)`</span> tag
+
+:+1: Bugfix PR's are welcome!
 
 # Thanks
 

@@ -1,11 +1,22 @@
-# tr-lang
+# ![tr-lang](./img/logo/logo.png)
+#### <center>Hızlı ve Kolay</center>
+<hr style="width: 50%;">
 
 ### ❤️ ile 🇹🇷 de yapılmıştır
+
 
 tr-lang programlama dili sözdizimini Türkçeye yaklaştırmayı amaçlayan bir programlama dilidir.
 tr-lang küme(stack) orantılı bir dil ve matematik için ters leh notasyonu kullanıyor.
 
-# Dilin hangi parçaları tamamlandı?
+# İçindekiler
+- [Dilin Hangi Parçaları Tamamlandı?](#dilin-hangi-parçaları-tamamlandı)
+- [İndirme](#indirme)
+- [Vikiye Bak](#vikiye-bak)
+- [Katkıda Bulunma](#katkıda-bulunma)
+- [Teşekkürler](#teşekkürler)
+
+# Dilin Hangi Parçaları Tamamlandı?
+
 
 ## ✔️ Dilin tüm parçaları tamamlanmış gözüküyor!
 
@@ -38,8 +49,15 @@ cargo build --release
 ```
 dosyanız `target/release/tr-lang`'da bulunacaktır
 
-# [Dil Spesifikasyonu](https://github.com/kaiserthe13th/tr-lang/wiki/Dil-Spesifikasyonu-TR)
-# [Vikiye bak](https://github.com/kaiserthe13th/tr-lang/wiki/Anasayfa---TR)
+# [Vikiye Bak](https://github.com/kaiserthe13th/tr-lang/wiki/Anasayfa---TR)
+- [Dil Spesifikasyonu](https://github.com/kaiserthe13th/tr-lang/wiki/Dil-Spesifikasyonu-TR)
+
+# Katkıda Bulunma
+bug raporlamak, yeni özellik tavsiye etmek veya dokümantasyonu güncellemek için [issue takipçisini](https://github.com/kaiserthe13th/tr-lang/issues) kullanın.
+
+özellikler için <span class="tag">`(enhancement | yükseltme)`</span> etiketini, buglar için <span class="tag">`(bug)`</span> etiketini ve dokümantasyon güncellemeleri için <span class="tag">`(documentation | dökümantasyon)`</span> etiketini kullanın
+
+:+1: Bugfix PR'lerine açığız!
 
 # Teşekkürler
 
