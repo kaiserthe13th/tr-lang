@@ -10,9 +10,9 @@ tr-lang küme(stack) orantılı bir dil ve matematik için ters leh notasyonu ku
 
 # :triangular_flag_on_post: İçindekiler
 - [Dilin Hangi Parçaları Tamamlandı?](#dilin-hangi-parçaları-tamamlandı)
-- [İndirme](#rocket-i̇ndirme)
-- [Vikiye Bak](#book-vikiye-bak)
-- [Katkıda Bulunma](#katkıda-bulunma)
+- [:rocket: İndirme](#rocket-i̇ndirme)
+- [:book: Vikiye Bak](#book-vikiye-bak)
+- [:handshake: Katkıda Bulunma](#handshake-katkıda-bulunma)
 - [Teşekkürler](#teşekkürler)
 
 # Dilin Hangi Parçaları Tamamlandı?
@@ -52,7 +52,7 @@ dosyanız `target/release/tr-lang`'da bulunacaktır
 # [:book: Vikiye Bak](https://github.com/kaiserthe13th/tr-lang/wiki/Anasayfa---TR)
 - [Dil Spesifikasyonu](https://github.com/kaiserthe13th/tr-lang/wiki/Dil-Spesifikasyonu-TR)
 
-# Katkıda Bulunma
+# :handshake: Katkıda Bulunma
 bug raporlamak, yeni özellik tavsiye etmek veya dokümantasyonu güncellemek için [issue takipçisini](https://github.com/kaiserthe13th/tr-lang/issues) kullanın.
 
 özellikler için <span class="tag">`(enhancement | yükseltme)`</span> etiketini, buglar için <span class="tag">`(bug)`</span> etiketini ve dokümantasyon güncellemeleri için <span class="tag">`(documentation | dökümantasyon)`</span> etiketini kullanın

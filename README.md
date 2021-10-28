@@ -9,9 +9,9 @@ tr-lang is a stack based language and uses reverse-polish notation for maths.
 
 # :triangular_flag_on_post: İçindekiler
 - [What Has Been Implemented?](#what-has-been-implemented)
-- [Installation](#rocket-installation)
-- [See the Wiki](#book-see-the-wiki)
-- [Contributing](#contributing)
+- [:rocket: Installation](#rocket-installation)
+- [:book: See the Wiki](#book-see-the-wiki)
+- [:handshake: Contributing](#handshake-contributing)
 - [Thanks](#thanks)
 
 # What Has Been Implemented?
@@ -50,7 +50,7 @@ your file will be in target/release/tr-lang
 # [:book: See the Wiki](https://github.com/kaiserthe13th/tr-lang/wiki)
 - [Specification](https://github.com/kaiserthe13th/tr-lang/wiki/Specification-EN)
 
-# Contributing
+# :handshake: Contributing
 To report bugs, suggest new features or update documentation use the [issue tracker](https://github.com/kaiserthe13th/tr-lang/issues)
 
 for features use <span class="tag">`(enhancement | yükseltme)`</span> tag, for bugs use <span class="tag">`(bug)`</span> tag and for documentation updates use <span class="tag">`(documentation | dökümantasyon)`</span> tag
