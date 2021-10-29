@@ -11,11 +11,11 @@ tr-lang küme(stack) orantılı bir dil ve matematik için ters leh notasyonu ku
 [İngilizce](README.md) görüntüle
 
 # :triangular_flag_on_post: İçindekiler
-- [:trophy: Dilin Hangi Parçaları Tamamlandı?](#trophy-dilin-hangi-parçaları-tamamlandı)
-- [:rocket: İndirme](#rocket-i̇ndirme)
-- [:book: Vikiye Bak](#book-vikiye-bak)
-- [:handshake: Katkıda Bulunma](#handshake-katkıda-bulunma)
-- [:scroll: Teşekkürler](#scroll-teşekkürler)
+- ### [:trophy: Dilin Hangi Parçaları Tamamlandı?](#trophy-dilin-hangi-parçaları-tamamlandı)
+- ### [:rocket: İndirme](#rocket-i̇ndirme)
+- ### [:book: Vikiye Bak](#book-vikiye-bak)
+- ### [:handshake: Katkıda Bulunma](#handshake-katkıda-bulunma)
+- ### [:scroll: Teşekkürler](#scroll-teşekkürler)
 
 # :trophy: Dilin Hangi Parçaları Tamamlandı?
 
