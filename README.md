@@ -28,18 +28,18 @@ View in [Turkish](README-TR.md)
 
 # :rocket: Installation
 
-## Homebrew
+## :beer: Homebrew
 ```console
 $ brew tap kaiserthe13th/tr-lang
 $ brew install tr-lang
 ```
 
-## Cargo
+## :package: Cargo
 ```console
 $ cargo install tr-lang
 ```
 
-## Build from source
+## :gear: Build from source
 dependencies: `rust, cargo`
 
 ```console

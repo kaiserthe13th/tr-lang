@@ -30,19 +30,19 @@ tr-lang küme(stack) orantılı bir dil ve matematik için ters leh notasyonu ku
 
 # :rocket: İndirme
 
-## Homebrew
+## :beer: Homebrew
 Homebrew kullanarak indirebilirsiniz
 ```console
 $ brew tap kaiserthe13th/tr-lang
 $ brew install tr-lang
 ```
 
-## Cargo
+## :package: Cargo
 ```console
 $ cargo install tr-lang
 ```
 
-## Kaynaktan Derleme
+## :gear: Kaynaktan Derleme
 gereksinimler: `rust, cargo`
 ```console
 $ git clone https://github.com/kaiserthe13th/tr-lang
