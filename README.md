@@ -12,7 +12,7 @@ View in [Turkish](README-TR.md)
 # :triangular_flag_on_post: Table of Contents
 - ### [:trophy: What Has Been Implemented?](#trophy-what-has-been-implemented)
 - ### [:rocket: Installation](#rocket-installation)
-- ### [:book: See the Wiki](#book-see-the-wiki)
+- ### [:book: See the Docs](#book-see-the-wiki)
 - ### [:handshake: Contributing](#handshake-contributing)
 - ### [:scroll: Thanks](#scroll-thanks)
 
@@ -49,8 +49,7 @@ $ cargo build --release
 ```
 your file will be in target/release/tr-lang
 
-# [:book: See the Wiki](https://github.com/kaiserthe13th/tr-lang/wiki)
-- [Specification](https://github.com/kaiserthe13th/tr-lang/wiki/Specification-EN)
+# [:book: See the Docs](https://tr-lang-docs.netlify.app/english/)
 
 # :handshake: Contributing
 To report bugs, suggest new features or update documentation use the [issue tracker](https://github.com/kaiserthe13th/tr-lang/issues)
