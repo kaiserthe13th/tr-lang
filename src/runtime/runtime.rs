@@ -298,7 +298,10 @@ impl Run {
 
         while self.program.len() > self.current {
             let token = self.program.get(self.current).unwrap();
-            
+           
+            println!("{:?}", token.clone());
+            println!("{:?}", stack.clone());
+
             match token.typ.clone() {
                 TokenType::İşlev { sonloc } => {
                     let id = self.program.get(self.current + 1).unwrap();
@@ -320,7 +323,7 @@ impl Run {
                     }
                     
                     işlev_derinliği += 1;
-                    self.current = loc + 1;
+                    self.current = loc;
                 },
                 TokenType::İşlevSonlandır { ref mut tp } => {
                     if işlev_derinliği < 1 {
