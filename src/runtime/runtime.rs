@@ -325,7 +325,7 @@ impl Run {
                     işlev_derinliği += 1;
                     self.current = loc;
                 },
-                TokenType::İşlevSonlandır { ref mut tp } => {
+                TokenType::İşlevSonlandır { .. } => {
                     if işlev_derinliği < 1 {
                         let loc = match token.typ {
                             TokenType::İşlevSonlandır { ref mut tp } => {
@@ -333,7 +333,6 @@ impl Run {
                             },
                             _ => unreachable!(),
                         };
-                        println!("{:?} {:?}", &tp, &loc);
                         self.current = loc;
                     } else {
                         işlev_derinliği -= 1;
