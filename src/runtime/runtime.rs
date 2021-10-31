@@ -297,10 +297,10 @@ impl Run {
         let mut işlev_derinliği: usize = 0;
 
         while self.program.len() > self.current {
-            let token = self.program.get(self.current).unwrap();
+            let token = self.program.get_mut(self.current).unwrap();
            
-            println!("{:?}", token.clone());
-            println!("{:?}", stack.clone());
+            //println!("{:?}", token.clone());
+            //println!("{:?}", stack.clone());
 
             match token.typ.clone() {
                 TokenType::İşlev { sonloc } => {
@@ -327,7 +327,13 @@ impl Run {
                 },
                 TokenType::İşlevSonlandır { ref mut tp } => {
                     if işlev_derinliği < 1 {
-                        let loc = tp.pop().unwrap();
+                        let loc = match token.typ {
+                            TokenType::İşlevSonlandır { ref mut tp } => {
+                                tp.pop().unwrap()
+                            },
+                            _ => unreachable!(),
+                        };
+                        println!("{:?} {:?}", &tp, &loc);
                         self.current = loc;
                     } else {
                         işlev_derinliği -= 1;
