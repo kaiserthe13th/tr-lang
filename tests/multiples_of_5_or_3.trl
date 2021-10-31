@@ -1,0 +1,16 @@
+işlev sum-multiples-of-5-or-3
+    0 tks -* 0 18 *-
+    :. kpy 0 > iken
+        --
+        kpy 3 % 0 = ise
+            tks üst + tks
+        yoksa
+            kpy 5 % 0 = ise
+                tks üst + tks
+            son
+        son
+    son at
+son
+
+10 sum-multiples-of-5-or-3 de "\n" de
+1000 sum-multiples-of-5-or-3 de "\n" de
