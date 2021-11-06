@@ -79,6 +79,13 @@ impl Lexer {
             let c: char = self.currentc();
 
             match c {
+                '#' => {
+                    while self.current < self.source.len() && self.currentc() != '\n' {
+                        self.current += 1;
+                        self.col += 1;
+                    }
+                    self.line += 1;
+                },
                 '\'' | '"' => {
                     let mut buf = String::new();
 
