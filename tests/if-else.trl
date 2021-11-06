@@ -1,3 +1,4 @@
+#!/home/linuxbrew/.linuxbrew/bin/tr-lang y
 doğru ise
     "true\n" de
 yoksa

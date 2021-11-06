@@ -1,3 +1,4 @@
+#!/home/linuxbrew/.linuxbrew/bin/tr-lang y
 -* unsanitized factorial implementation in tr-lang *-
 
 yükle "math.trl"

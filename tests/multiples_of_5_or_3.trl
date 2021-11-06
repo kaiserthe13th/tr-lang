@@ -1,3 +1,4 @@
+#!/home/linuxbrew/.linuxbrew/bin/tr-lang y
 işlev sum-multiples-of-5-or-3
     0 tks -* 0 18 *-
     :. kpy 0 > iken
