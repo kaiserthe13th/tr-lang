@@ -40,6 +40,7 @@ pub mod tokentypes {
         İşlevSonlandır { tp: Vec<usize> },
         Koy,
         At,
+        Tipinde,
         EOF,
     }
     
@@ -88,6 +89,7 @@ pub mod tokentypes {
         Koy,
         At,
         Yükle,
+        Tipinde,
         EOF,
     }
 }

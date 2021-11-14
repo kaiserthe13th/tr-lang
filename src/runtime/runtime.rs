@@ -282,6 +282,53 @@ impl Object {
             b => panic!("{:?} `ve` anahtar kelimesini desteklemiyor", b),
         }
     }
+    // Dönüşüm
+    fn dönüştür(&self, a: String) -> Self {
+        match a.to_lowercase().as_str() {
+            "yazı" => {
+                match self {
+                    Self::Bool(b) => match b {
+                        true => Self::Yazı("doğru".to_string()),
+                        false => Self::Yazı("yanlış".to_string()),
+                    },
+                    Self::Sayı(n) => Self::Yazı(format!("{:?}", n)),
+                    Self::Yazı(_) => self.clone(),
+                    Self::İşlev(_) => unreachable!(),
+                }
+            },
+            "bool" | "boolean" => {
+                match self {
+                    Self::Bool(_) => self.clone(),
+                    Self::Sayı(n) => if n == &0. {
+                        Self::Bool(false)
+                    } else {
+                        Self::Bool(true)
+                    },
+                    Self::Yazı(s) => match s.as_str() {
+                        "doğru" => Self::Bool(true),
+                        "yanlış" => Self::Bool(false),
+                        _ => unimplemented!(), // SomeError
+                    },
+                    Self::İşlev(_) => unreachable!(),
+                }
+            },
+            "sayı" => {
+                match self {
+                    Self::Bool(b) => match b {
+                        true => Self::Sayı(1.),
+                        false => Self::Sayı(0.),
+                    },
+                    Self::Sayı(_) => self.clone(),
+                    Self::Yazı(s) => match s.parse::<f64>() {
+                        Ok(m) => Self::Sayı(m),
+                        Err(_) => unimplemented!(),
+                    },
+                    Self::İşlev(_) => unreachable!(),
+                }
+            },
+            a => panic!("bilinmeyen tip: {}", a),
+        }
+    }
 }
 
 pub type Stack = Vec<Object>;
@@ -613,6 +660,18 @@ impl Run {
                     let a = stack.pop().unwrap();
                     let b = stack.pop().unwrap();
                     stack.push(b.veya(a));
+                    self.current += 1;
+                },
+                TokenType::Tipinde => {
+                    let a = stack.pop().unwrap();
+                    self.current += 1;
+                    let b = self.program.get_mut(self.current).unwrap();
+                    match &b.typ {
+                        TokenType::Identifier { id } => {
+                            stack.push(a.dönüştür(id.clone()));
+                        },
+                        _ => unimplemented!("hata: tip tanımlayıcı değil"),
+                    };
                     self.current += 1;
                 },
             }

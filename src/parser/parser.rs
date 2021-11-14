@@ -226,6 +226,7 @@ impl Parser {
                 LexTokenType::Üst => parsed.push(Token::new(TokenType::Üst, ptoken.line, ptoken.col)),
                 LexTokenType::Ve => parsed.push(Token::new(TokenType::Ve, ptoken.line, ptoken.col)),
                 LexTokenType::Veya => parsed.push(Token::new(TokenType::Veya, ptoken.line, ptoken.col)),
+                LexTokenType::Tipinde => parsed.push(Token::new(TokenType::Tipinde, ptoken.line, ptoken.col)),
                 LexTokenType::EOF => parsed.push(Token::new(TokenType::EOF, ptoken.line, ptoken.col)),
             }
         }

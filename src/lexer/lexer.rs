@@ -300,6 +300,11 @@ impl Lexer {
                     self.col += 1;
                     tokens.push(Token::new(TokenType::İse, "?".to_string(), self.line, self.col));
                 },
+                '@' => {
+                    self.current += 1;
+                    self.col += 1;
+                    tokens.push(Token::new(TokenType::Tipinde, "@".to_string(), self.line, self.col));
+                },
                 ' ' => {
                     self.current += 1;
                     self.col += 1;
@@ -307,7 +312,7 @@ impl Lexer {
                 _ => {
                     let mut buf = String::new();
 
-                    while self.source.len() > self.current && !char_in_str(self.currentc(), "\t\r \n\"':?=<>!/%*") {
+                    while self.source.len() > self.current && !char_in_str(self.currentc(), "\t\r \n\"':?=<>!/%*@") {
                         buf.push(self.currentc());
                         self.current += 1;
                         self.col += 1;
