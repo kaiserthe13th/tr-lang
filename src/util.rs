@@ -2,6 +2,31 @@ use crate::store::{
     VERSION,
     RELEASE,
 };
+use crate::exit;
+
+use locale_config::Locale;
+
+pub enum SupportedLanguage {
+    Turkish,
+    English,
+}
+
+pub fn get_lang() -> SupportedLanguage {
+    //! Returns a SupportedLanguage by checking systems default locale
+    //! if an unrecognized language is found it will return English
+    let l = format!("{}", Locale::user_default());
+    // As Unix provides more info about locale(number format, date format, time format...)
+    // separated by ',' we split once at the first ',' if it is successfull we take the first
+    // else we just retain former state
+    let lang = match l.split_once(',') {
+        None => l,
+        Some((a, _)) => a.to_string(),
+    };
+    match lang.as_str() {
+        "tr-TR" => SupportedLanguage::Turkish,
+        _       => SupportedLanguage::English,
+    }
+}
 
 pub fn char_in_str(a: char, b: &str) -> bool {
     for ch in b.chars() {
@@ -15,6 +40,9 @@ pub fn char_in_str(a: char, b: &str) -> bool {
 pub fn in_vec<T>(a: &T, v: &Vec<T>) -> bool
 where T: Eq
 {
+    //! Checks if &T is in a &Vec<T>
+    //! It is shortcircuiting function meaning if it finds any match it will immideatly return true
+    //! if no matches are found it will return false
     for item in v.iter() {
         if item == a {
             return true;
@@ -26,6 +54,9 @@ where T: Eq
 pub fn item_in_vec<T>(arr: &[T], v: &Vec<T>) -> bool
 where T: Eq
 {
+    //! Checks if any item of arr: &[T] has a counterpart in v: &Vec<T>
+    //! It is shortcircuiting function meaning if it finds any match it will immideatly return true
+    //! if no matches are found it will return false
     for a in arr {
         for item in v.iter() {
             if item == a {
@@ -37,27 +68,53 @@ where T: Eq
 }
 
 pub fn print_help(exit_code: i32, prog_name: String) -> ! {
-    println!("{} sürüm {}, {} tarihinde yayınlandı", prog_name, VERSION, RELEASE);
-    println!("");
-    println!("KULLANIM:");
-    println!("  {} <ALTKOMUT> <DOSYA> [SEÇENEKLER]", prog_name);
-    println!("");
-    println!("ALTKOMUTLAR:");
-    println!("    y yürüt    DOSYA'yı yürüt");
-    println!("    b byt      DOSYA'yı bytecode'a dönüstür");
-    println!("    yb yürbyt  bytecode DOSYA'sını yürüt");
-    println!("");
-    println!("SEÇENEKLER:");
-    println!("  -h -y --yardım         yardım göster ve çık");
-    println!("  -V -s --sürüm          sürümü göster ve çık");
-    println!("  -o -ç --çıkış <DOSYA>  çıkışta buraya bytecode yaz");
-    println!("  -l --lexer-çıktısı     lex süreci bittikten sonra lexer'ın çıktısını göster");
-    println!("  -p --parser-çıktısı    parse süreci bittikten sonra parser'ın çıktısını göster");
-    println!("  --                     bundan sonra argv ekleyin");
-    crate::exit(exit_code);
+    match get_lang() {
+        SupportedLanguage::Turkish => {
+            println!("{} sürüm {}, {} tarihinde yayınlandı", prog_name, VERSION, RELEASE);
+            println!("");
+            println!("KULLANIM:");
+            println!("  {} <ALTKOMUT> <DOSYA> [SEÇENEKLER]", prog_name);
+            println!("");
+            println!("ALTKOMUTLAR:");
+            println!("    y yürüt    DOSYA'yı yürüt");
+            println!("    b byt      DOSYA'yı bytecode'a dönüstür");
+            println!("    yb yürbyt  bytecode DOSYA'sını yürüt");
+            println!("");
+            println!("SEÇENEKLER:");
+            println!("  -h -y --yardım         yardım göster ve çık");
+            println!("  -V -s --sürüm          sürümü göster ve çık");
+            println!("  -o -ç --çıkış <DOSYA>  çıkışta buraya bytecode yaz");
+            println!("  -l --lexer-çıktısı     lex süreci bittikten sonra lexer'ın çıktısını göster");
+            println!("  -p --parser-çıktısı    parse süreci bittikten sonra parser'ın çıktısını göster");
+            println!("  --                     bundan sonra argv ekleyin");
+        },
+        SupportedLanguage::English => {
+            println!("{} version {}, released at {}", prog_name, VERSION, RELEASE);
+            println!("");
+            println!("USAGE:");
+            println!("    {} <SUBCOMMAND> <FILE> [OPTIONS]", prog_name);
+            println!("");
+            println!("SUBCOMMANDS:");
+            println!("    y yürüt    run FILE");
+            println!("    b byt      output bytecode for FILE");
+            println!("    yb yürbyt  run bytecode FILE");
+            println!("");
+            println!("OPTIONS:");
+            println!("    -h -y --yardım        print help and exit");
+            println!("    -V -s --sürüm         prin version and exit");
+            println!("    -o -ç --çıkış <file>  write bytecode at <file>");
+            println!("    -l --lexer-çıktısı    after lexing show lexed tokens");
+            println!("    -p --parser-çıktısı   after parsing show parsed tokens");
+            println!("    --                    add argv after this");
+        },
+    }
+    exit(exit_code);
 }
 
 pub fn print_version(prog_name: String) -> ! {
-    println!("{} sürüm {}, {} tarihinde yayınlandı", prog_name, VERSION, RELEASE);
-    crate::exit(0);
+    match get_lang() {
+        SupportedLanguage::Turkish => println!("{} sürüm {}, {} tarihinde yayınlandı", prog_name, VERSION, RELEASE),
+        SupportedLanguage::English => println!("{} version {}, released at {}", prog_name, VERSION, RELEASE),
+    }
+    exit(0);
 }
