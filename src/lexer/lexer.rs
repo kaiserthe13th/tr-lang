@@ -56,7 +56,7 @@ impl Lexer {
 
                             let mut nl = Lexer::new(buf);
                             if !crate::util::in_vec(&abs_path, visited) {
-                                tokens.append(&mut nl.lex(visited, folder.clone()));
+                                tokens.append(&mut nl.tokenize(visited, folder.clone()));
                             }
                         },
                         TokenType::Identifier => unimplemented!(),
@@ -72,7 +72,7 @@ impl Lexer {
         }
         tokens
     }
-    pub fn lex(&mut self, visited: &mut Vec<String>, folder: String) -> Vec<Token> {
+    pub fn tokenize(&mut self, visited: &mut Vec<String>, folder: String) -> Vec<Token> {
         let mut tokens: Vec<Token> = vec![];
 
         while self.current < self.source.len() {

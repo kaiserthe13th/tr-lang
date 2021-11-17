@@ -28,7 +28,7 @@ impl Parser {
 
     pub fn from_lexer(lexer: &mut lexer::Lexer, folder: String) -> Self {
         Self {
-            tokens: lexer.lex(&mut vec![], folder),
+            tokens: lexer.tokenize(&mut vec![], folder),
         }
     }
 

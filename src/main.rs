@@ -34,7 +34,7 @@ fn main() {
             let mut path = PathBuf::from(&args.file);
             let mut lexer = Lexer::new(util::read_file(&path));
             path.pop();
-            let lexed = lexer.clone().lex(&mut vec![], path.as_path().display().to_string());
+            let lexed = lexer.clone().tokenize(&mut vec![], path.as_path().display().to_string());
             if args.lex_out {
                 println!("{:#?}", &lexed);
             }
@@ -60,7 +60,7 @@ fn main() {
             let mut path = PathBuf::from(args.file);
             let mut lexer = Lexer::new(util::read_file(&path));
             path.pop();
-            let lexed = lexer.clone().lex(&mut vec![], path.as_path().display().to_string());
+            let lexed = lexer.clone().tokenize(&mut vec![], path.as_path().display().to_string());
             if args.lex_out {
                 println!("{:#?}", lexed);
             }
