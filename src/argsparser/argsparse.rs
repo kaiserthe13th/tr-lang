@@ -62,7 +62,7 @@ pub fn parse_args() -> Options {
         "-V" | "-s" | "--sürüm" => {
             util::print_version(name);
         },
-        a => crate::error_print("unknown subcommand", format!("{}", a)),
+        a => util::error_print("unknown subcommand", format!("{}", a)),
     };
     args.remove(0);
 
@@ -87,7 +87,7 @@ pub fn parse_args() -> Options {
                 prd_out = true;
             },
             "--" => argv_m = true,
-            a => crate::error_print("unknown argument", format!("{}", a)),
+            a => util::error_print("unknown argument", format!("{}", a)),
         }
     }
 

@@ -4,11 +4,45 @@ use crate::store::{
 };
 use crate::exit;
 
+use std::fs::File;
+use std::path::PathBuf;
+use std::io::Read;
+
 use locale_config::Locale;
 
 pub enum SupportedLanguage {
     Turkish,
     English,
+}
+
+pub fn error_print<T>(error_name: &str, error_explanation: T) -> !
+where
+    T: std::fmt::Debug
+{
+    eprintln!("{}: {:?}", error_name, error_explanation);
+    exit(1);
+}
+
+pub fn read_file(path: &PathBuf) -> String {
+    let mut file = match File::open(path.clone()) {
+        Err(e) => error_print("error opening file", format!("{}: {}", e, path.as_path().display())),
+        Ok(f) => f,
+    };
+
+    let mut buf = String::new();
+    file.read_to_string(&mut buf).unwrap();
+    buf
+}
+
+pub fn read_file_to_vec_u8(path: &PathBuf) -> Vec<u8> {
+    let mut file = match File::open(path.clone()) {
+        Err(e) => error_print("error opening file", format!("{}: {}", e, path.as_path().display())),
+        Ok(f) => f,
+    };
+
+    let mut buf: Vec<u8> = vec![];
+    file.read_to_end(&mut buf).unwrap();
+    buf
 }
 
 pub fn get_lang() -> SupportedLanguage {

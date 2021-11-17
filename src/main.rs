@@ -1,8 +1,8 @@
 use std::fs;
 use std::io::Write;
-use std::io::Read;
 
 pub use std::process::exit;
+use std::path::PathBuf;
 
 pub mod lexer;
 use lexer::Lexer;
@@ -19,14 +19,6 @@ pub mod runtime;
 
 mod argsparser;
 
-pub fn error_print<T>(error_name: &str, error_explanation: T) -> !
-where
-    T: std::fmt::Debug
-{
-    eprintln!("{}: {:?}", error_name, error_explanation);
-    exit(1);
-}
-
 fn main() {
     let args = argsparser::parse_args();
     if args.help == true {
@@ -39,14 +31,8 @@ fn main() {
     
     match args.sub_cmd {
         argsparser::Subcommands::Byt => {
-            let mut path = std::path::PathBuf::from(&args.file);
-            let mut lexer = Lexer::new({
-                let mut my_file = fs::File::open(path.clone()).unwrap();
-
-                let mut buf = String::new();
-                my_file.read_to_string(&mut buf).unwrap();
-                buf
-            });
+            let mut path = PathBuf::from(&args.file);
+            let mut lexer = Lexer::new(util::read_file(&path));
             path.pop();
             let lexed = lexer.clone().lex(&mut vec![], path.as_path().display().to_string());
             if args.lex_out {
@@ -71,17 +57,8 @@ fn main() {
         },
         argsparser::Subcommands::Run => {
             // TODO: if specified accept args.outfile
-            let mut path = std::path::PathBuf::from(&args.file);
-            let mut lexer = Lexer::new({
-                let mut my_file = match fs::File::open(path.clone()) {
-                    Err(e) => error_print("error opening file", format!("{}: {}", e, &args.file)),
-                    Ok(f) => f,
-                };
-
-                let mut buf = String::new();
-                my_file.read_to_string(&mut buf).unwrap();
-                buf
-            });
+            let mut path = PathBuf::from(args.file);
+            let mut lexer = Lexer::new(util::read_file(&path));
             path.pop();
             let lexed = lexer.clone().lex(&mut vec![], path.as_path().display().to_string());
             if args.lex_out {
@@ -98,14 +75,8 @@ fn main() {
             run.run();
         },
         argsparser::Subcommands::RunBytes => {
-            let mut bytecode_src = match fs::File::open(&args.file) {
-                Err(e) => error_print("could not open file", format!("{}: {}", e, args.file)),
-                Ok(f) => f,
-            };
-
-            let mut con: Vec<u8> = vec![];
-            bytecode_src.read_to_end(&mut con).unwrap();
-
+            let path = PathBuf::from(args.file);
+            let con = util::read_file_to_vec_u8(&path);
             let parsed = bytecode::from_bytecode(&con[..]);
 
             let mut run = runtime::Run::new(parsed);
