@@ -1,10 +1,10 @@
 use crate::token::LexerToken as Token;
 use crate::token::tokentypes::LexerTokenType as TokenType;
-use crate::util::char_in_str;
+use crate::util::{char_in_str, in_vec, read_file};
+use crate::store::PATH_SEP;
 
-use std::fs;
-use std::path;
-use std::io::Read;
+use std::path::PathBuf;
+use std::fs::canonicalize;
 
 #[derive(Clone)]
 pub struct Lexer {
@@ -23,7 +23,7 @@ impl Lexer {
             col:     1,
         }
     }
-    fn post_proc(&self, prog: Vec<Token>, visited: &mut Vec<String>, folder: String) -> Vec<Token> {
+    fn post_proc(&self, prog: Vec<Token>, visited: &mut Vec<String>, file: String) -> Vec<Token> {
         let mut tokens: Vec<Token> = vec![];
         let mut current: usize = 0;
 
@@ -35,34 +35,38 @@ impl Lexer {
                     let next_tok = prog.get(current + 1).unwrap().clone();
                     match next_tok.typ {
                         TokenType::Yazı => {
-                            let path = path::Path::new(&folder);
-                            let abs_path = if path.has_root() {
-                                match fs::canonicalize(&folder) {
+                            let pathstr = next_tok.lexeme;
+                            let path = PathBuf::from(pathstr.clone());
+                            let canon_path: String = if path.has_root() {
+                                match canonicalize(&path) {
                                     Ok(a) => a.as_path().display().to_string(),
-                                    Err(e) => panic!("couldn't load file `{}`: `{}`", next_tok.lexeme, e),
+                                    Err(e) => panic!("`{}` adlı dosya yüklenemedi: `{}`", pathstr, e),
                                 }
                             } else {
-                                match fs::canonicalize(folder.clone() + &"/".to_string() + &next_tok.lexeme) {
+                                let fold = file.rsplit_once(PATH_SEP);
+                                match canonicalize(match fold {
+                                    Some((a, _)) => a.to_string(),
+                                    None => file.clone(),
+                                } + &PATH_SEP.to_string() + &pathstr) {
                                     Ok(a) => a.as_path().display().to_string(),
-                                    Err(e) => panic!("couldn't load file `{}`: {}", next_tok.lexeme, e),
+                                    Err(e) => panic!("`{}` adlı dosya yüklenemedi: {}", pathstr, e),
                                 }
                             };
-                            let mut file = match fs::File::open(abs_path.clone()) {
-                                Ok(f) => f,
-                                Err(e) => panic!("couldn't load file `{}`: {}", abs_path, e),
-                            };
-                            let mut buf = String::new();
-                            file.read_to_string(&mut buf).unwrap();
 
-                            let mut nl = Lexer::new(buf);
-                            if !crate::util::in_vec(&abs_path, visited) {
-                                tokens.append(&mut nl.tokenize(visited, folder.clone()));
+                            let path = PathBuf::from(canon_path.clone());
+                            if !in_vec(&canon_path, &visited) {
+                                visited.push(canon_path.clone());
+
+                                let ns = read_file(&path);
+                                let mut nl = Self::new(ns);
+    
+                                let mut tokenl = nl.tokenize(visited, canon_path);
+                                tokens.append(&mut tokenl);
                             }
                         },
-                        TokenType::Identifier => unimplemented!(),
-                        _ => panic!("yüklenecek dosya sadece bir yazıdan veya addan çıkarılabilir"),
+                        TokenType::Identifier => {},
+                        _ => panic!("yazı veya tanımlayıcı bekleniyordu ancak bulunamadı"), // SyntaxError
                     }
-                    current += 2;
                 },
                 _ => {
                     tokens.push(c);
