@@ -1,2 +1,2 @@
-mod err;
-mod warn;
+mod errwarn;
+pub use errwarn::ErrorGenerator;
