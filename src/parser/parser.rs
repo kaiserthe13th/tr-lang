@@ -43,7 +43,7 @@ impl Parser {
                     blocktokens.push(BlockToken::İşlev(ip));
                     parsed.push(Token::new(
                         TokenType::İşlev { sonloc: None },
-                        ptoken.line, ptoken.col
+                        ptoken.line, ptoken.col, ptoken.file.clone()
                     ));
                 },
                 LexTokenType::At => {
@@ -51,6 +51,7 @@ impl Parser {
                         TokenType::At,
                         ptoken.line,
                         ptoken.col,
+                        ptoken.file.clone(),
                     ));
                 },
                 LexTokenType::Sayı => {
@@ -58,6 +59,7 @@ impl Parser {
                         TokenType::Sayı { val: ptoken.lexeme.as_str().parse().unwrap() },
                         ptoken.line,
                         ptoken.col,
+                        ptoken.file.clone(),
                     ));
                 },
                 LexTokenType::Yazı => {
@@ -65,6 +67,7 @@ impl Parser {
                         TokenType::Yazı { val: ptoken.lexeme.clone() },
                         ptoken.line,
                         ptoken.col,
+                        ptoken.file.clone(),
                     ))
                 },
                 LexTokenType::Identifier => {
@@ -72,6 +75,7 @@ impl Parser {
                         TokenType::Identifier { id: ptoken.lexeme.clone() },
                         ptoken.line,
                         ptoken.col,
+                        ptoken.file.clone(),
                     ))
                 },
                 LexTokenType::İkiNoktaNokta => {
@@ -80,6 +84,7 @@ impl Parser {
                         TokenType::İkiNoktaNokta,
                         ptoken.line,
                         ptoken.col,
+                        ptoken.file.clone(),
                     ))
                 },
                 LexTokenType::İken => {
@@ -93,6 +98,7 @@ impl Parser {
                         TokenType::İken(None),
                         ptoken.line,
                         ptoken.col,
+                        ptoken.file.clone(),
                     ));
                 },
                 LexTokenType::İse => {
@@ -101,6 +107,7 @@ impl Parser {
                         TokenType::İse( None ),
                         ptoken.line,
                         ptoken.col,
+                        ptoken.file.clone(),
                     ));
                 },
                 LexTokenType::Yoksa => {
@@ -123,6 +130,7 @@ impl Parser {
                         TokenType::Yoksa(None),
                         ptoken.line,
                         ptoken.col,
+                        ptoken.file.clone(),
                     ));
                 },
                 LexTokenType::Son => {
@@ -144,6 +152,7 @@ impl Parser {
                                 TokenType::Son { tp },
                                 ptoken.line,
                                 ptoken.col,
+                                ptoken.file.clone(),
                             ));
                         },
                         BlockToken::İken(bip) => {
@@ -171,6 +180,7 @@ impl Parser {
                                 TokenType::Son { tp },
                                 ptoken.line,
                                 ptoken.col,
+                                ptoken.file.clone(),
                             ));
                         },
                         BlockToken::İşlev(bip) => {
@@ -183,7 +193,7 @@ impl Parser {
                             }
                             parsed.push(Token::new(
                                 TokenType::İşlevSonlandır { tp: vec![] },
-                                ptoken.line, ptoken.col
+                                ptoken.line, ptoken.col, ptoken.file.clone()
                             ));
                         },
                         _ => unimplemented!(),
@@ -194,6 +204,7 @@ impl Parser {
                         TokenType::Bool { val: true },
                         ptoken.line,
                         ptoken.col,
+                        ptoken.file.clone(),
                     ))
                 },
                 LexTokenType::Yanlış => {
@@ -201,33 +212,34 @@ impl Parser {
                         TokenType::Bool { val: false },
                         ptoken.line,
                         ptoken.col,
+                        ptoken.file.clone(),
                     ))
                 },
-                LexTokenType::Artı => parsed.push(Token::new(TokenType::Artı, ptoken.line, ptoken.col)),
-                LexTokenType::ArtıArtı => parsed.push(Token::new(TokenType::ArtıArtı, ptoken.line, ptoken.col)),
-                LexTokenType::Eksi => parsed.push(Token::new(TokenType::Eksi, ptoken.line, ptoken.col)),
-                LexTokenType::EksiEksi => parsed.push(Token::new(TokenType::EksiEksi, ptoken.line, ptoken.col)),
-                LexTokenType::Çarpı => parsed.push(Token::new(TokenType::Çarpı, ptoken.line, ptoken.col)),
-                LexTokenType::Bölü => parsed.push(Token::new(TokenType::Bölü, ptoken.line, ptoken.col)),
-                LexTokenType::Modulo => parsed.push(Token::new(TokenType::Modulo, ptoken.line, ptoken.col)),
-                LexTokenType::De => parsed.push(Token::new(TokenType::De, ptoken.line, ptoken.col)),
-                LexTokenType::Girdi => parsed.push(Token::new(TokenType::Girdi, ptoken.line, ptoken.col)),
-                LexTokenType::Kopya => parsed.push(Token::new(TokenType::Kopya, ptoken.line, ptoken.col)),
-                LexTokenType::Koy => parsed.push(Token::new(TokenType::Koy, ptoken.line, ptoken.col)),
-                LexTokenType::Büyüktür => parsed.push(Token::new(TokenType::Büyüktür, ptoken.line, ptoken.col)),
-                LexTokenType::BüyükEşittir => parsed.push(Token::new(TokenType::BüyükEşittir, ptoken.line, ptoken.col)),
-                LexTokenType::Küçüktür => parsed.push(Token::new(TokenType::Küçüktür, ptoken.line, ptoken.col)),
-                LexTokenType::KüçükEşittir => parsed.push(Token::new(TokenType::KüçükEşittir, ptoken.line, ptoken.col)),
-                LexTokenType::Eşittir => parsed.push(Token::new(TokenType::Eşittir, ptoken.line, ptoken.col)),
-                LexTokenType::EşitDeğildir => parsed.push(Token::new(TokenType::EşitDeğildir, ptoken.line, ptoken.col)),
-                LexTokenType::Değildir => parsed.push(Token::new(TokenType::Değildir, ptoken.line, ptoken.col)),
-                LexTokenType::Takas => parsed.push(Token::new(TokenType::Takas, ptoken.line, ptoken.col)),
-                LexTokenType::Döndür => parsed.push(Token::new(TokenType::Döndür, ptoken.line, ptoken.col)),
-                LexTokenType::Üst => parsed.push(Token::new(TokenType::Üst, ptoken.line, ptoken.col)),
-                LexTokenType::Ve => parsed.push(Token::new(TokenType::Ve, ptoken.line, ptoken.col)),
-                LexTokenType::Veya => parsed.push(Token::new(TokenType::Veya, ptoken.line, ptoken.col)),
-                LexTokenType::Tipinde => parsed.push(Token::new(TokenType::Tipinde, ptoken.line, ptoken.col)),
-                LexTokenType::EOF => parsed.push(Token::new(TokenType::EOF, ptoken.line, ptoken.col)),
+                LexTokenType::Artı => parsed.push(Token::new(TokenType::Artı, ptoken.line, ptoken.col, ptoken.file.clone())),
+                LexTokenType::ArtıArtı => parsed.push(Token::new(TokenType::ArtıArtı, ptoken.line, ptoken.col, ptoken.file.clone())),
+                LexTokenType::Eksi => parsed.push(Token::new(TokenType::Eksi, ptoken.line, ptoken.col, ptoken.file.clone())),
+                LexTokenType::EksiEksi => parsed.push(Token::new(TokenType::EksiEksi, ptoken.line, ptoken.col, ptoken.file.clone())),
+                LexTokenType::Çarpı => parsed.push(Token::new(TokenType::Çarpı, ptoken.line, ptoken.col, ptoken.file.clone())),
+                LexTokenType::Bölü => parsed.push(Token::new(TokenType::Bölü, ptoken.line, ptoken.col, ptoken.file.clone())),
+                LexTokenType::Modulo => parsed.push(Token::new(TokenType::Modulo, ptoken.line, ptoken.col, ptoken.file.clone())),
+                LexTokenType::De => parsed.push(Token::new(TokenType::De, ptoken.line, ptoken.col, ptoken.file.clone())),
+                LexTokenType::Girdi => parsed.push(Token::new(TokenType::Girdi, ptoken.line, ptoken.col, ptoken.file.clone())),
+                LexTokenType::Kopya => parsed.push(Token::new(TokenType::Kopya, ptoken.line, ptoken.col, ptoken.file.clone())),
+                LexTokenType::Koy => parsed.push(Token::new(TokenType::Koy, ptoken.line, ptoken.col, ptoken.file.clone())),
+                LexTokenType::Büyüktür => parsed.push(Token::new(TokenType::Büyüktür, ptoken.line, ptoken.col, ptoken.file.clone())),
+                LexTokenType::BüyükEşittir => parsed.push(Token::new(TokenType::BüyükEşittir, ptoken.line, ptoken.col, ptoken.file.clone())),
+                LexTokenType::Küçüktür => parsed.push(Token::new(TokenType::Küçüktür, ptoken.line, ptoken.col, ptoken.file.clone())),
+                LexTokenType::KüçükEşittir => parsed.push(Token::new(TokenType::KüçükEşittir, ptoken.line, ptoken.col, ptoken.file.clone())),
+                LexTokenType::Eşittir => parsed.push(Token::new(TokenType::Eşittir, ptoken.line, ptoken.col, ptoken.file.clone())),
+                LexTokenType::EşitDeğildir => parsed.push(Token::new(TokenType::EşitDeğildir, ptoken.line, ptoken.col, ptoken.file.clone())),
+                LexTokenType::Değildir => parsed.push(Token::new(TokenType::Değildir, ptoken.line, ptoken.col, ptoken.file.clone())),
+                LexTokenType::Takas => parsed.push(Token::new(TokenType::Takas, ptoken.line, ptoken.col, ptoken.file.clone())),
+                LexTokenType::Döndür => parsed.push(Token::new(TokenType::Döndür, ptoken.line, ptoken.col, ptoken.file.clone())),
+                LexTokenType::Üst => parsed.push(Token::new(TokenType::Üst, ptoken.line, ptoken.col, ptoken.file.clone())),
+                LexTokenType::Ve => parsed.push(Token::new(TokenType::Ve, ptoken.line, ptoken.col, ptoken.file.clone())),
+                LexTokenType::Veya => parsed.push(Token::new(TokenType::Veya, ptoken.line, ptoken.col, ptoken.file.clone())),
+                LexTokenType::Tipinde => parsed.push(Token::new(TokenType::Tipinde, ptoken.line, ptoken.col, ptoken.file.clone())),
+                LexTokenType::EOF => parsed.push(Token::new(TokenType::EOF, ptoken.line, ptoken.col, ptoken.file.clone())),
             }
         }
         parsed

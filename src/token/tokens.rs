@@ -100,11 +100,12 @@ pub struct LexerToken {
     pub lexeme: String,
     pub line:   usize,
     pub col:    usize,
+    pub file:   String,
 }
 
 impl LexerToken {
-    pub fn new(typ: tokentypes::LexerTokenType, lexeme: String, line: usize, col: usize) -> Self {
-        Self { typ, lexeme, line, col }
+    pub fn new(typ: tokentypes::LexerTokenType, lexeme: String, line: usize, col: usize, file: String) -> Self {
+        Self { typ, lexeme, line, col, file }
     }
 }
 
@@ -113,10 +114,11 @@ pub struct ParserToken {
     pub typ:  tokentypes::ParserTokenType,
     pub line: usize,
     pub col:  usize,
+    pub file: String,
 }
 
 impl ParserToken {
-    pub fn new(typ: tokentypes::ParserTokenType, line: usize, col: usize) -> Self {
-        Self { typ, line, col }
+    pub fn new(typ: tokentypes::ParserTokenType, line: usize, col: usize, file: String) -> Self {
+        Self { typ, line, col, file }
     }
 }

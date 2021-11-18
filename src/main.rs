@@ -31,11 +31,10 @@ fn main() {
     
     match args.sub_cmd {
         argsparser::Subcommands::Byt => {
-            let mut path = PathBuf::from(&args.file);
+            let path = PathBuf::from(&args.file);
             let mut lexer = Lexer::new(util::read_file(&path));
-            path.pop();
-            let lexed = lexer.clone().tokenize(&mut vec![], path.as_path().display().to_string());
             if args.lex_out {
+                let lexed = lexer.clone().tokenize(&mut vec![args.file.clone()], args.file.clone()); 
                 println!("{:#?}", &lexed);
             }
         
@@ -57,17 +56,16 @@ fn main() {
         },
         argsparser::Subcommands::Run => {
             // TODO: if specified accept args.outfile
-            let mut path = PathBuf::from(args.file);
+            let path = PathBuf::from(args.file.clone());
             let mut lexer = Lexer::new(util::read_file(&path));
-            path.pop();
-            let lexed = lexer.clone().tokenize(&mut vec![], path.as_path().display().to_string());
             if args.lex_out {
+                let lexed = lexer.clone().tokenize(&mut vec![args.file.clone()], args.file.clone());
                 println!("{:#?}", lexed);
             }
         
-            let mut parser = Parser::from_lexer(&mut lexer, path.as_path().display().to_string());
-            let parsed = parser.clone().parse();
+            let mut parser = Parser::from_lexer(&mut lexer, args.file);
             if args.prs_out {
+                let parsed = parser.clone().parse();
                 println!("{:#?}", parsed);
             }
 
