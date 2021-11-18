@@ -38,7 +38,7 @@ fn main() {
                 println!("{:#?}", &lexed);
             }
         
-            let mut parser = Parser::from_lexer(&mut lexer, path.as_path().display().to_string());
+            let mut parser = Parser::from_lexer(&mut lexer, args.file.clone());
             let parsed = parser.parse();
             if args.prs_out {
                 println!("{:#?}", parsed.clone());
