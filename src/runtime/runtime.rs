@@ -1,4 +1,6 @@
 use crate::token::{ ParserToken as Token, tokentypes::ParserTokenType as TokenType };
+use crate::errwarn::ErrorGenerator;
+use crate::util::{ get_lang, SupportedLanguage };
 use std::io::{ self, prelude::* };
 use std::collections::HashMap;
 
@@ -25,7 +27,10 @@ impl std::fmt::Debug for Object {
                     write!(f, "{:?}", n)
                 }
             },
-            Self::Bool(b) => write!(f, "{:?}", b),
+            Self::Bool(b) => match b {
+                true => write!(f, "doğru"),
+                false => write!(f, "yanlış"),
+            },
             Self::Yazı(s) => write!(f, "{}", s),
             Self::İşlev(loc) => write!(f, "<işlev: {:?}>", loc),
         }
@@ -338,9 +343,10 @@ impl Run {
         Self { program, current: 0 }
     }
 
-    pub fn run(&mut self) {
+    pub fn run(&mut self, file: String) {
         let mut stack: Stack = vec![];
         let mut hashs: HashMap<String, Object> = HashMap::new();
+        // let mut warnings: Vec<Box<dyn Fn() -> ()>> = vec![]; // for later use
         let mut işlev_derinliği: usize = 0;
 
         while self.program.len() > self.current {
@@ -673,6 +679,65 @@ impl Run {
                         _ => unimplemented!("hata: tip tanımlayıcı değil"),
                     };
                     self.current += 1;
+                },
+            }
+        }
+
+        if stack.len() > 0 {
+            match get_lang() {
+                SupportedLanguage::Turkish => {
+                    ErrorGenerator::warning(
+                        "KümeBoşDeğil",
+                        "küme boş değil, eğer nedeninden şüphe ediyorsanız kodunuzu kontrol etmeniz önerilir",
+                        0,
+                        0,
+                        file
+                    )();
+                    print!("    kümede kalan değişkenler({:?}) [", stack.len());
+                    for (i, o) in stack.iter().rev().take(3).rev().enumerate() {
+                        let o = match o {
+                            Object::Yazı(s) => format!("{:?}", s),
+                            Object::Bool(_) | Object::Sayı(_) => format!("{:?}", o),
+                            Object::İşlev(_) => unreachable!(),
+                        };
+                        if i > 0 {
+                            print!(", {}", o);
+                        } else {
+                            if stack.len() > 3 {
+                                print!("... {}", o);
+                            } else {
+                                print!("{}", o);
+                            }
+                        }
+                    }
+                    println!("]");
+                },
+                SupportedLanguage::English => {
+                    ErrorGenerator::warning(
+                        "StackNotEmpty",
+                        "stack is not empty, if you aren't sure about why, you might want to take a look at you code",
+                        0,
+                        0,
+                        file
+                    )();
+                    print!("    variables left in the stack({:?}) [", stack.len());
+                    for (i, o) in stack.iter().rev().take(3).rev().enumerate() {
+                        let o = match o {
+                            Object::Yazı(s) => format!("{:?}", s),
+                            Object::Bool(_) | Object::Sayı(_) => format!("{:?}", o),
+                            Object::İşlev(_) => unreachable!(),
+                        };
+                        if i > 0 {
+                            print!(", {}", o);
+                        } else {
+                            if stack.len() > 3 {
+                                print!("... {}", o);
+                            } else {
+                                print!("{}", o);
+                            }
+                        }
+                    }
+                    println!("]");
                 },
             }
         }

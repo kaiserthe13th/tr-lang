@@ -18,6 +18,7 @@ pub mod util;
 pub mod bytecode;
 
 pub mod runtime;
+pub mod errwarn;
 
 mod argsparser;
 
@@ -77,22 +78,22 @@ fn main() {
                 println!("{:#?}", lexed);
             }
         
-            let mut parser = Parser::from_lexer(&mut lexer, args.file);
+            let mut parser = Parser::from_lexer(&mut lexer, args.file.clone());
             if args.prs_out {
                 let parsed = parser.clone().parse();
                 println!("{:#?}", parsed);
             }
 
             let mut run = runtime::Run::new(parser.parse());
-            run.run();
+            run.run(args.file);
         },
         argsparser::Subcommands::RunBytes => {
-            let path = PathBuf::from(args.file);
+            let path = PathBuf::from(args.file.clone());
             let con = util::read_file_to_vec_u8(&path);
             let parsed = bytecode::from_bytecode(&con[..]);
 
             let mut run = runtime::Run::new(parsed);
-            run.run();
+            run.run(args.file);
         },
     }
 }
