@@ -18,13 +18,13 @@ impl ErrorGenerator {
         }
         exit(1);
     }
-    fn warning(name: String, explanation: String, line: usize, col: usize, file: String) {
+    fn warning(name: String, explanation: String, line: usize, col: usize, file: String) -> impl Fn() -> () {
         match get_lang() {
-            SupportedLanguage::English => {
+            SupportedLanguage::English => ||{
                 eprintln!("[WARNING] {}, Line {:?}, Column {:?}", file, line, col);
                 eprintln!("    {}: {}", name, explanation);
             },
-            SupportedLanguage::Turkish => {
+            SupportedLanguage::Turkish => ||{
                 eprintln!("[UYARI] {}, Satır {:?}, Sütun {:?}", file, line, col);
                 eprintln!("    {}: {}", name, explanation);
             },
