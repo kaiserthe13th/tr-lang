@@ -1,3 +1,5 @@
+#![feature(io_error_more)]
+
 use std::fs;
 use std::io::Write;
 
@@ -31,8 +33,14 @@ fn main() {
     
     match args.sub_cmd {
         argsparser::Subcommands::Byt => {
-            let path = PathBuf::from(&args.file);
-            let mut lexer = Lexer::new(util::read_file(&path));
+            let mut path = PathBuf::from(&args.file);
+            let mut lexer = Lexer::new(match util::read_file(&path) {
+                Ok(f) => f,
+                Err(util::FSErr::IsADir) => {
+                    path.push("main.trl");
+                    util::read_file(&path).unwrap()
+                },
+            });
             if args.lex_out {
                 let lexed = lexer.clone().tokenize(&mut vec![args.file.clone()], args.file.clone()); 
                 println!("{:#?}", &lexed);
@@ -56,8 +64,14 @@ fn main() {
         },
         argsparser::Subcommands::Run => {
             // TODO: if specified accept args.outfile
-            let path = PathBuf::from(args.file.clone());
-            let mut lexer = Lexer::new(util::read_file(&path));
+            let mut path = PathBuf::from(args.file.clone());
+            let mut lexer = Lexer::new(match util::read_file(&path) {
+                Ok(f) => f,
+                Err(util::FSErr::IsADir) => {
+                    path.push("main.trl");
+                    util::read_file(&path).unwrap()
+                },
+            });
             if args.lex_out {
                 let lexed = lexer.clone().tokenize(&mut vec![args.file.clone()], args.file.clone());
                 println!("{:#?}", lexed);

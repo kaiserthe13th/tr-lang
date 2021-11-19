@@ -1,6 +1,6 @@
 use crate::token::LexerToken as Token;
 use crate::token::tokentypes::LexerTokenType as TokenType;
-use crate::util::{char_in_str, in_vec, read_file};
+use crate::util::{char_in_str, in_vec, read_file, FSErr};
 use crate::store::PATH_SEP;
 
 use std::path::PathBuf;
@@ -53,11 +53,17 @@ impl Lexer {
                                 }
                             };
 
-                            let path = PathBuf::from(canon_path.clone());
+                            let mut path = PathBuf::from(canon_path.clone());
                             if !in_vec(&canon_path, &visited) {
                                 visited.push(canon_path.clone());
 
-                                let mut nl = Self::new(read_file(&path));
+                                let mut nl = Self::new(match read_file(&path) {
+                                    Ok(f) => f,
+                                    Err(FSErr::IsADir) => {
+                                        path.push("main.trl");
+                                        read_file(&path).unwrap()
+                                    },
+                                });
                                 tokens.append(&mut nl.tokenize(visited, canon_path));
                             }
                         },
