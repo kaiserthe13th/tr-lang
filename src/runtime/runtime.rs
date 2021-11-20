@@ -592,8 +592,52 @@ impl Run {
                 }
                 TokenType::Üst => {
                     if işlev_derinliği < 1 {
-                        let a = stack.pop().unwrap();
-                        let b = stack.pop().unwrap();
+                        let a = match stack.pop() {
+                            Some(a) => a,
+                            None => match get_lang() {
+                                SupportedLanguage::Turkish => {
+                                    ErrorGenerator::error(
+                                        "KümedeYeterliDeğişkenYok",
+                                        "kümede yeterli değişken bulunmadığından dolayı `üst` anahtar kelimesi uygulanamamıştır",
+                                        tokenc.line,
+                                        tokenc.col,
+                                        file,
+                                    );
+                                },
+                                SupportedLanguage::English => {
+                                    ErrorGenerator::error(
+                                        "NotEnoughVarsInStack",
+                                        "because there weren't enough variables in the stack, the keyword `üst` couldn't be used",
+                                        tokenc.line,
+                                        tokenc.col,
+                                        file,
+                                    );
+                                },
+                            },
+                        };
+                        let b = match stack.pop() {
+                            Some(a) => a,
+                            None => match get_lang() {
+                                SupportedLanguage::Turkish => {
+                                    ErrorGenerator::error(
+                                        "KümedeYeterliDeğişkenYok",
+                                        "kümede yeterli değişken bulunmadığından dolayı `->` operatörü uygulanamamıştır",
+                                        tokenc.line,
+                                        tokenc.col,
+                                        file,
+                                    );
+                                },
+                                SupportedLanguage::English => {
+                                    ErrorGenerator::error(
+                                        "NotEnoughVarsInStack",
+                                        "because there weren't enough variables in the stack, the operator `->` couldn't be used",
+                                        tokenc.line,
+                                        tokenc.col,
+                                        file,
+                                    );
+                                },
+                            },
+                        };
                         stack.push(b.clone());
                         stack.push(a);
                         stack.push(b);
@@ -661,7 +705,7 @@ impl Run {
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
                                     "NotEnoughVarsInStack",
-                                    "because there weren't enough variables, the operator `->` couldn't be used",
+                                    "because there weren't enough variables in the stack, the operator `->` couldn't be used",
                                     tokenc.line,
                                     tokenc.col,
                                     file,
@@ -711,7 +755,7 @@ impl Run {
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
                                     "NotEnoughVarsInStack",
-                                    "because there weren't enough variables, the operator `ve` couldn't be used",
+                                    "because there weren't enough variables in the stack, the operator `ve` couldn't be used",
                                     tokenc.line,
                                     tokenc.col,
                                     file,
@@ -734,7 +778,7 @@ impl Run {
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
                                     "NotEnoughVarsInStack",
-                                    "because there weren't enough variables, the operator `ve` couldn't be used",
+                                    "because there weren't enough variables in the stack, the operator `ve` couldn't be used",
                                     tokenc.line,
                                     tokenc.col,
                                     file,
@@ -761,7 +805,7 @@ impl Run {
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
                                     "NotEnoughVarsInStack",
-                                    "because there weren't enough variables, the operator `veya` couldn't be used",
+                                    "because there weren't enough variables in the stack, the operator `veya` couldn't be used",
                                     tokenc.line,
                                     tokenc.col,
                                     file,
@@ -784,7 +828,7 @@ impl Run {
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
                                     "NotEnoughVarsInStack",
-                                    "because there weren't enough variables, the operator `veya` couldn't be used",
+                                    "because there weren't enough variables in the stack, the operator `veya` couldn't be used",
                                     tokenc.line,
                                     tokenc.col,
                                     file,
