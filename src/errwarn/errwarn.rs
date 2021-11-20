@@ -6,11 +6,11 @@ pub mod ErrorGenerator {
     pub fn error(name: &str, explanation: &str, line: usize, col: usize, file: String) -> ! {
         match get_lang() {
             SupportedLanguage::English => {
-                eprintln!("[ERROR] {}, Line {:?}, Column {:?}", file, line, col);
+                eprintln!("\n[ERROR] {}, Line {:?}, Column {:?}", file, line, col);
                 eprintln!("    {}: {}", name, explanation);
             },
             SupportedLanguage::Turkish => {
-                eprintln!("[HATA] {}, Satır {:?}, Sütun {:?}", file, line, col);
+                eprintln!("\n[HATA] {}, Satır {:?}, Sütun {:?}", file, line, col);
                 eprintln!("    {}: {}", name, explanation);
             },
         }
