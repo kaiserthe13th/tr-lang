@@ -457,23 +457,133 @@ impl Run {
                 }
                 TokenType::Eşittir => {
                     if işlev_derinliği < 1 {
-                        let a = stack.pop().unwrap();
-                        let b = stack.pop().unwrap();
+                        let a = match stack.pop() {
+                            Some(a) => a,
+                            None => match get_lang() {
+                                SupportedLanguage::Turkish => {
+                                    ErrorGenerator::error(
+                                    "KümedeYeterliDeğişkenYok",
+                                    &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
+                                    tokenc.line,
+                                    tokenc.col,
+                                    file,
+                                );
+                                }
+                                SupportedLanguage::English => {
+                                    ErrorGenerator::error(
+                                    "NotEnoughVarsInStack",
+                                    &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
+                                    tokenc.line,
+                                    tokenc.col,
+                                    file,
+                                );
+                                }
+                            },
+                        };
+                        let b = match stack.pop() {
+                            Some(a) => a,
+                            None => match get_lang() {
+                                SupportedLanguage::Turkish => {
+                                    ErrorGenerator::error(
+                                    "KümedeYeterliDeğişkenYok",
+                                    &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
+                                    tokenc.line,
+                                    tokenc.col,
+                                    file,
+                                );
+                                }
+                                SupportedLanguage::English => {
+                                    ErrorGenerator::error(
+                                    "NotEnoughVarsInStack",
+                                    &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
+                                    tokenc.line,
+                                    tokenc.col,
+                                    file,
+                                );
+                                }
+                            },
+                        };
                         stack.push(b.eşittir(a));
                     }
                     self.current += 1;
                 }
                 TokenType::EşitDeğildir => {
                     if işlev_derinliği < 1 {
-                        let a = stack.pop().unwrap();
-                        let b = stack.pop().unwrap();
+                        let a = match stack.pop() {
+                            Some(a) => a,
+                            None => match get_lang() {
+                                SupportedLanguage::Turkish => {
+                                    ErrorGenerator::error(
+                                    "KümedeYeterliDeğişkenYok",
+                                    &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
+                                    tokenc.line,
+                                    tokenc.col,
+                                    file,
+                                );
+                                }
+                                SupportedLanguage::English => {
+                                    ErrorGenerator::error(
+                                    "NotEnoughVarsInStack",
+                                    &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
+                                    tokenc.line,
+                                    tokenc.col,
+                                    file,
+                                );
+                                }
+                            },
+                        };
+                        let b = match stack.pop() {
+                            Some(a) => a,
+                            None => match get_lang() {
+                                SupportedLanguage::Turkish => {
+                                    ErrorGenerator::error(
+                                    "KümedeYeterliDeğişkenYok",
+                                    &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
+                                    tokenc.line,
+                                    tokenc.col,
+                                    file,
+                                );
+                                }
+                                SupportedLanguage::English => {
+                                    ErrorGenerator::error(
+                                    "NotEnoughVarsInStack",
+                                    &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
+                                    tokenc.line,
+                                    tokenc.col,
+                                    file,
+                                );
+                                }
+                            },
+                        };
                         stack.push(b.eşit_değildir(a));
                     }
                     self.current += 1;
                 }
                 TokenType::Değildir => {
                     if işlev_derinliği < 1 {
-                        let a = stack.pop().unwrap();
+                        let a = match stack.pop() {
+                            Some(a) => a,
+                            None => match get_lang() {
+                                SupportedLanguage::Turkish => {
+                                    ErrorGenerator::error(
+                                    "KümedeYeterliDeğişkenYok",
+                                    &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
+                                    tokenc.line,
+                                    tokenc.col,
+                                    file,
+                                );
+                                }
+                                SupportedLanguage::English => {
+                                    ErrorGenerator::error(
+                                    "NotEnoughVarsInStack",
+                                    &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
+                                    tokenc.line,
+                                    tokenc.col,
+                                    file,
+                                );
+                                }
+                            },
+                        };
                         stack.push(a.değildir());
                     }
                     self.current += 1;
