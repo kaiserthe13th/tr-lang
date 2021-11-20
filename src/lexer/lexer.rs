@@ -43,12 +43,7 @@ impl Lexer {
                                     Err(e) => panic!("`{}` adlı dosya yüklenemedi: `{}`", pathstr, e),
                                 }
                             } else {
-                                let fold = file.rsplit_once(PATH_SEP);
-
-                                match canonicalize(match canonicalize(match fold {
-                                    Some((a, _)) => a.to_string(),
-                                    None => file.clone(),
-                                }) {
+                                match canonicalize(match canonicalize(file.clone()) {
                                     Ok(a) => {
                                         let mut a = a;
                                         a.pop();
