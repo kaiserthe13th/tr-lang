@@ -648,7 +648,29 @@ impl Run {
                     }
                 },
                 TokenType::Koy => {
-                    let a = stack.pop().unwrap();
+                    let a = match stack.pop() {
+                        Some(a) => a,
+                        None => match get_lang() {
+                            SupportedLanguage::Turkish => {
+                                ErrorGenerator::error(
+                                    "KümedeYeterliDeğişkenYok",
+                                    "kümede yeterli değişken bulunmadığından dolayı `->` operatörü uygulanamamıştır",
+                                    token.line,
+                                    token.col,
+                                    file,
+                                );
+                            },
+                            SupportedLanguage::English => {
+                                ErrorGenerator::error(
+                                    "NotEnoughVarsInStack",
+                                    "because there weren't enough variables, the operator `->` couldn't be used",
+                                    token.line,
+                                    token.col,
+                                    file,
+                                );
+                            },
+                        },
+                    };
                     let id = self.program.get(self.current+1).unwrap();
                     hashs.insert(match id.typ.clone() {
                         TokenType::Identifier { id } => id,
