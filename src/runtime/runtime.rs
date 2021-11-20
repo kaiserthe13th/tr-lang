@@ -1,6 +1,7 @@
 use crate::errwarn::ErrorGenerator;
 use crate::token::{tokentypes::ParserTokenType as TokenType, ParserToken as Token};
 use crate::util::{get_lang, SupportedLanguage};
+use crate::store::SUPRESS_WARN;
 use std::collections::HashMap;
 use std::io::{self, prelude::*};
 
@@ -1076,7 +1077,7 @@ impl Run {
             }
         }
 
-        if stack.len() > 0 {
+        if stack.len() > 0 && !unsafe { SUPRESS_WARN } {
             match get_lang() {
                 SupportedLanguage::Turkish => {
                     ErrorGenerator::warning(

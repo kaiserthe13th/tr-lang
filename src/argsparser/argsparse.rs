@@ -1,5 +1,6 @@
 use std::env;
 use crate::util;
+use crate::store::SUPRESS_WARN;
 
 #[derive(Debug)]
 pub enum Subcommands {
@@ -81,6 +82,9 @@ pub fn parse_args() -> Options {
             "-h" | "-y" | "--yardım" => help = true,
             "-V" | "-s" | "--sürüm" => version = true,
             "-l" | "--lexer-çıktısı" => lex_out = true,
+            "-u" | "--uyarıları-engelle" => unsafe {
+                SUPRESS_WARN = true;
+            },
             "-p" | "--parser-çıktısı" => prs_out = true,
             "-o" | "-ç" | "--çıkış" => {
                 outs = true;
