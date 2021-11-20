@@ -44,9 +44,17 @@ impl Lexer {
                                 }
                             } else {
                                 let fold = file.rsplit_once(PATH_SEP);
-                                match canonicalize(match fold {
+
+                                match canonicalize(match canonicalize(match fold {
                                     Some((a, _)) => a.to_string(),
                                     None => file.clone(),
+                                }) {
+                                    Ok(a) => {
+                                        let mut a = a;
+                                        a.pop();
+                                        a.as_path().display().to_string()
+                                    },
+                                    Err(e) => panic!("`{}` adlı dosya yüklenemedi: {}", pathstr, e),
                                 } + &PATH_SEP.to_string() + &pathstr) {
                                     Ok(a) => a.as_path().display().to_string(),
                                     Err(e) => panic!("`{}` adlı dosya yüklenemedi: {}", pathstr, e),
@@ -70,6 +78,7 @@ impl Lexer {
                         TokenType::Identifier => {},
                         _ => panic!("yükle anahtar kelimesinden sonra yazı veya tanımlayıcı bekleniyordu ancak bulunamadı"), // SyntaxError
                     }
+                    current += 2;
                 },
                 _ => {
                     tokens.push(c);
