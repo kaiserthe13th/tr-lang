@@ -748,28 +748,28 @@ impl Run {
                             },
                         };
                         let b = match stack.pop() {
-                            Some(a) => a,
-                            None => match get_lang() {
-                                SupportedLanguage::Turkish => {
-                                    ErrorGenerator::error(
-                                        "KümedeYeterliDeğişkenYok",
-                                        "kümede yeterli değişken bulunmadığından dolayı `üst` operatörü uygulanamamıştır",
-                                        tokenc.line,
-                                        tokenc.col,
-                                        file,
-                                    );
-                                },
-                                SupportedLanguage::English => {
-                                    ErrorGenerator::error(
-                                        "NotEnoughVarsInStack",
-                                        "because there weren't enough variables in the stack, the operator `üst` couldn't be used",
-                                        tokenc.line,
-                                        tokenc.col,
-                                        file,
-                                    );
-                                },
+                        Some(a) => a,
+                        None => match get_lang() {
+                            SupportedLanguage::Turkish => {
+                                ErrorGenerator::error(
+                                    "KümedeYeterliDeğişkenYok",
+                                    format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
+                                    tokenc.line,
+                                    tokenc.col,
+                                    file,
+                                );
                             },
-                        };
+                            SupportedLanguage::English => {
+                                ErrorGenerator::error(
+                                    "NotEnoughVarsInStack",
+                                    format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
+                                    tokenc.line,
+                                    tokenc.col,
+                                    file,
+                                );
+                            },
+                        },
+                    };
                         stack.push(b.clone());
                         stack.push(a);
                         stack.push(b);
@@ -828,7 +828,7 @@ impl Run {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
-                                    "kümede yeterli değişken bulunmadığından dolayı `->` operatörü uygulanamamıştır",
+                                    format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
                                     file,
@@ -837,7 +837,7 @@ impl Run {
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
                                     "NotEnoughVarsInStack",
-                                    "because there weren't enough variables in the stack, the operator `->` couldn't be used",
+                                    format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
                                     file,
@@ -878,7 +878,7 @@ impl Run {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
-                                    "kümede yeterli değişken bulunmadığından dolayı `ve` operatörü uygulanamamıştır",
+                                    format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
                                     file,
@@ -887,7 +887,7 @@ impl Run {
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
                                     "NotEnoughVarsInStack",
-                                    "because there weren't enough variables in the stack, the operator `ve` couldn't be used",
+                                    format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
                                     file,
@@ -901,7 +901,7 @@ impl Run {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
-                                    "kümede yeterli değişken bulunmadığından dolayı `ve` operatörü uygulanamamıştır",
+                                    format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
                                     file,
@@ -910,7 +910,7 @@ impl Run {
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
                                     "NotEnoughVarsInStack",
-                                    "because there weren't enough variables in the stack, the operator `ve` couldn't be used",
+                                    format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
                                     file,
@@ -928,7 +928,7 @@ impl Run {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
-                                    "kümede yeterli değişken bulunmadığından dolayı `veya` operatörü uygulanamamıştır",
+                                    format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
                                     file,
@@ -937,7 +937,7 @@ impl Run {
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
                                     "NotEnoughVarsInStack",
-                                    "because there weren't enough variables in the stack, the operator `veya` couldn't be used",
+                                    format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
                                     file,
@@ -951,7 +951,7 @@ impl Run {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
-                                    "kümede yeterli değişken bulunmadığından dolayı `veya` operatörü uygulanamamıştır",
+                                    format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
                                     file,
@@ -960,7 +960,7 @@ impl Run {
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
                                     "NotEnoughVarsInStack",
-                                    "because there weren't enough variables in the stack, the operator `veya` couldn't be used",
+                                    format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
                                     file,
