@@ -1,6 +1,7 @@
 #![feature(io_error_more)]
 
 use std::fs;
+use std::fs::canonicalize;
 use std::io::Write;
 
 pub use std::process::exit;
@@ -43,7 +44,11 @@ fn main() {
                 },
             });
             if args.lex_out {
-                let lexed = lexer.clone().tokenize(&mut vec![args.file.clone()], args.file.clone()); 
+                let canon_path = match canonicalize(args.file.clone()) {
+                    Ok(a) => a.as_path().display().to_string(),
+                    Err(e) => panic!("`{}` adlı dosya yüklenemedi: {}", args.file.clone(), e),
+                };
+                let lexed = lexer.clone().tokenize(&mut vec![canon_path.clone()], canon_path); 
                 println!("{:#?}", &lexed);
             }
         
@@ -74,7 +79,11 @@ fn main() {
                 },
             });
             if args.lex_out {
-                let lexed = lexer.clone().tokenize(&mut vec![args.file.clone()], args.file.clone());
+                let canon_path = match canonicalize(args.file.clone()) {
+                    Ok(a) => a.as_path().display().to_string(),
+                    Err(e) => panic!("`{}` adlı dosya yüklenemedi: {}", args.file.clone(), e),
+                };
+                let lexed = lexer.clone().tokenize(&mut vec![canon_path.clone()], canon_path);
                 println!("{:#?}", lexed);
             }
         
