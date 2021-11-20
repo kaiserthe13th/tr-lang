@@ -566,8 +566,52 @@ impl Run {
                 },
                 TokenType::Takas => {
                     if işlev_derinliği < 1 {
-                        let a = stack.pop().unwrap();
-                        let b = stack.pop().unwrap();
+                        let a = match stack.pop() {
+                            Some(a) => a,
+                            None => match get_lang() {
+                                SupportedLanguage::Turkish => {
+                                    ErrorGenerator::error(
+                                        "KümedeYeterliDeğişkenYok",
+                                        "kümede yeterli değişken bulunmadığından dolayı `tks` anahtar kelimesi uygulanamamıştır",
+                                        tokenc.line,
+                                        tokenc.col,
+                                        file,
+                                    );
+                                },
+                                SupportedLanguage::English => {
+                                    ErrorGenerator::error(
+                                        "NotEnoughVarsInStack",
+                                        "because there weren't enough variables in the stack, the keyword `tks` couldn't be used",
+                                        tokenc.line,
+                                        tokenc.col,
+                                        file,
+                                    );
+                                },
+                            },
+                        };
+                        let b = match stack.pop() {
+                            Some(a) => a,
+                            None => match get_lang() {
+                                SupportedLanguage::Turkish => {
+                                    ErrorGenerator::error(
+                                        "KümedeYeterliDeğişkenYok",
+                                        "kümede yeterli değişken bulunmadığından dolayı `tks` anahtar kelimesi uygulanamamıştır",
+                                        tokenc.line,
+                                        tokenc.col,
+                                        file,
+                                    );
+                                },
+                                SupportedLanguage::English => {
+                                    ErrorGenerator::error(
+                                        "NotEnoughVarsInStack",
+                                        "because there weren't enough variables in the stack, the keyword `tks` couldn't be used",
+                                        tokenc.line,
+                                        tokenc.col,
+                                        file,
+                                    );
+                                },
+                            },
+                        };
                         stack.push(a);
                         stack.push(b);
                     }
