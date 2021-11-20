@@ -3,7 +3,7 @@ pub mod ErrorGenerator {
     use crate::exit;
     use crate::util::{ get_lang, SupportedLanguage };
 
-    pub fn error(name: String, explanation: String, line: usize, col: usize, file: String) -> ! {
+    pub fn error(name: &str, explanation: &str, line: usize, col: usize, file: String) -> ! {
         match get_lang() {
             SupportedLanguage::English => {
                 eprintln!("[ERROR] {}, Line {:?}, Column {:?}", file, line, col);
