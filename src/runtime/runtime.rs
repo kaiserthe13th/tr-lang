@@ -352,9 +352,6 @@ impl Run {
         while self.program.len() > self.current {
             let tokenc = self.program.get(self.current).unwrap().clone();
             let token = self.program.get_mut(self.current).unwrap();
-           
-            //println!("{:?}", token.clone());
-            //println!("{:?}", stack.clone());
 
             match token.typ.clone() {
                 TokenType::İşlev { sonloc } => {
