@@ -663,8 +663,52 @@ impl Run {
                     self.current += 1;
                 },
                 TokenType::Veya => {
-                    let a = stack.pop().unwrap();
-                    let b = stack.pop().unwrap();
+                    let a = match stack.pop() {
+                        Some(a) => a,
+                        None => match get_lang() {
+                            SupportedLanguage::Turkish => {
+                                ErrorGenerator::error(
+                                    "KümedeYeterliDeğişkenYok",
+                                    "kümede yeterli değişken bulunmadığından dolayı `veya` operatörü uygulanamamıştır",
+                                    token.line,
+                                    token.col,
+                                    file,
+                                );
+                            },
+                            SupportedLanguage::English => {
+                                ErrorGenerator::error(
+                                    "NotEnoughVarsInStack",
+                                    "because there weren't enough variables, the operator `veya` couldn't be used",
+                                    token.line,
+                                    token.col,
+                                    file,
+                                );
+                            },
+                        },
+                    };
+                    let b = match stack.pop() {
+                        Some(a) => a,
+                        None => match get_lang() {
+                            SupportedLanguage::Turkish => {
+                                ErrorGenerator::error(
+                                    "KümedeYeterliDeğişkenYok",
+                                    "kümede yeterli değişken bulunmadığından dolayı `veya` operatörü uygulanamamıştır",
+                                    token.line,
+                                    token.col,
+                                    file,
+                                );
+                            },
+                            SupportedLanguage::English => {
+                                ErrorGenerator::error(
+                                    "NotEnoughVarsInStack",
+                                    "because there weren't enough variables, the operator `veya` couldn't be used",
+                                    token.line,
+                                    token.col,
+                                    file,
+                                );
+                            },
+                        },
+                    };
                     stack.push(b.veya(a));
                     self.current += 1;
                 },
