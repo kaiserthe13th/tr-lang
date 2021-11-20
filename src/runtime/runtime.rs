@@ -350,6 +350,7 @@ impl Run {
         let mut işlev_derinliği: usize = 0;
 
         while self.program.len() > self.current {
+            let tokenc = self.program.get(self.current).unwrap().clone();
             let token = self.program.get_mut(self.current).unwrap();
            
             //println!("{:?}", token.clone());
@@ -655,8 +656,8 @@ impl Run {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
                                     "kümede yeterli değişken bulunmadığından dolayı `->` operatörü uygulanamamıştır",
-                                    token.line,
-                                    token.col,
+                                    tokenc.line,
+                                    tokenc.col,
                                     file,
                                 );
                             },
@@ -664,8 +665,8 @@ impl Run {
                                 ErrorGenerator::error(
                                     "NotEnoughVarsInStack",
                                     "because there weren't enough variables, the operator `->` couldn't be used",
-                                    token.line,
-                                    token.col,
+                                    tokenc.line,
+                                    tokenc.col,
                                     file,
                                 );
                             },
@@ -673,8 +674,27 @@ impl Run {
                     };
                     let id = self.program.get(self.current+1).unwrap();
                     hashs.insert(match id.typ.clone() {
-                        TokenType::Identifier { id } => id,
-                        _ => unimplemented!(), // SyntaxError
+                        TokenType::Identifier { id : i } => i,
+                        t => match get_lang() {
+                            SupportedLanguage::Turkish => {
+                                ErrorGenerator::error(
+                                    "BeklenmedikSimge",
+                                    &format!("Tanımlayıcı simgesi beklenmişti ancak {:?} bulundu", t),
+                                    tokenc.line,
+                                    tokenc.col,
+                                    file,
+                                );
+                            },
+                            SupportedLanguage::English => {
+                                ErrorGenerator::error(
+                                    "BeklenmedikSimge",
+                                    &format!("expected Identifier but found {:?}", t),
+                                    tokenc.line,
+                                    tokenc.col,
+                                    file,
+                                );
+                            },
+                        },
                     }, a);
                     self.current += 2;
                 },
@@ -686,8 +706,8 @@ impl Run {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
                                     "kümede yeterli değişken bulunmadığından dolayı `ve` operatörü uygulanamamıştır",
-                                    token.line,
-                                    token.col,
+                                    tokenc.line,
+                                    tokenc.col,
                                     file,
                                 );
                             },
@@ -695,8 +715,8 @@ impl Run {
                                 ErrorGenerator::error(
                                     "NotEnoughVarsInStack",
                                     "because there weren't enough variables, the operator `ve` couldn't be used",
-                                    token.line,
-                                    token.col,
+                                    tokenc.line,
+                                    tokenc.col,
                                     file,
                                 );
                             },
@@ -709,8 +729,8 @@ impl Run {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
                                     "kümede yeterli değişken bulunmadığından dolayı `ve` operatörü uygulanamamıştır",
-                                    token.line,
-                                    token.col,
+                                    tokenc.line,
+                                    tokenc.col,
                                     file,
                                 );
                             },
@@ -718,8 +738,8 @@ impl Run {
                                 ErrorGenerator::error(
                                     "NotEnoughVarsInStack",
                                     "because there weren't enough variables, the operator `ve` couldn't be used",
-                                    token.line,
-                                    token.col,
+                                    tokenc.line,
+                                    tokenc.col,
                                     file,
                                 );
                             },
@@ -736,8 +756,8 @@ impl Run {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
                                     "kümede yeterli değişken bulunmadığından dolayı `veya` operatörü uygulanamamıştır",
-                                    token.line,
-                                    token.col,
+                                    tokenc.line,
+                                    tokenc.col,
                                     file,
                                 );
                             },
@@ -745,8 +765,8 @@ impl Run {
                                 ErrorGenerator::error(
                                     "NotEnoughVarsInStack",
                                     "because there weren't enough variables, the operator `veya` couldn't be used",
-                                    token.line,
-                                    token.col,
+                                    tokenc.line,
+                                    tokenc.col,
                                     file,
                                 );
                             },
@@ -759,8 +779,8 @@ impl Run {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
                                     "kümede yeterli değişken bulunmadığından dolayı `veya` operatörü uygulanamamıştır",
-                                    token.line,
-                                    token.col,
+                                    tokenc.line,
+                                    tokenc.col,
                                     file,
                                 );
                             },
@@ -768,8 +788,8 @@ impl Run {
                                 ErrorGenerator::error(
                                     "NotEnoughVarsInStack",
                                     "because there weren't enough variables, the operator `veya` couldn't be used",
-                                    token.line,
-                                    token.col,
+                                    tokenc.line,
+                                    tokenc.col,
                                     file,
                                 );
                             },
