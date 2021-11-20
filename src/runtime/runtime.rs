@@ -466,7 +466,7 @@ impl Run {
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
-                                    file,
+                                    tokenc.file,
                                 );
                                 }
                                 SupportedLanguage::English => {
@@ -475,7 +475,7 @@ impl Run {
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
-                                    file,
+                                    tokenc.file,
                                 );
                                 }
                             },
@@ -489,7 +489,7 @@ impl Run {
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
-                                    file,
+                                    tokenc.file,
                                 );
                                 }
                                 SupportedLanguage::English => {
@@ -498,7 +498,7 @@ impl Run {
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
-                                    file,
+                                    tokenc.file,
                                 );
                                 }
                             },
@@ -518,7 +518,7 @@ impl Run {
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
-                                    file,
+                                    tokenc.file,
                                 );
                                 }
                                 SupportedLanguage::English => {
@@ -527,7 +527,7 @@ impl Run {
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
-                                    file,
+                                    tokenc.file,
                                 );
                                 }
                             },
@@ -541,7 +541,7 @@ impl Run {
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
-                                    file,
+                                    tokenc.file,
                                 );
                                 }
                                 SupportedLanguage::English => {
@@ -550,7 +550,7 @@ impl Run {
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
-                                    file,
+                                    tokenc.file,
                                 );
                                 }
                             },
@@ -570,7 +570,7 @@ impl Run {
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
-                                    file,
+                                    tokenc.file,
                                 );
                                 }
                                 SupportedLanguage::English => {
@@ -579,7 +579,7 @@ impl Run {
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
-                                    file,
+                                    tokenc.file,
                                 );
                                 }
                             },
@@ -617,7 +617,7 @@ impl Run {
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
-                                    file,
+                                    tokenc.file,
                                 );
                                 }
                                 SupportedLanguage::English => {
@@ -626,7 +626,7 @@ impl Run {
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
-                                    file,
+                                    tokenc.file,
                                 );
                                 }
                             },
@@ -640,7 +640,7 @@ impl Run {
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
-                                    file,
+                                    tokenc.file,
                                 );
                                 }
                                 SupportedLanguage::English => {
@@ -649,7 +649,7 @@ impl Run {
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
-                                    file,
+                                    tokenc.file,
                                 );
                                 }
                             },
@@ -669,7 +669,7 @@ impl Run {
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` anahtar kelimesi uygulanamamıştır", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
-                                    file,
+                                    tokenc.file,
                                 );
                                 }
                                 SupportedLanguage::English => {
@@ -678,7 +678,7 @@ impl Run {
                                     &format!("because there weren't enough variables in the stack, the keyword `{}` couldn't be used", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
-                                    file,
+                                    tokenc.file,
                                 );
                                 }
                             },
@@ -692,7 +692,7 @@ impl Run {
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` anahtar kelimesi uygulanamamıştır", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
-                                    file,
+                                    tokenc.file,
                                 );
                                 }
                                 SupportedLanguage::English => {
@@ -701,7 +701,7 @@ impl Run {
                                     &format!("because there weren't enough variables in the stack, the keyword `{}` couldn't be used", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
-                                    file,
+                                    tokenc.file,
                                 );
                                 }
                             },
@@ -722,7 +722,7 @@ impl Run {
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` anahtar kelimesi uygulanamamıştır", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
-                                    file,
+                                    tokenc.file,
                                 );
                                 }
                                 SupportedLanguage::English => {
@@ -731,7 +731,7 @@ impl Run {
                                     &format!("because there weren't enough variables in the stack, the keyword `{}` couldn't be used", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
-                                    file,
+                                    tokenc.file,
                                 );
                                 }
                             },
@@ -745,7 +745,7 @@ impl Run {
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` anahtar kelimesi uygulanamamıştır", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
-                                    file,
+                                    tokenc.file,
                                 );
                                 }
                                 SupportedLanguage::English => {
@@ -754,7 +754,7 @@ impl Run {
                                     &format!("because there weren't enough variables in the stack, the keyword `{}` couldn't be used", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
-                                    file,
+                                    tokenc.file,
                                 );
                                 }
                             },
@@ -768,7 +768,7 @@ impl Run {
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` anahtar kelimesi uygulanamamıştır", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
-                                    file,
+                                    tokenc.file,
                                 );
                                 }
                                 SupportedLanguage::English => {
@@ -777,7 +777,7 @@ impl Run {
                                     &format!("because there weren't enough variables in the stack, the keyword `{}` couldn't be used", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
-                                    file,
+                                    tokenc.file,
                                 );
                                 }
                             },
@@ -799,7 +799,7 @@ impl Run {
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` anahtar kelimesi uygulanamamıştır", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
-                                    file,
+                                    tokenc.file,
                                 );
                                 }
                                 SupportedLanguage::English => {
@@ -808,7 +808,7 @@ impl Run {
                                     &format!("because there weren't enough variables in the stack, the keyword `{}` couldn't be used", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
-                                    file,
+                                    tokenc.file,
                                 );
                                 }
                             },
@@ -827,7 +827,7 @@ impl Run {
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` anahtar kelimesi uygulanamamıştır", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
-                                    file,
+                                    tokenc.file,
                                 );
                                 }
                                 SupportedLanguage::English => {
@@ -836,7 +836,7 @@ impl Run {
                                     &format!("because there weren't enough variables in the stack, the keyword `{}` couldn't be used", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
-                                    file,
+                                    tokenc.file,
                                 );
                                 }
                             },
@@ -850,7 +850,7 @@ impl Run {
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` anahtar kelimesi uygulanamamıştır", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
-                                    file,
+                                    tokenc.file,
                                 );
                                 }
                                 SupportedLanguage::English => {
@@ -859,7 +859,7 @@ impl Run {
                                     &format!("because there weren't enough variables in the stack, the keyword `{}` couldn't be used", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
-                                    file,
+                                    tokenc.file,
                                 );
                                 }
                             },
@@ -921,7 +921,7 @@ impl Run {
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
-                                    file,
+                                    tokenc.file,
                                 );
                             }
                             SupportedLanguage::English => {
@@ -930,7 +930,7 @@ impl Run {
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
-                                    file,
+                                    tokenc.file,
                                 );
                             }
                         },
@@ -945,7 +945,7 @@ impl Run {
                                     &format!("Tanımlayıcı simgesi beklenmişti ancak {:?} bulundu", t),
                                     tokenc.line,
                                     tokenc.col,
-                                    file,
+                                    tokenc.file,
                                 );
                             },
                             SupportedLanguage::English => {
@@ -954,7 +954,7 @@ impl Run {
                                     &format!("expected Identifier but found {:?}", t),
                                     tokenc.line,
                                     tokenc.col,
-                                    file,
+                                    tokenc.file,
                                 );
                             },
                         },
@@ -971,7 +971,7 @@ impl Run {
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
-                                    file,
+                                    tokenc.file,
                                 );
                             }
                             SupportedLanguage::English => {
@@ -980,7 +980,7 @@ impl Run {
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
-                                    file,
+                                    tokenc.file,
                                 );
                             }
                         },
@@ -994,7 +994,7 @@ impl Run {
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
-                                    file,
+                                    tokenc.file,
                                 );
                             }
                             SupportedLanguage::English => {
@@ -1003,7 +1003,7 @@ impl Run {
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
-                                    file,
+                                    tokenc.file,
                                 );
                             }
                         },
@@ -1021,7 +1021,7 @@ impl Run {
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
-                                    file,
+                                    tokenc.file,
                                 );
                             }
                             SupportedLanguage::English => {
@@ -1030,7 +1030,7 @@ impl Run {
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
-                                    file,
+                                    tokenc.file,
                                 );
                             }
                         },
@@ -1044,7 +1044,7 @@ impl Run {
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
-                                    file,
+                                    tokenc.file,
                                 );
                             }
                             SupportedLanguage::English => {
@@ -1053,7 +1053,7 @@ impl Run {
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
-                                    file,
+                                    tokenc.file,
                                 );
                             }
                         },
