@@ -575,9 +575,75 @@ impl Run {
                 },
                 TokenType::Döndür => {
                     if işlev_derinliği < 1 {
-                        let a = stack.pop().unwrap();
-                        let b = stack.pop().unwrap();
-                        let c = stack.pop().unwrap();
+                        let a = match stack.pop() {
+                            Some(a) => a,
+                            None => match get_lang() {
+                                SupportedLanguage::Turkish => {
+                                    ErrorGenerator::error(
+                                        "KümedeYeterliDeğişkenYok",
+                                        "kümede yeterli değişken bulunmadığından dolayı `dön` anahtar kelimesi uygulanamamıştır",
+                                        tokenc.line,
+                                        tokenc.col,
+                                        file,
+                                    );
+                                },
+                                SupportedLanguage::English => {
+                                    ErrorGenerator::error(
+                                        "NotEnoughVarsInStack",
+                                        "because there weren't enough variables in the stack, the keyword `dön` couldn't be used",
+                                        tokenc.line,
+                                        tokenc.col,
+                                        file,
+                                    );
+                                },
+                            },
+                        };
+                        let b = match stack.pop() {
+                            Some(a) => a,
+                            None => match get_lang() {
+                                SupportedLanguage::Turkish => {
+                                    ErrorGenerator::error(
+                                        "KümedeYeterliDeğişkenYok",
+                                        "kümede yeterli değişken bulunmadığından dolayı `dön` anahtar kelimesi uygulanamamıştır",
+                                        tokenc.line,
+                                        tokenc.col,
+                                        file,
+                                    );
+                                },
+                                SupportedLanguage::English => {
+                                    ErrorGenerator::error(
+                                        "NotEnoughVarsInStack",
+                                        "because there weren't enough variables in the stack, the keyword `dön` couldn't be used",
+                                        tokenc.line,
+                                        tokenc.col,
+                                        file,
+                                    );
+                                },
+                            },
+                        };
+                        let c = match stack.pop() {
+                            Some(a) => a,
+                            None => match get_lang() {
+                                SupportedLanguage::Turkish => {
+                                    ErrorGenerator::error(
+                                        "KümedeYeterliDeğişkenYok",
+                                        "kümede yeterli değişken bulunmadığından dolayı `dön` anahtar kelimesi uygulanamamıştır",
+                                        tokenc.line,
+                                        tokenc.col,
+                                        file,
+                                    );
+                                },
+                                SupportedLanguage::English => {
+                                    ErrorGenerator::error(
+                                        "NotEnoughVarsInStack",
+                                        "because there weren't enough variables in the stack, the keyword `dön` couldn't be used",
+                                        tokenc.line,
+                                        tokenc.col,
+                                        file,
+                                    );
+                                },
+                            },
+                        };
                         stack.push(a);
                         stack.push(b);
                         stack.push(c);
@@ -586,7 +652,29 @@ impl Run {
                 },
                 TokenType::At => {
                     if işlev_derinliği < 1 {
-                        stack.pop().unwrap();
+                        match stack.pop() {
+                            Some(a) => a,
+                            None => match get_lang() {
+                                SupportedLanguage::Turkish => {
+                                    ErrorGenerator::error(
+                                        "KümedeYeterliDeğişkenYok",
+                                        "kümede yeterli değişken bulunmadığından dolayı `at` anahtar kelimesi uygulanamamıştır",
+                                        tokenc.line,
+                                        tokenc.col,
+                                        file,
+                                    );
+                                },
+                                SupportedLanguage::English => {
+                                    ErrorGenerator::error(
+                                        "NotEnoughVarsInStack",
+                                        "because there weren't enough variables in the stack, the keyword `at` couldn't be used",
+                                        tokenc.line,
+                                        tokenc.col,
+                                        file,
+                                    );
+                                },
+                            },
+                        };
                     }
                     self.current += 1;
                 }
@@ -621,7 +709,7 @@ impl Run {
                                 SupportedLanguage::Turkish => {
                                     ErrorGenerator::error(
                                         "KümedeYeterliDeğişkenYok",
-                                        "kümede yeterli değişken bulunmadığından dolayı `->` operatörü uygulanamamıştır",
+                                        "kümede yeterli değişken bulunmadığından dolayı `üst` operatörü uygulanamamıştır",
                                         tokenc.line,
                                         tokenc.col,
                                         file,
@@ -630,7 +718,7 @@ impl Run {
                                 SupportedLanguage::English => {
                                     ErrorGenerator::error(
                                         "NotEnoughVarsInStack",
-                                        "because there weren't enough variables in the stack, the operator `->` couldn't be used",
+                                        "because there weren't enough variables in the stack, the operator `üst` couldn't be used",
                                         tokenc.line,
                                         tokenc.col,
                                         file,
