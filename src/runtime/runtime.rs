@@ -1,8 +1,8 @@
-use crate::token::{ ParserToken as Token, tokentypes::ParserTokenType as TokenType };
 use crate::errwarn::ErrorGenerator;
-use crate::util::{ get_lang, SupportedLanguage };
-use std::io::{ self, prelude::* };
+use crate::token::{tokentypes::ParserTokenType as TokenType, ParserToken as Token};
+use crate::util::{get_lang, SupportedLanguage};
 use std::collections::HashMap;
+use std::io::{self, prelude::*};
 
 pub struct Run {
     program: Vec<Token>,
@@ -26,7 +26,7 @@ impl std::fmt::Debug for Object {
                 } else {
                     write!(f, "{:?}", n)
                 }
-            },
+            }
             Self::Bool(b) => match b {
                 true => write!(f, "doğru"),
                 false => write!(f, "yanlış"),
@@ -41,110 +41,70 @@ impl Object {
     // Karşılaştırma
     fn eşittir(&self, a: Self) -> Self {
         match self {
-            Self::Sayı(f) => {
-                match a {
-                    Self::Sayı(a) => {
-                        Self::Bool(f==&a)
-                    },
-                    b => panic!("{:?} `=` {:?} operatörü desteklemiyor", f, b),
-                }
+            Self::Sayı(f) => match a {
+                Self::Sayı(a) => Self::Bool(f == &a),
+                b => panic!("{:?} `=` {:?} operatörü desteklemiyor", f, b),
             },
-            Self::Bool(b) => {
-                match a {
-                    Self::Bool(a) => {
-                        Self::Bool(b==&a)
-                    },
-                    c => panic!("{:?} `=` {:?} operatörü desteklemiyor", b, c),
-                }
+            Self::Bool(b) => match a {
+                Self::Bool(a) => Self::Bool(b == &a),
+                c => panic!("{:?} `=` {:?} operatörü desteklemiyor", b, c),
             },
-            Self::Yazı(s) => {
-                match a {
-                    Self::Yazı(a) => {
-                        Self::Bool(s==&a)
-                    },
-                    c => panic!("{:?} `=` {:?} operatörü desteklemiyor", s, c),
-                }
+            Self::Yazı(s) => match a {
+                Self::Yazı(a) => Self::Bool(s == &a),
+                c => panic!("{:?} `=` {:?} operatörü desteklemiyor", s, c),
             },
             Self::İşlev(_) => unreachable!(),
         }
     }
     fn eşit_değildir(&self, a: Self) -> Self {
         match self {
-            Self::Sayı(f) => {
-                match a {
-                    Self::Sayı(a) => {
-                        Self::Bool(f!=&a)
-                    },
-                    b => panic!("{:?} `!=` {:?} operatörü desteklemiyor", f, b),
-                }
+            Self::Sayı(f) => match a {
+                Self::Sayı(a) => Self::Bool(f != &a),
+                b => panic!("{:?} `!=` {:?} operatörü desteklemiyor", f, b),
             },
-            Self::Bool(b) => {
-                match a {
-                    Self::Bool(a) => {
-                        Self::Bool(b!=&a)
-                    },
-                    c => panic!("{:?} `!=` {:?} operatörü desteklemiyor", b, c),
-                }
+            Self::Bool(b) => match a {
+                Self::Bool(a) => Self::Bool(b != &a),
+                c => panic!("{:?} `!=` {:?} operatörü desteklemiyor", b, c),
             },
-            Self::Yazı(s) => {
-                match a {
-                    Self::Yazı(a) => {
-                        Self::Bool(s!=&a)
-                    },
-                    c => panic!("{:?} `!=` {:?} operatörü desteklemiyor", s, c),
-                }
+            Self::Yazı(s) => match a {
+                Self::Yazı(a) => Self::Bool(s != &a),
+                c => panic!("{:?} `!=` {:?} operatörü desteklemiyor", s, c),
             },
             Self::İşlev(_) => unreachable!(),
         }
     }
     fn büyüktür(&self, a: Self) -> Self {
         match self {
-            Self::Sayı(f) => {
-                match a {
-                    Self::Sayı(a) => {
-                        Self::Bool(f>&a)
-                    },
-                    b => panic!("{:?} `>` {:?} operatörü desteklemiyor", f, b),
-                }
+            Self::Sayı(f) => match a {
+                Self::Sayı(a) => Self::Bool(f > &a),
+                b => panic!("{:?} `>` {:?} operatörü desteklemiyor", f, b),
             },
             b => panic!("{:?} `>` operatörünü desteklemiyor", b),
         }
     }
     fn büyük_eşittir(&self, a: Self) -> Self {
         match self {
-            Self::Sayı(f) => {
-                match a {
-                    Self::Sayı(a) => {
-                        Self::Bool(f>=&a)
-                    },
-                    b => panic!("{:?} `>=` {:?} operatörü desteklemiyor", f, b),
-                }
+            Self::Sayı(f) => match a {
+                Self::Sayı(a) => Self::Bool(f >= &a),
+                b => panic!("{:?} `>=` {:?} operatörü desteklemiyor", f, b),
             },
             b => panic!("{:?} `>=` operatörünü desteklemiyor", b),
         }
     }
     fn küçüktür(&self, a: Self) -> Self {
         match self {
-            Self::Sayı(f) => {
-                match a {
-                    Self::Sayı(a) => {
-                        Self::Bool(f<&a)
-                    },
-                    b => panic!("{:?} `<` {:?} operatörü desteklemiyor", f, b),
-                }
+            Self::Sayı(f) => match a {
+                Self::Sayı(a) => Self::Bool(f < &a),
+                b => panic!("{:?} `<` {:?} operatörü desteklemiyor", f, b),
             },
             b => panic!("{:?} `<` operatörünü desteklemiyor", b),
         }
     }
     fn küçük_eşittir(&self, a: Self) -> Self {
         match self {
-            Self::Sayı(f) => {
-                match a {
-                    Self::Sayı(a) => {
-                        Self::Bool(f<=&a)
-                    },
-                    b => panic!("{:?} `<=` {:?} operatörü desteklemiyor", f, b),
-                }
+            Self::Sayı(f) => match a {
+                Self::Sayı(a) => Self::Bool(f <= &a),
+                b => panic!("{:?} `<=` {:?} operatörü desteklemiyor", f, b),
             },
             b => panic!("{:?} `<=` operatörünü desteklemiyor", b),
         }
@@ -158,24 +118,18 @@ impl Object {
     // Matematik
     fn ekle(&self, a: Self) -> Self {
         match self {
-            Self::Sayı(f) => {
-                match a {
-                    Self::Sayı(a) => {
-                        Self::Sayı(f+a)
-                    },
-                    a => panic!("{:?} `+` {:?} desteklenmiyor", f, a),
-                }
+            Self::Sayı(f) => match a {
+                Self::Sayı(a) => Self::Sayı(f + a),
+                a => panic!("{:?} `+` {:?} desteklenmiyor", f, a),
             },
-            Self::Yazı(s) => {
-                match a {
-                    Self::Yazı(b) => {
-                        let mut buf = String::new();
-                        buf.push_str(s.as_str());
-                        buf.push_str(b.as_str());
-                        Self::Yazı(buf)
-                    },
-                    f => panic!("{:?} `+` {:?} desteklenmiyor", s, f),
+            Self::Yazı(s) => match a {
+                Self::Yazı(b) => {
+                    let mut buf = String::new();
+                    buf.push_str(s.as_str());
+                    buf.push_str(b.as_str());
+                    Self::Yazı(buf)
                 }
+                f => panic!("{:?} `+` {:?} desteklenmiyor", s, f),
             },
             Self::Bool(b) => panic!("{:?} `+` operatörünü desteklemiyor", b),
             Self::İşlev(_) => unreachable!(),
@@ -183,13 +137,9 @@ impl Object {
     }
     fn çıkar(&self, a: Self) -> Self {
         match self {
-            Self::Sayı(f) => {
-                match a {
-                    Self::Sayı(a) => {
-                        Self::Sayı(f-a)
-                    },
-                    b => panic!("{:?} `-` {:?} operatörü desteklemiyor", f, b),
-                }
+            Self::Sayı(f) => match a {
+                Self::Sayı(a) => Self::Sayı(f - a),
+                b => panic!("{:?} `-` {:?} operatörü desteklemiyor", f, b),
             },
             b => panic!("{:?} `-` operatörünü desteklemiyor", b),
         }
@@ -208,15 +158,13 @@ impl Object {
                             panic!("`*` operatörü tam olmayan sayılar ve yazılar arasında desteklenmiyor");
                         }
                         Self::Yazı(buf)
-                    },
+                    }
                     a => panic!("{:?} `*` {:?} desteklenmiyor", s, a),
                 }
-            },
+            }
             Self::Sayı(f) => {
                 match a {
-                    Self::Sayı(a) => {
-                        Self::Sayı(f*a)
-                    },
+                    Self::Sayı(a) => Self::Sayı(f * a),
                     Self::Yazı(s) => {
                         let mut buf = String::new();
                         if f == &((*f as i128) as f64) {
@@ -230,32 +178,24 @@ impl Object {
                     }
                     b => panic!("{:?} `*` {:?} operatörü desteklemiyor", f, b),
                 }
-            },
+            }
             b => panic!("{:?} `*` operatörünü desteklemiyor", b),
         }
     }
     fn böl(&self, a: Self) -> Self {
         match self {
-            Self::Sayı(f) => {
-                match a {
-                    Self::Sayı(a) => {
-                        Self::Sayı(f/a)
-                    },
-                    b => panic!("{:?} `/` {:?} operatörü desteklemiyor", f, b),
-                }
+            Self::Sayı(f) => match a {
+                Self::Sayı(a) => Self::Sayı(f / a),
+                b => panic!("{:?} `/` {:?} operatörü desteklemiyor", f, b),
             },
             b => panic!("{:?} `/` operatörünü desteklemiyor", b),
         }
     }
     fn modulo(&self, a: Self) -> Self {
         match self {
-            Self::Sayı(f) => {
-                match a {
-                    Self::Sayı(a) => {
-                        Self::Sayı(f%a)
-                    },
-                    b => panic!("{:?} `/` {:?} desteklenmiyor", f, b),
-                }
+            Self::Sayı(f) => match a {
+                Self::Sayı(a) => Self::Sayı(f % a),
+                b => panic!("{:?} `/` {:?} desteklenmiyor", f, b),
             },
             b => panic!("{:?} `/` operatörünü desteklemiyor", b),
         }
@@ -263,26 +203,18 @@ impl Object {
     // Mantık
     fn ve(&self, a: Self) -> Self {
         match self {
-            Self::Bool(f) => {
-                match a {
-                    Self::Bool(a) => {
-                        Self::Bool(*f&&a)
-                    },
-                    b => panic!("{:?} `ve` {:?} desteklenmiyor", f, b),
-                }
+            Self::Bool(f) => match a {
+                Self::Bool(a) => Self::Bool(*f && a),
+                b => panic!("{:?} `ve` {:?} desteklenmiyor", f, b),
             },
             b => panic!("{:?} `ve` anahtar kelimesini desteklemiyor", b),
         }
     }
     fn veya(&self, a: Self) -> Self {
         match self {
-            Self::Bool(f) => {
-                match a {
-                    Self::Bool(a) => {
-                        Self::Bool(*f||a)
-                    },
-                    b => panic!("{:?} `ve` {:?} desteklenmiyor", f, b),
-                }
+            Self::Bool(f) => match a {
+                Self::Bool(a) => Self::Bool(*f || a),
+                b => panic!("{:?} `ve` {:?} desteklenmiyor", f, b),
             },
             b => panic!("{:?} `ve` anahtar kelimesini desteklemiyor", b),
         }
@@ -290,25 +222,25 @@ impl Object {
     // Dönüşüm
     fn dönüştür(&self, a: String) -> Self {
         match a.to_lowercase().as_str() {
-            "yazı" => {
-                match self {
-                    Self::Bool(b) => match b {
-                        true => Self::Yazı("doğru".to_string()),
-                        false => Self::Yazı("yanlış".to_string()),
-                    },
-                    Self::Sayı(n) => Self::Yazı(format!("{:?}", n)),
-                    Self::Yazı(_) => self.clone(),
-                    Self::İşlev(_) => unreachable!(),
-                }
+            "yazı" => match self {
+                Self::Bool(b) => match b {
+                    true => Self::Yazı("doğru".to_string()),
+                    false => Self::Yazı("yanlış".to_string()),
+                },
+                Self::Sayı(n) => Self::Yazı(format!("{:?}", n)),
+                Self::Yazı(_) => self.clone(),
+                Self::İşlev(_) => unreachable!(),
             },
             "bool" | "boolean" => {
                 match self {
                     Self::Bool(_) => self.clone(),
-                    Self::Sayı(n) => if n == &0. {
-                        Self::Bool(false)
-                    } else {
-                        Self::Bool(true)
-                    },
+                    Self::Sayı(n) => {
+                        if n == &0. {
+                            Self::Bool(false)
+                        } else {
+                            Self::Bool(true)
+                        }
+                    }
                     Self::Yazı(s) => match s.as_str() {
                         "doğru" => Self::Bool(true),
                         "yanlış" => Self::Bool(false),
@@ -316,20 +248,18 @@ impl Object {
                     },
                     Self::İşlev(_) => unreachable!(),
                 }
-            },
-            "sayı" => {
-                match self {
-                    Self::Bool(b) => match b {
-                        true => Self::Sayı(1.),
-                        false => Self::Sayı(0.),
-                    },
-                    Self::Sayı(_) => self.clone(),
-                    Self::Yazı(s) => match s.parse::<f64>() {
-                        Ok(m) => Self::Sayı(m),
-                        Err(_) => unimplemented!(),
-                    },
-                    Self::İşlev(_) => unreachable!(),
-                }
+            }
+            "sayı" => match self {
+                Self::Bool(b) => match b {
+                    true => Self::Sayı(1.),
+                    false => Self::Sayı(0.),
+                },
+                Self::Sayı(_) => self.clone(),
+                Self::Yazı(s) => match s.parse::<f64>() {
+                    Ok(m) => Self::Sayı(m),
+                    Err(_) => unimplemented!(),
+                },
+                Self::İşlev(_) => unreachable!(),
             },
             a => panic!("bilinmeyen tip: {}", a),
         }
@@ -340,7 +270,10 @@ pub type Stack = Vec<Object>;
 
 impl Run {
     pub fn new(program: Vec<Token>) -> Self {
-        Self { program, current: 0 }
+        Self {
+            program,
+            current: 0,
+        }
     }
 
     pub fn run(&mut self, file: String) {
@@ -357,9 +290,9 @@ impl Run {
                 TokenType::İşlev { sonloc } => {
                     let id = self.program.get(self.current + 1).unwrap();
                     match id.typ.clone() {
-                        TokenType::Identifier { id : ident } => {
+                        TokenType::Identifier { id: ident } => {
                             hashs.insert(ident, Object::İşlev(self.current));
-                        },
+                        }
                         _ => unimplemented!(), // SyntaxError
                     }
                     let loc = match sonloc {
@@ -369,19 +302,16 @@ impl Run {
                     match self.program.get_mut(loc).unwrap().typ {
                         TokenType::İşlevSonlandır { ref mut tp } => {
                             tp.push(loc);
-                        },
+                        }
                         _ => unreachable!(),
                     }
-                    
                     işlev_derinliği += 1;
                     self.current = loc;
-                },
+                }
                 TokenType::İşlevSonlandır { .. } => {
                     if işlev_derinliği < 1 {
                         let loc = match token.typ {
-                            TokenType::İşlevSonlandır { ref mut tp } => {
-                                tp.pop().unwrap()
-                            },
+                            TokenType::İşlevSonlandır { ref mut tp } => tp.pop().unwrap(),
                             _ => unreachable!(),
                         };
                         self.current = loc;
@@ -389,14 +319,14 @@ impl Run {
                         işlev_derinliği -= 1;
                     }
                     self.current += 1;
-                },
+                }
                 TokenType::De => {
                     if işlev_derinliği < 1 {
                         print!("{:?}", stack.pop().unwrap());
                         io::stdout().flush().unwrap();
                     }
                     self.current += 1;
-                },
+                }
                 TokenType::Artı => {
                     if işlev_derinliği < 1 {
                         let b = stack.pop().unwrap();
@@ -404,14 +334,14 @@ impl Run {
                         stack.push(a.ekle(b));
                     }
                     self.current += 1;
-                },
+                }
                 TokenType::ArtıArtı => {
                     if işlev_derinliği < 1 {
                         let a = stack.pop().unwrap();
                         stack.push(a.ekle(Object::Sayı(1.0)));
                     }
                     self.current += 1;
-                },
+                }
                 TokenType::Eksi => {
                     if işlev_derinliği < 1 {
                         let a = stack.pop().unwrap();
@@ -419,14 +349,14 @@ impl Run {
                         stack.push(b.çıkar(a));
                     }
                     self.current += 1;
-                },
+                }
                 TokenType::EksiEksi => {
                     if işlev_derinliği < 1 {
                         let a = stack.pop().unwrap();
                         stack.push(a.çıkar(Object::Sayı(1.0)));
                     }
                     self.current += 1;
-                },
+                }
                 TokenType::Çarpı => {
                     if işlev_derinliği < 1 {
                         let b = stack.pop().unwrap();
@@ -434,7 +364,7 @@ impl Run {
                         stack.push(a.çarp(b));
                     }
                     self.current += 1;
-                },
+                }
                 TokenType::Bölü => {
                     if işlev_derinliği < 1 {
                         let a = stack.pop().unwrap();
@@ -442,29 +372,29 @@ impl Run {
                         stack.push(b.böl(a));
                     }
                     self.current += 1;
-                },
+                }
                 TokenType::Sayı { val } => {
                     if işlev_derinliği < 1 {
                         let n = Object::Sayı(val);
                         stack.push(n);
                     }
                     self.current += 1;
-                },
+                }
                 TokenType::Yazı { val } => {
                     if işlev_derinliği < 1 {
                         let s = Object::Yazı(val);
                         stack.push(s);
                     }
                     self.current += 1;
-                },
+                }
                 TokenType::Bool { val } => {
                     if işlev_derinliği < 1 {
                         let b = Object::Bool(val);
                         stack.push(b);
                         self.current += 1;
                     }
-                },
-                TokenType::İse ( yoksa ) | TokenType::İken ( yoksa ) => {
+                }
+                TokenType::İse(yoksa) | TokenType::İken(yoksa) => {
                     if işlev_derinliği < 1 {
                         if let Some(tp) = yoksa {
                             let a = stack.pop().unwrap();
@@ -478,9 +408,13 @@ impl Run {
                                 },
                                 a => panic!("ise'den önce stackte bir boolean olması lazım; şu anda {:?} var", a),
                             }
-                        } else { unreachable!() }
-                } else { self.current += 1; }
-                },
+                        } else {
+                            unreachable!()
+                        }
+                    } else {
+                        self.current += 1;
+                    }
+                }
                 TokenType::Kopya => {
                     if işlev_derinliği < 1 {
                         let last = stack.pop().unwrap();
@@ -488,7 +422,7 @@ impl Run {
                         stack.push(last);
                     }
                     self.current += 1;
-                },
+                }
                 TokenType::Büyüktür => {
                     if işlev_derinliği < 1 {
                         let a = stack.pop().unwrap();
@@ -496,7 +430,7 @@ impl Run {
                         stack.push(b.büyüktür(a));
                     }
                     self.current += 1;
-                },
+                }
                 TokenType::BüyükEşittir => {
                     if işlev_derinliği < 1 {
                         let a = stack.pop().unwrap();
@@ -504,7 +438,7 @@ impl Run {
                         stack.push(b.büyük_eşittir(a));
                     }
                     self.current += 1;
-                },
+                }
                 TokenType::Küçüktür => {
                     if işlev_derinliği < 1 {
                         let a = stack.pop().unwrap();
@@ -512,7 +446,7 @@ impl Run {
                         stack.push(b.küçüktür(a));
                     }
                     self.current += 1;
-                },
+                }
                 TokenType::KüçükEşittir => {
                     if işlev_derinliği < 1 {
                         let a = stack.pop().unwrap();
@@ -520,7 +454,7 @@ impl Run {
                         stack.push(b.küçük_eşittir(a));
                     }
                     self.current += 1;
-                },
+                }
                 TokenType::Eşittir => {
                     if işlev_derinliği < 1 {
                         let a = stack.pop().unwrap();
@@ -528,7 +462,7 @@ impl Run {
                         stack.push(b.eşittir(a));
                     }
                     self.current += 1;
-                },
+                }
                 TokenType::EşitDeğildir => {
                     if işlev_derinliği < 1 {
                         let a = stack.pop().unwrap();
@@ -536,26 +470,32 @@ impl Run {
                         stack.push(b.eşit_değildir(a));
                     }
                     self.current += 1;
-                },
+                }
                 TokenType::Değildir => {
                     if işlev_derinliği < 1 {
                         let a = stack.pop().unwrap();
                         stack.push(a.değildir());
                     }
                     self.current += 1;
-                },
+                }
                 TokenType::Son { tp } => {
                     if işlev_derinliği < 1 {
                         self.current = tp;
-                    } else { self.current += 1; }
-                },
-                TokenType::Yoksa ( yoksa ) => {
+                    } else {
+                        self.current += 1;
+                    }
+                }
+                TokenType::Yoksa(yoksa) => {
                     if işlev_derinliği < 1 {
                         if let Some(tp) = yoksa {
                             self.current = tp;
-                        } else { unreachable!() }
-                    } else { self.current += 1; }
-                },
+                        } else {
+                            unreachable!()
+                        }
+                    } else {
+                        self.current += 1;
+                    }
+                }
                 TokenType::Modulo => {
                     if işlev_derinliği < 1 {
                         let a = stack.pop().unwrap();
@@ -563,219 +503,219 @@ impl Run {
                         stack.push(b.modulo(a));
                     }
                     self.current += 1;
-                },
+                }
                 TokenType::Takas => {
                     if işlev_derinliği < 1 {
                         let a = match stack.pop() {
-                        Some(a) => a,
-                        None => match get_lang() {
-                            SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                            Some(a) => a,
+                            None => match get_lang() {
+                                SupportedLanguage::Turkish => {
+                                    ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
                                     format!("kümede yeterli değişken bulunmadığından dolayı `{}` anahtar kelimesi uygulanamamıştır", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
                                     file,
                                 );
-                            },
-                            SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                }
+                                SupportedLanguage::English => {
+                                    ErrorGenerator::error(
                                     "NotEnoughVarsInStack",
                                     format!("because there weren't enough variables in the stack, the keyword `{}` couldn't be used", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
                                     file,
                                 );
+                                }
                             },
-                        },
-                    };
+                        };
                         let b = match stack.pop() {
-                        Some(a) => a,
-                        None => match get_lang() {
-                            SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                            Some(a) => a,
+                            None => match get_lang() {
+                                SupportedLanguage::Turkish => {
+                                    ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
                                     format!("kümede yeterli değişken bulunmadığından dolayı `{}` anahtar kelimesi uygulanamamıştır", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
                                     file,
                                 );
-                            },
-                            SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                }
+                                SupportedLanguage::English => {
+                                    ErrorGenerator::error(
                                     "NotEnoughVarsInStack",
                                     format!("because there weren't enough variables in the stack, the keyword `{}` couldn't be used", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
                                     file,
                                 );
+                                }
                             },
-                        },
-                    };
+                        };
                         stack.push(a);
                         stack.push(b);
                     }
                     self.current += 1;
-                },
+                }
                 TokenType::Döndür => {
                     if işlev_derinliği < 1 {
                         let a = match stack.pop() {
-                        Some(a) => a,
-                        None => match get_lang() {
-                            SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                            Some(a) => a,
+                            None => match get_lang() {
+                                SupportedLanguage::Turkish => {
+                                    ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
                                     format!("kümede yeterli değişken bulunmadığından dolayı `{}` anahtar kelimesi uygulanamamıştır", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
                                     file,
                                 );
-                            },
-                            SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                }
+                                SupportedLanguage::English => {
+                                    ErrorGenerator::error(
                                     "NotEnoughVarsInStack",
                                     format!("because there weren't enough variables in the stack, the keyword `{}` couldn't be used", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
                                     file,
                                 );
+                                }
                             },
-                        },
-                    };
+                        };
                         let b = match stack.pop() {
-                        Some(a) => a,
-                        None => match get_lang() {
-                            SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                            Some(a) => a,
+                            None => match get_lang() {
+                                SupportedLanguage::Turkish => {
+                                    ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
                                     format!("kümede yeterli değişken bulunmadığından dolayı `{}` anahtar kelimesi uygulanamamıştır", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
                                     file,
                                 );
-                            },
-                            SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                }
+                                SupportedLanguage::English => {
+                                    ErrorGenerator::error(
                                     "NotEnoughVarsInStack",
                                     format!("because there weren't enough variables in the stack, the keyword `{}` couldn't be used", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
                                     file,
                                 );
+                                }
                             },
-                        },
-                    };
+                        };
                         let c = match stack.pop() {
-                        Some(a) => a,
-                        None => match get_lang() {
-                            SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                            Some(a) => a,
+                            None => match get_lang() {
+                                SupportedLanguage::Turkish => {
+                                    ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
                                     format!("kümede yeterli değişken bulunmadığından dolayı `{}` anahtar kelimesi uygulanamamıştır", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
                                     file,
                                 );
-                            },
-                            SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                }
+                                SupportedLanguage::English => {
+                                    ErrorGenerator::error(
                                     "NotEnoughVarsInStack",
                                     format!("because there weren't enough variables in the stack, the keyword `{}` couldn't be used", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
                                     file,
                                 );
+                                }
                             },
-                        },
-                    };
+                        };
                         stack.push(a);
                         stack.push(b);
                         stack.push(c);
                     }
                     self.current += 1;
-                },
+                }
                 TokenType::At => {
                     if işlev_derinliği < 1 {
                         match stack.pop() {
-                        Some(a) => a,
-                        None => match get_lang() {
-                            SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                            Some(a) => a,
+                            None => match get_lang() {
+                                SupportedLanguage::Turkish => {
+                                    ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
                                     format!("kümede yeterli değişken bulunmadığından dolayı `{}` anahtar kelimesi uygulanamamıştır", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
                                     file,
                                 );
-                            },
-                            SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                }
+                                SupportedLanguage::English => {
+                                    ErrorGenerator::error(
                                     "NotEnoughVarsInStack",
                                     format!("because there weren't enough variables in the stack, the keyword `{}` couldn't be used", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
                                     file,
                                 );
+                                }
                             },
-                        },
-                    };
+                        };
                     }
                     self.current += 1;
                 }
                 TokenType::Üst => {
                     if işlev_derinliği < 1 {
                         let a = match stack.pop() {
-                        Some(a) => a,
-                        None => match get_lang() {
-                            SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                            Some(a) => a,
+                            None => match get_lang() {
+                                SupportedLanguage::Turkish => {
+                                    ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
                                     format!("kümede yeterli değişken bulunmadığından dolayı `{}` anahtar kelimesi uygulanamamıştır", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
                                     file,
                                 );
-                            },
-                            SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                }
+                                SupportedLanguage::English => {
+                                    ErrorGenerator::error(
                                     "NotEnoughVarsInStack",
                                     format!("because there weren't enough variables in the stack, the keyword `{}` couldn't be used", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
                                     file,
                                 );
+                                }
                             },
-                        },
-                    };
+                        };
                         let b = match stack.pop() {
-                        Some(a) => a,
-                        None => match get_lang() {
-                            SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                            Some(a) => a,
+                            None => match get_lang() {
+                                SupportedLanguage::Turkish => {
+                                    ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
                                     format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
                                     file,
                                 );
-                            },
-                            SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                }
+                                SupportedLanguage::English => {
+                                    ErrorGenerator::error(
                                     "NotEnoughVarsInStack",
                                     format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     tokenc.line,
                                     tokenc.col,
                                     file,
                                 );
+                                }
                             },
-                        },
-                    };
+                        };
                         stack.push(b.clone());
                         stack.push(a);
                         stack.push(b);
                     }
                     self.current += 1;
-                },
+                }
                 TokenType::Girdi => {
                     if işlev_derinliği < 1 {
                         let mut buf = String::new();
@@ -783,42 +723,38 @@ impl Run {
                         stack.push(Object::Yazı(buf.trim_end().to_string()));
                     }
                     self.current += 1;
-                },
+                }
                 TokenType::İkiNoktaNokta | TokenType::EOF => self.current += 1,
-                TokenType::Identifier { id } => {
-                    match hashs.get_mut(&id) {
-                        Some(val) => {
-                            match val {
-                                Object::Bool(_) | Object::Sayı(_) | Object::Yazı(_) => {
-                                    stack.push(val.clone());
-                                    self.current += 1;
-                                },
-                                Object::İşlev(tp) => {
-                                    let işlev = self.program.get(*tp).unwrap();
-                                    match işlev.typ {
-                                        TokenType::İşlev { sonloc : tpi } => {
-                                            let loc = match tpi {
-                                                Some(i) => i,
-                                                None => unreachable!(),
-                                            };
-                                            let işlevson = self.program.get_mut(loc).unwrap();
-                                            match &mut işlevson.typ {
-                                                TokenType::İşlevSonlandır { tp : ref mut tps } => {
-                                                    tps.push(self.current);
-                                                },
-                                                _ => unreachable!(),
-                                            }
-                                            self.current = *tp + 2;
-                                        },
+                TokenType::Identifier { id } => match hashs.get_mut(&id) {
+                    Some(val) => match val {
+                        Object::Bool(_) | Object::Sayı(_) | Object::Yazı(_) => {
+                            stack.push(val.clone());
+                            self.current += 1;
+                        }
+                        Object::İşlev(tp) => {
+                            let işlev = self.program.get(*tp).unwrap();
+                            match işlev.typ {
+                                TokenType::İşlev { sonloc: tpi } => {
+                                    let loc = match tpi {
+                                        Some(i) => i,
+                                        None => unreachable!(),
+                                    };
+                                    let işlevson = self.program.get_mut(loc).unwrap();
+                                    match &mut işlevson.typ {
+                                        TokenType::İşlevSonlandır { tp: ref mut tps } => {
+                                            tps.push(self.current);
+                                        }
                                         _ => unreachable!(),
                                     }
-                                },
+                                    self.current = *tp + 2;
+                                }
+                                _ => unreachable!(),
                             }
-                        },
-                        None => {
-                            println!("bilinen değişkenler: {:?}", hashs);
-                            panic!("{} bulunamadı.", id);
-                        },
+                        }
+                    },
+                    None => {
+                        println!("bilinen değişkenler: {:?}", hashs);
+                        panic!("{} bulunamadı.", id);
                     }
                 },
                 TokenType::Koy => {
@@ -833,7 +769,7 @@ impl Run {
                                     tokenc.col,
                                     file,
                                 );
-                            },
+                            }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
                                     "NotEnoughVarsInStack",
@@ -842,10 +778,10 @@ impl Run {
                                     tokenc.col,
                                     file,
                                 );
-                            },
+                            }
                         },
                     };
-                    let id = self.program.get(self.current+1).unwrap();
+                    let id = self.program.get(self.current + 1).unwrap();
                     hashs.insert(match id.typ.clone() {
                         TokenType::Identifier { id : i } => i,
                         t => match get_lang() {
@@ -870,7 +806,7 @@ impl Run {
                         },
                     }, a);
                     self.current += 2;
-                },
+                }
                 TokenType::Ve => {
                     let a = match stack.pop() {
                         Some(a) => a,
@@ -883,7 +819,7 @@ impl Run {
                                     tokenc.col,
                                     file,
                                 );
-                            },
+                            }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
                                     "NotEnoughVarsInStack",
@@ -892,7 +828,7 @@ impl Run {
                                     tokenc.col,
                                     file,
                                 );
-                            },
+                            }
                         },
                     };
                     let b = match stack.pop() {
@@ -906,7 +842,7 @@ impl Run {
                                     tokenc.col,
                                     file,
                                 );
-                            },
+                            }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
                                     "NotEnoughVarsInStack",
@@ -915,12 +851,12 @@ impl Run {
                                     tokenc.col,
                                     file,
                                 );
-                            },
+                            }
                         },
                     };
                     stack.push(b.ve(a));
                     self.current += 1;
-                },
+                }
                 TokenType::Veya => {
                     let a = match stack.pop() {
                         Some(a) => a,
@@ -933,7 +869,7 @@ impl Run {
                                     tokenc.col,
                                     file,
                                 );
-                            },
+                            }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
                                     "NotEnoughVarsInStack",
@@ -942,7 +878,7 @@ impl Run {
                                     tokenc.col,
                                     file,
                                 );
-                            },
+                            }
                         },
                     };
                     let b = match stack.pop() {
@@ -956,7 +892,7 @@ impl Run {
                                     tokenc.col,
                                     file,
                                 );
-                            },
+                            }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
                                     "NotEnoughVarsInStack",
@@ -965,12 +901,12 @@ impl Run {
                                     tokenc.col,
                                     file,
                                 );
-                            },
+                            }
                         },
                     };
                     stack.push(b.veya(a));
                     self.current += 1;
-                },
+                }
                 TokenType::Tipinde => {
                     let a = stack.pop().unwrap();
                     self.current += 1;
@@ -978,11 +914,11 @@ impl Run {
                     match &b.typ {
                         TokenType::Identifier { id } => {
                             stack.push(a.dönüştür(id.clone()));
-                        },
+                        }
                         _ => unimplemented!("hata: tip tanımlayıcı değil"),
                     };
                     self.current += 1;
-                },
+                }
             }
         }
 
@@ -1014,7 +950,7 @@ impl Run {
                         }
                     }
                     println!("]");
-                },
+                }
                 SupportedLanguage::English => {
                     ErrorGenerator::warning(
                         "StackNotEmpty",
@@ -1041,7 +977,7 @@ impl Run {
                         }
                     }
                     println!("]");
-                },
+                }
             }
         }
     }
