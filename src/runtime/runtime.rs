@@ -957,7 +957,7 @@ impl Run {
                                     tokenc.col,
                                     tokenc.file,
                                     Box::new(||{
-                                        let mut hashc: Vec<String> = hashs.into_keys().collect();
+                                        let mut hashc: Vec<String> = hashs.clone().into_keys().collect();
                                         hashc.sort();
                                     }),
                                 );
