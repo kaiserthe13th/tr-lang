@@ -4,8 +4,8 @@ use std::fs;
 use std::fs::canonicalize;
 use std::io::Write;
 
-pub use std::process::exit;
 use std::path::PathBuf;
+pub use std::process::exit;
 
 pub mod lexer;
 use lexer::Lexer;
@@ -13,13 +13,13 @@ use lexer::Lexer;
 pub mod parser;
 use parser::Parser;
 
-pub mod token;
-pub mod store;
-pub mod util;
 pub mod bytecode;
+pub mod store;
+pub mod token;
+pub mod util;
 
-pub mod runtime;
 pub mod errwarn;
+pub mod runtime;
 
 mod argsparser;
 
@@ -31,8 +31,7 @@ fn main() {
     if args.version {
         util::print_version(args.name);
     }
-    
-    
+
     match args.sub_cmd {
         argsparser::Subcommands::Byt => {
             let mut path = PathBuf::from(&args.file);
@@ -41,17 +40,19 @@ fn main() {
                 Err(util::FSErr::IsADir) => {
                     path.push("main.trl");
                     util::read_file(&path).unwrap()
-                },
+                }
             });
             if args.lex_out {
                 let canon_path = match canonicalize(args.file.clone()) {
                     Ok(a) => a.as_path().display().to_string(),
                     Err(e) => panic!("`{}` adlı dosya yüklenemedi: {}", args.file.clone(), e),
                 };
-                let lexed = lexer.clone().tokenize(&mut vec![canon_path.clone()], canon_path); 
+                let lexed = lexer
+                    .clone()
+                    .tokenize(&mut vec![canon_path.clone()], canon_path);
                 println!("{:#?}", &lexed);
             }
-        
+
             let mut parser = Parser::from_lexer(&mut lexer, args.file.clone());
             let parsed = parser.parse();
             if args.prs_out {
@@ -63,11 +64,12 @@ fn main() {
                 let mut bytecode_src = fs::File::create(&match &args.outfile {
                     Some(f) => f.clone(),
                     None => format!("{}.trbyt", args.file),
-                }).unwrap();
-                
+                })
+                .unwrap();
+
                 bytecode_src.write_all(&encoded[..]).unwrap();
             }
-        },
+        }
         argsparser::Subcommands::Run => {
             // TODO: if specified accept args.outfile
             let mut path = PathBuf::from(args.file.clone());
@@ -76,17 +78,19 @@ fn main() {
                 Err(util::FSErr::IsADir) => {
                     path.push("main.trl");
                     util::read_file(&path).unwrap()
-                },
+                }
             });
             if args.lex_out {
                 let canon_path = match canonicalize(args.file.clone()) {
                     Ok(a) => a.as_path().display().to_string(),
                     Err(e) => panic!("`{}` adlı dosya yüklenemedi: {}", args.file.clone(), e),
                 };
-                let lexed = lexer.clone().tokenize(&mut vec![canon_path.clone()], canon_path);
+                let lexed = lexer
+                    .clone()
+                    .tokenize(&mut vec![canon_path.clone()], canon_path);
                 println!("{:#?}", lexed);
             }
-        
+
             let mut parser = Parser::from_lexer(&mut lexer, args.file.clone());
             if args.prs_out {
                 let parsed = parser.clone().parse();
@@ -95,7 +99,7 @@ fn main() {
 
             let mut run = runtime::Run::new(parser.parse());
             run.run(args.file);
-        },
+        }
         argsparser::Subcommands::RunBytes => {
             let path = PathBuf::from(args.file.clone());
             let con = util::read_file_to_vec_u8(&path);
@@ -103,6 +107,6 @@ fn main() {
 
             let mut run = runtime::Run::new(parsed);
             run.run(args.file);
-        },
+        }
     }
 }

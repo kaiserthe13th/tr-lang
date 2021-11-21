@@ -1,7 +1,7 @@
 use crate::errwarn::ErrorGenerator;
+use crate::store::globarg::SUPRESS_WARN;
 use crate::token::{tokentypes::ParserTokenType as TokenType, ParserToken as Token};
 use crate::util::{get_lang, SupportedLanguage};
-use crate::store::globarg::SUPRESS_WARN;
 use std::collections::HashMap;
 use std::io::{self, prelude::*};
 
@@ -323,11 +323,13 @@ impl Run {
                 }
                 TokenType::De => {
                     if işlev_derinliği < 1 {
-                        print!("{:?}", match stack.pop() {
-                            Some(a) => a,
-                            None => match get_lang() {
-                                SupportedLanguage::Turkish => {
-                                    ErrorGenerator::error(
+                        print!(
+                            "{:?}",
+                            match stack.pop() {
+                                Some(a) => a,
+                                None => match get_lang() {
+                                    SupportedLanguage::Turkish => {
+                                        ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
                                     tokenc.line,
@@ -335,9 +337,9 @@ impl Run {
                                     tokenc.file,
                                     Box::new(||{}),
                                 );
-                                }
-                                SupportedLanguage::English => {
-                                    ErrorGenerator::error(
+                                    }
+                                    SupportedLanguage::English => {
+                                        ErrorGenerator::error(
                                     "NotEnoughVarsInStack",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     tokenc.line,
@@ -345,9 +347,10 @@ impl Run {
                                     tokenc.file,
                                     Box::new(||{}),
                                 );
-                                }
-                            },
-                        });
+                                    }
+                                },
+                            }
+                        );
                         io::stdout().flush().unwrap();
                     }
                     self.current += 1;
@@ -663,10 +666,10 @@ impl Run {
                     if işlev_derinliği < 1 {
                         if let Some(tp) = yoksa {
                             let a = match stack.pop() {
-                            Some(a) => a,
-                            None => match get_lang() {
-                                SupportedLanguage::Turkish => {
-                                    ErrorGenerator::error(
+                                Some(a) => a,
+                                None => match get_lang() {
+                                    SupportedLanguage::Turkish => {
+                                        ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
                                     tokenc.line,
@@ -674,9 +677,9 @@ impl Run {
                                     tokenc.file,
                                     Box::new(||{}),
                                 );
-                                }
-                                SupportedLanguage::English => {
-                                    ErrorGenerator::error(
+                                    }
+                                    SupportedLanguage::English => {
+                                        ErrorGenerator::error(
                                     "NotEnoughVarsInStack",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     tokenc.line,
@@ -684,9 +687,9 @@ impl Run {
                                     tokenc.file,
                                     Box::new(||{}),
                                 );
-                                }
-                            },
-                        };
+                                    }
+                                },
+                            };
                             match a {
                                 Object::Bool(b) => {
                                     if b {
@@ -1446,15 +1449,19 @@ impl Run {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "BilinmeyenTanımlayıcı",
-                                    &format!("bilinmeyen değişken: `{}`, bu değişken bulunamamıştır", tokenc.repr()),
+                                    &format!(
+                                        "bilinmeyen değişken: `{}`, bu değişken bulunamamıştır",
+                                        tokenc.repr()
+                                    ),
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
                                     {
                                         let hashc = hashs.clone();
                                         let id: String = id.clone();
-                                        Box::new(||{
-                                            let mut hashc: Vec<String> = hashc.into_keys().collect();
+                                        Box::new(|| {
+                                            let mut hashc: Vec<String> =
+                                                hashc.into_keys().collect();
                                             let id = id;
                                             hashc.sort();
                                             let n = match hashc[..].binary_search(&id) {
@@ -1656,10 +1663,10 @@ impl Run {
                 }
                 TokenType::Tipinde => {
                     let a = match stack.pop() {
-                            Some(a) => a,
-                            None => match get_lang() {
-                                SupportedLanguage::Turkish => {
-                                    ErrorGenerator::error(
+                        Some(a) => a,
+                        None => match get_lang() {
+                            SupportedLanguage::Turkish => {
+                                ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
                                     tokenc.line,
@@ -1667,9 +1674,9 @@ impl Run {
                                     tokenc.file,
                                     Box::new(||{}),
                                 );
-                                }
-                                SupportedLanguage::English => {
-                                    ErrorGenerator::error(
+                            }
+                            SupportedLanguage::English => {
+                                ErrorGenerator::error(
                                     "NotEnoughVarsInStack",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     tokenc.line,
@@ -1677,9 +1684,9 @@ impl Run {
                                     tokenc.file,
                                     Box::new(||{}),
                                 );
-                                }
-                            },
-                        };
+                            }
+                        },
+                    };
                     self.current += 1;
                     let b = self.program.get_mut(self.current).unwrap();
                     match &b.typ {

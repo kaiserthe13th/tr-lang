@@ -1,26 +1,26 @@
-use crate::token::LexerToken as Token;
-use crate::token::tokentypes::LexerTokenType as TokenType;
-use crate::util::{char_in_str, in_vec, read_file, FSErr};
 use crate::store::PATH_SEP;
+use crate::token::tokentypes::LexerTokenType as TokenType;
+use crate::token::LexerToken as Token;
+use crate::util::{char_in_str, in_vec, read_file, FSErr};
 
-use std::path::PathBuf;
 use std::fs::canonicalize;
+use std::path::PathBuf;
 
 #[derive(Clone)]
 pub struct Lexer {
     source: Vec<char>,
-    current:    usize,
-    line:       usize,
-    col:        usize,
+    current: usize,
+    line: usize,
+    col: usize,
 }
 
 impl Lexer {
     pub fn new(content: String) -> Self {
         Self {
-            source:  content.chars().collect(),
+            source: content.chars().collect(),
             current: 0,
-            line:    1,
-            col:     1,
+            line: 1,
+            col: 1,
         }
     }
     fn post_proc(&self, prog: Vec<Token>, visited: &mut Vec<String>, file: String) -> Vec<Token> {
@@ -29,7 +29,7 @@ impl Lexer {
 
         while current < prog.len() - 1 {
             let c: Token = prog.get(current).unwrap().clone();
-            
+
             match c.typ {
                 TokenType::Yükle => {
                     let next_tok = prog.get(current + 1).unwrap().clone();
@@ -74,11 +74,11 @@ impl Lexer {
                         _ => panic!("yükle anahtar kelimesinden sonra yazı veya tanımlayıcı bekleniyordu ancak bulunamadı"), // SyntaxError
                     }
                     current += 2;
-                },
+                }
                 _ => {
                     tokens.push(c);
                     current += 1;
-                },
+                }
             }
         }
         tokens
@@ -96,7 +96,7 @@ impl Lexer {
                         self.col += 1;
                     }
                     self.line += 1;
-                },
+                }
                 '\'' | '"' => {
                     let mut buf = String::new();
 
@@ -125,25 +125,34 @@ impl Lexer {
                                 _ => {
                                     buf.push('\\');
                                     buf.push(self.currentc())
-                                },
+                                }
                             }
                             self.col += 1;
                             self.current += 1;
                         }
                     }
                     self.current += 1;
-                    tokens.push(Token::new(TokenType::Yazı, buf, self.line, self.col, file.clone()))
-                },
+                    tokens.push(Token::new(
+                        TokenType::Yazı,
+                        buf,
+                        self.line,
+                        self.col,
+                        file.clone(),
+                    ))
+                }
                 b if b.is_numeric() => {
                     let mut buf = String::new();
                     let mut dot_used = false;
 
-                    while self.source.len() > self.current && (self.currentc().is_numeric() || self.currentc() == '.') {
+                    while self.source.len() > self.current
+                        && (self.currentc().is_numeric() || self.currentc() == '.')
+                    {
                         if self.currentc() != '.' {
                             buf.push(self.currentc());
                         } else {
-                            if dot_used { panic!("Sayılarda birden fazla nokta olamaz"); }
-                            else {
+                            if dot_used {
+                                panic!("Sayılarda birden fazla nokta olamaz");
+                            } else {
                                 buf.push('.');
                                 dot_used = true;
                             }
@@ -151,38 +160,62 @@ impl Lexer {
                         self.current += 1;
                         self.col += 1;
                     }
-                    tokens.push(Token::new(TokenType::Sayı, buf, self.line, self.col, file.clone()));
-                },
+                    tokens.push(Token::new(
+                        TokenType::Sayı,
+                        buf,
+                        self.line,
+                        self.col,
+                        file.clone(),
+                    ));
+                }
                 '\n' => {
                     self.current += 1;
                     self.line += 1;
-                    self.col  =  1;
-                },
+                    self.col = 1;
+                }
                 '+' => {
                     self.col += 1;
                     self.current += 1;
                     if self.source.len() > self.current {
                         if self.currentc() == '+' {
                             self.current += 1;
-                            self.col     += 1;
-                            tokens.push(Token::new(TokenType::ArtıArtı, "++".to_string(), self.line, self.col, file.clone()))
+                            self.col += 1;
+                            tokens.push(Token::new(
+                                TokenType::ArtıArtı,
+                                "++".to_string(),
+                                self.line,
+                                self.col,
+                                file.clone(),
+                            ))
                         } else {
-                            tokens.push(Token::new(TokenType::Artı, "+".to_string(), self.line, self.col, file.clone()))
+                            tokens.push(Token::new(
+                                TokenType::Artı,
+                                "+".to_string(),
+                                self.line,
+                                self.col,
+                                file.clone(),
+                            ))
                         }
                     }
-                },
+                }
                 '-' => {
                     self.col += 1;
                     self.current += 1;
                     if self.source.len() > self.current {
                         if self.currentc() == '-' {
                             self.current += 1;
-                            self.col     += 1;
-                            tokens.push(Token::new(TokenType::EksiEksi, "--".to_string(), self.line, self.col, file.clone()))
+                            self.col += 1;
+                            tokens.push(Token::new(
+                                TokenType::EksiEksi,
+                                "--".to_string(),
+                                self.line,
+                                self.col,
+                                file.clone(),
+                            ))
                         } else if self.currentc() == '*' {
                             loop {
                                 self.current += 1;
-                                self.col     += 1;
+                                self.col += 1;
                                 if self.current > self.source.len() {
                                     panic!("unterminated comment");
                                 }
@@ -195,7 +228,7 @@ impl Lexer {
                                     if self.source.len() > self.current {
                                         if self.currentc() == '-' {
                                             self.current += 1;
-                                            self.col     += 1;
+                                            self.col += 1;
                                             break;
                                         }
                                     } else {
@@ -205,154 +238,402 @@ impl Lexer {
                             }
                         } else if self.currentc() == '>' {
                             self.current += 1;
-                            self.col     += 1;
-                            tokens.push(Token::new(TokenType::Koy, "->".to_string(), self.line, self.col, file.clone()));
+                            self.col += 1;
+                            tokens.push(Token::new(
+                                TokenType::Koy,
+                                "->".to_string(),
+                                self.line,
+                                self.col,
+                                file.clone(),
+                            ));
                         } else {
-                            tokens.push(Token::new(TokenType::Eksi, "-".to_string(), self.line, self.col, file.clone()))
+                            tokens.push(Token::new(
+                                TokenType::Eksi,
+                                "-".to_string(),
+                                self.line,
+                                self.col,
+                                file.clone(),
+                            ))
                         }
                     } else {
-                        tokens.push(Token::new(TokenType::Eksi, "-".to_string(), self.line, self.col, file.clone()))
+                        tokens.push(Token::new(
+                            TokenType::Eksi,
+                            "-".to_string(),
+                            self.line,
+                            self.col,
+                            file.clone(),
+                        ))
                     }
-                },
+                }
                 '*' => {
                     self.col += 1;
                     self.current += 1;
-                    tokens.push(Token::new(TokenType::Çarpı, "*".to_string(), self.line, self.col, file.clone()))
-                },
+                    tokens.push(Token::new(
+                        TokenType::Çarpı,
+                        "*".to_string(),
+                        self.line,
+                        self.col,
+                        file.clone(),
+                    ))
+                }
                 '/' => {
                     self.col += 1;
                     self.current += 1;
-                    tokens.push(Token::new(TokenType::Bölü, "/".to_string(), self.line, self.col, file.clone()))
-                },
+                    tokens.push(Token::new(
+                        TokenType::Bölü,
+                        "/".to_string(),
+                        self.line,
+                        self.col,
+                        file.clone(),
+                    ))
+                }
                 '%' => {
                     self.col += 1;
                     self.current += 1;
-                    tokens.push(Token::new(TokenType::Modulo, "%".to_string(), self.line, self.col, file.clone()))
-                },
+                    tokens.push(Token::new(
+                        TokenType::Modulo,
+                        "%".to_string(),
+                        self.line,
+                        self.col,
+                        file.clone(),
+                    ))
+                }
                 '>' => {
                     self.col += 1;
                     self.current += 1;
                     if self.source.len() > self.current {
                         if self.currentc() == '=' {
-                            tokens.push(Token::new(TokenType::BüyükEşittir, ">=".to_string(), self.line, self.col, file.clone()));
+                            tokens.push(Token::new(
+                                TokenType::BüyükEşittir,
+                                ">=".to_string(),
+                                self.line,
+                                self.col,
+                                file.clone(),
+                            ));
                             self.col += 1;
                             self.current += 1;
                         } else {
-                            tokens.push(Token::new(TokenType::Büyüktür, ">".to_string(), self.line, self.col, file.clone()));
+                            tokens.push(Token::new(
+                                TokenType::Büyüktür,
+                                ">".to_string(),
+                                self.line,
+                                self.col,
+                                file.clone(),
+                            ));
                         }
                     } else {
-                        tokens.push(Token::new(TokenType::Büyüktür, ">".to_string(), self.line, self.col, file.clone()));
+                        tokens.push(Token::new(
+                            TokenType::Büyüktür,
+                            ">".to_string(),
+                            self.line,
+                            self.col,
+                            file.clone(),
+                        ));
                     }
-                },
+                }
                 '<' => {
                     self.col += 1;
                     self.current += 1;
                     if self.source.len() > self.current {
                         if self.currentc() == '=' {
-                            tokens.push(Token::new(TokenType::KüçükEşittir, "<=".to_string(), self.line, self.col, file.clone()));
+                            tokens.push(Token::new(
+                                TokenType::KüçükEşittir,
+                                "<=".to_string(),
+                                self.line,
+                                self.col,
+                                file.clone(),
+                            ));
                             self.col += 1;
                             self.current += 1;
                         } else {
-                            tokens.push(Token::new(TokenType::Küçüktür, "<".to_string(), self.line, self.col, file.clone()));
+                            tokens.push(Token::new(
+                                TokenType::Küçüktür,
+                                "<".to_string(),
+                                self.line,
+                                self.col,
+                                file.clone(),
+                            ));
                         }
                     } else {
-                        tokens.push(Token::new(TokenType::Küçüktür, "<".to_string(), self.line, self.col, file.clone()));
+                        tokens.push(Token::new(
+                            TokenType::Küçüktür,
+                            "<".to_string(),
+                            self.line,
+                            self.col,
+                            file.clone(),
+                        ));
                     }
-                },
+                }
                 '!' => {
                     self.col += 1;
                     self.current += 1;
                     if self.source.len() > self.current {
                         if self.currentc() == '=' {
-                            tokens.push(Token::new(TokenType::EşitDeğildir, "!=".to_string(), self.line, self.col, file.clone()));
+                            tokens.push(Token::new(
+                                TokenType::EşitDeğildir,
+                                "!=".to_string(),
+                                self.line,
+                                self.col,
+                                file.clone(),
+                            ));
                             self.col += 1;
                             self.current += 1;
                         } else {
-                            tokens.push(Token::new(TokenType::Değildir, "!".to_string(), self.line, self.col, file.clone()));
+                            tokens.push(Token::new(
+                                TokenType::Değildir,
+                                "!".to_string(),
+                                self.line,
+                                self.col,
+                                file.clone(),
+                            ));
                         }
                     } else {
-                        tokens.push(Token::new(TokenType::Değildir, "!".to_string(), self.line, self.col, file.clone()));
+                        tokens.push(Token::new(
+                            TokenType::Değildir,
+                            "!".to_string(),
+                            self.line,
+                            self.col,
+                            file.clone(),
+                        ));
                     }
-                },
+                }
                 '=' => {
                     self.col += 1;
                     self.current += 1;
                     if self.source.len() > self.current {
                         if self.currentc() == '?' {
-                            tokens.push(Token::new(TokenType::Son, "=?".to_string(), self.line, self.col, file.clone()));
+                            tokens.push(Token::new(
+                                TokenType::Son,
+                                "=?".to_string(),
+                                self.line,
+                                self.col,
+                                file.clone(),
+                            ));
                             self.col += 1;
                             self.current += 1;
                         } else {
-                            tokens.push(Token::new(TokenType::Eşittir, "=".to_string(), self.line, self.col, file.clone()));
+                            tokens.push(Token::new(
+                                TokenType::Eşittir,
+                                "=".to_string(),
+                                self.line,
+                                self.col,
+                                file.clone(),
+                            ));
                         }
                     } else {
-                        tokens.push(Token::new(TokenType::Eşittir, "=".to_string(), self.line, self.col, file.clone()));
+                        tokens.push(Token::new(
+                            TokenType::Eşittir,
+                            "=".to_string(),
+                            self.line,
+                            self.col,
+                            file.clone(),
+                        ));
                     }
-                },
+                }
                 ':' => {
                     self.col += 1;
                     self.current += 1;
                     if self.source.len() > self.current {
                         if self.currentc() == '.' {
-                            tokens.push(Token::new(TokenType::İkiNoktaNokta, ":.".to_string(), self.line, self.col, file.clone()));
+                            tokens.push(Token::new(
+                                TokenType::İkiNoktaNokta,
+                                ":.".to_string(),
+                                self.line,
+                                self.col,
+                                file.clone(),
+                            ));
                             self.col += 1;
                             self.current += 1;
                         } else if self.currentc() == '?' {
-                            tokens.push(Token::new(TokenType::Yoksa, ":?".to_string(), self.line, self.col, file.clone()));
+                            tokens.push(Token::new(
+                                TokenType::Yoksa,
+                                ":?".to_string(),
+                                self.line,
+                                self.col,
+                                file.clone(),
+                            ));
                             self.col += 1;
                             self.current += 1;
                         } else {
                             unimplemented!("':' operatorü implemente edilmiş değil");
                         }
                     }
-                },
+                }
                 '?' => {
                     self.current += 1;
                     self.col += 1;
-                    tokens.push(Token::new(TokenType::İse, "?".to_string(), self.line, self.col, file.clone()));
-                },
+                    tokens.push(Token::new(
+                        TokenType::İse,
+                        "?".to_string(),
+                        self.line,
+                        self.col,
+                        file.clone(),
+                    ));
+                }
                 '@' => {
                     self.current += 1;
                     self.col += 1;
-                    tokens.push(Token::new(TokenType::Tipinde, "@".to_string(), self.line, self.col, file.clone()));
-                },
+                    tokens.push(Token::new(
+                        TokenType::Tipinde,
+                        "@".to_string(),
+                        self.line,
+                        self.col,
+                        file.clone(),
+                    ));
+                }
                 ' ' => {
                     self.current += 1;
                     self.col += 1;
-                },
+                }
                 _ => {
                     let mut buf = String::new();
 
-                    while self.source.len() > self.current && !char_in_str(self.currentc(), "\t\r \n\"':?=<>!/%*@") {
+                    while self.source.len() > self.current
+                        && !char_in_str(self.currentc(), "\t\r \n\"':?=<>!/%*@")
+                    {
                         buf.push(self.currentc());
                         self.current += 1;
                         self.col += 1;
                     }
 
                     match buf.as_str() {
-                        "at" => tokens.push(Token::new(TokenType::At, "at".to_string(), self.line, self.col, file.clone())),
-                        "de" => tokens.push(Token::new(TokenType::De, "de".to_string(), self.line, self.col, file.clone())),
-                        "ise" => tokens.push(Token::new(TokenType::İse, "ise".to_string(), self.line, self.col, file.clone())),
-                        "son" => tokens.push(Token::new(TokenType::Son, "son".to_string(), self.line, self.col, file.clone())),
-                        "iken" => tokens.push(Token::new(TokenType::İken, "iken".to_string(), self.line, self.col, file.clone())),
-                        "yoksa" => tokens.push(Token::new(TokenType::Yoksa, "yoksa".to_string(), self.line, self.col, file.clone())),
-                        "doğru" => tokens.push(Token::new(TokenType::Doğru, "doğru".to_string(), self.line, self.col, file.clone())),
-                        "yanlış" => tokens.push(Token::new(TokenType::Yanlış, "yanlış".to_string(), self.line, self.col, file.clone())),
-                        "kpy" => tokens.push(Token::new(TokenType::Kopya, "kpy".to_string(), self.line, self.col, file.clone())),
-                        "tks" => tokens.push(Token::new(TokenType::Takas, "tks".to_string(), self.line, self.col, file.clone())),
-                        "üst" => tokens.push(Token::new(TokenType::Üst, "üst".to_string(), self.line, self.col, file.clone())),
-                        "veya" => tokens.push(Token::new(TokenType::Veya, "veya".to_string(), self.line, self.col, file.clone())),
-                        "ve" => tokens.push(Token::new(TokenType::Ve, "ve".to_string(), self.line, self.col, file.clone())),
-                        "dön" => tokens.push(Token::new(TokenType::Döndür, "dön".to_string(), self.line, self.col, file.clone())),
-                        "girdi" => tokens.push(Token::new(TokenType::Girdi, "girdi".to_string(), self.line, self.col, file.clone())),
-                        "işlev" => tokens.push(Token::new(TokenType::İşlev, "işlev".to_string(), self.line, self.col, file.clone())),
-                        "yükle" => tokens.push(Token::new(TokenType::Yükle, "yükle".to_string(), self.line, self.col, file.clone())),
-                        a => tokens.push(Token::new(TokenType::Identifier, a.to_string(), self.line, self.col, file.clone())),
+                        "at" => tokens.push(Token::new(
+                            TokenType::At,
+                            "at".to_string(),
+                            self.line,
+                            self.col,
+                            file.clone(),
+                        )),
+                        "de" => tokens.push(Token::new(
+                            TokenType::De,
+                            "de".to_string(),
+                            self.line,
+                            self.col,
+                            file.clone(),
+                        )),
+                        "ise" => tokens.push(Token::new(
+                            TokenType::İse,
+                            "ise".to_string(),
+                            self.line,
+                            self.col,
+                            file.clone(),
+                        )),
+                        "son" => tokens.push(Token::new(
+                            TokenType::Son,
+                            "son".to_string(),
+                            self.line,
+                            self.col,
+                            file.clone(),
+                        )),
+                        "iken" => tokens.push(Token::new(
+                            TokenType::İken,
+                            "iken".to_string(),
+                            self.line,
+                            self.col,
+                            file.clone(),
+                        )),
+                        "yoksa" => tokens.push(Token::new(
+                            TokenType::Yoksa,
+                            "yoksa".to_string(),
+                            self.line,
+                            self.col,
+                            file.clone(),
+                        )),
+                        "doğru" => tokens.push(Token::new(
+                            TokenType::Doğru,
+                            "doğru".to_string(),
+                            self.line,
+                            self.col,
+                            file.clone(),
+                        )),
+                        "yanlış" => tokens.push(Token::new(
+                            TokenType::Yanlış,
+                            "yanlış".to_string(),
+                            self.line,
+                            self.col,
+                            file.clone(),
+                        )),
+                        "kpy" => tokens.push(Token::new(
+                            TokenType::Kopya,
+                            "kpy".to_string(),
+                            self.line,
+                            self.col,
+                            file.clone(),
+                        )),
+                        "tks" => tokens.push(Token::new(
+                            TokenType::Takas,
+                            "tks".to_string(),
+                            self.line,
+                            self.col,
+                            file.clone(),
+                        )),
+                        "üst" => tokens.push(Token::new(
+                            TokenType::Üst,
+                            "üst".to_string(),
+                            self.line,
+                            self.col,
+                            file.clone(),
+                        )),
+                        "veya" => tokens.push(Token::new(
+                            TokenType::Veya,
+                            "veya".to_string(),
+                            self.line,
+                            self.col,
+                            file.clone(),
+                        )),
+                        "ve" => tokens.push(Token::new(
+                            TokenType::Ve,
+                            "ve".to_string(),
+                            self.line,
+                            self.col,
+                            file.clone(),
+                        )),
+                        "dön" => tokens.push(Token::new(
+                            TokenType::Döndür,
+                            "dön".to_string(),
+                            self.line,
+                            self.col,
+                            file.clone(),
+                        )),
+                        "girdi" => tokens.push(Token::new(
+                            TokenType::Girdi,
+                            "girdi".to_string(),
+                            self.line,
+                            self.col,
+                            file.clone(),
+                        )),
+                        "işlev" => tokens.push(Token::new(
+                            TokenType::İşlev,
+                            "işlev".to_string(),
+                            self.line,
+                            self.col,
+                            file.clone(),
+                        )),
+                        "yükle" => tokens.push(Token::new(
+                            TokenType::Yükle,
+                            "yükle".to_string(),
+                            self.line,
+                            self.col,
+                            file.clone(),
+                        )),
+                        a => tokens.push(Token::new(
+                            TokenType::Identifier,
+                            a.to_string(),
+                            self.line,
+                            self.col,
+                            file.clone(),
+                        )),
                     }
-                },
+                }
             }
         }
-        tokens.push(Token::new(TokenType::EOF, "".to_string(), self.line, self.col, file.clone()));
+        tokens.push(Token::new(
+            TokenType::EOF,
+            "".to_string(),
+            self.line,
+            self.col,
+            file.clone(),
+        ));
         self.post_proc(tokens, visited, file)
     }
     fn currentc(&self) -> char {

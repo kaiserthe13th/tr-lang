@@ -1,13 +1,10 @@
-use crate::store::{
-    VERSION,
-    RELEASE,
-};
 use crate::exit;
+use crate::store::{RELEASE, VERSION};
 
-use std::io::ErrorKind::IsADirectory;
 use std::fs::File;
-use std::path::PathBuf;
+use std::io::ErrorKind::IsADirectory;
 use std::io::Read;
+use std::path::PathBuf;
 
 use locale_config::Locale;
 
@@ -23,7 +20,7 @@ pub enum SupportedLanguage {
 
 pub fn error_print<T>(error_name: &str, error_explanation: T) -> !
 where
-    T: std::fmt::Debug
+    T: std::fmt::Debug,
 {
     eprintln!("{}: {:?}", error_name, error_explanation);
     exit(1);
@@ -31,7 +28,10 @@ where
 
 pub fn read_file(path: &PathBuf) -> Result<String, FSErr> {
     let mut file = match File::open(path.clone()) {
-        Err(e) => error_print("error opening file", format!("{}: {}", e, path.as_path().display())),
+        Err(e) => error_print(
+            "error opening file",
+            format!("{}: {}", e, path.as_path().display()),
+        ),
         Ok(f) => f,
     };
 
@@ -41,16 +41,19 @@ pub fn read_file(path: &PathBuf) -> Result<String, FSErr> {
         Err(err) => match err.kind() {
             IsADirectory => {
                 return Err(FSErr::IsADir);
-            },
+            }
             _ => panic!(),
-        }
+        },
     };
     Ok(buf)
 }
 
 pub fn read_file_to_vec_u8(path: &PathBuf) -> Vec<u8> {
     let mut file = match File::open(path.clone()) {
-        Err(e) => error_print("error opening file", format!("{}: {}", e, path.as_path().display())),
+        Err(e) => error_print(
+            "error opening file",
+            format!("{}: {}", e, path.as_path().display()),
+        ),
         Ok(f) => f,
     };
 
@@ -72,7 +75,7 @@ pub fn get_lang() -> SupportedLanguage {
     };
     match lang.as_str() {
         "tr-TR" => SupportedLanguage::Turkish,
-        _       => SupportedLanguage::English,
+        _ => SupportedLanguage::English,
     }
 }
 
@@ -86,7 +89,8 @@ pub fn char_in_str(a: char, b: &str) -> bool {
 }
 
 pub fn in_vec<T>(a: &T, v: &Vec<T>) -> bool
-where T: Eq
+where
+    T: Eq,
 {
     //! Checks if &T is in a &Vec<T>
     //! It is shortcircuiting function meaning if it finds any match it will immideatly return true
@@ -100,7 +104,8 @@ where T: Eq
 }
 
 pub fn item_in_vec<T>(arr: &[T], v: &Vec<T>) -> bool
-where T: Eq
+where
+    T: Eq,
 {
     //! Checks if any item of arr: &[T] has a counterpart in v: &Vec<T>
     //! It is shortcircuiting function meaning if it finds any match it will immideatly return true
@@ -118,7 +123,10 @@ where T: Eq
 pub fn print_help(exit_code: i32, prog_name: String) -> ! {
     match get_lang() {
         SupportedLanguage::Turkish => {
-            println!("{} sürüm {}, {} tarihinde yayınlandı", prog_name, VERSION, RELEASE);
+            println!(
+                "{} sürüm {}, {} tarihinde yayınlandı",
+                prog_name, VERSION, RELEASE
+            );
             println!("");
             println!("KULLANIM:");
             println!("  {} <ALTKOMUT> <DOSYA> [SEÇENEKLER]", prog_name);
@@ -132,10 +140,14 @@ pub fn print_help(exit_code: i32, prog_name: String) -> ! {
             println!("  -h -y --yardım         yardım göster ve çık");
             println!("  -V -s --sürüm          sürümü göster ve çık");
             println!("  -o -ç --çıkış <DOSYA>  çıkışta buraya bytecode yaz");
-            println!("  -l --lexer-çıktısı     lex süreci bittikten sonra lexer'ın çıktısını göster");
-            println!("  -p --parser-çıktısı    parse süreci bittikten sonra parser'ın çıktısını göster");
+            println!(
+                "  -l --lexer-çıktısı     lex süreci bittikten sonra lexer'ın çıktısını göster"
+            );
+            println!(
+                "  -p --parser-çıktısı    parse süreci bittikten sonra parser'ın çıktısını göster"
+            );
             println!("  --                     bundan sonra argv ekleyin");
-        },
+        }
         SupportedLanguage::English => {
             println!("{} version {}, released at {}", prog_name, VERSION, RELEASE);
             println!("");
@@ -154,15 +166,20 @@ pub fn print_help(exit_code: i32, prog_name: String) -> ! {
             println!("    -l --lexer-çıktısı    after lexing show lexed tokens");
             println!("    -p --parser-çıktısı   after parsing show parsed tokens");
             println!("    --                    add argv after this");
-        },
+        }
     }
     exit(exit_code);
 }
 
 pub fn print_version(prog_name: String) -> ! {
     match get_lang() {
-        SupportedLanguage::Turkish => println!("{} sürüm {}, {} tarihinde yayınlandı", prog_name, VERSION, RELEASE),
-        SupportedLanguage::English => println!("{} version {}, released at {}", prog_name, VERSION, RELEASE),
+        SupportedLanguage::Turkish => println!(
+            "{} sürüm {}, {} tarihinde yayınlandı",
+            prog_name, VERSION, RELEASE
+        ),
+        SupportedLanguage::English => {
+            println!("{} version {}, released at {}", prog_name, VERSION, RELEASE)
+        }
     }
     exit(0);
 }

@@ -1,3 +1,3 @@
 mod parser;
 
-pub use parser::Parser as Parser;
+pub use parser::Parser;

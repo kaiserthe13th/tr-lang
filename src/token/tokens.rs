@@ -1,7 +1,7 @@
-use serde::{ Serialize, Deserialize };
+use serde::{Deserialize, Serialize};
 
 pub mod tokentypes {
-    use serde::{ Serialize, Deserialize };
+    use serde::{Deserialize, Serialize};
 
     #[derive(Debug, Clone, Serialize, Deserialize)]
     pub enum ParserTokenType {
@@ -29,11 +29,11 @@ pub mod tokentypes {
         Veya,
         Girdi,
         İkiNoktaNokta,
-        İken ( Option<usize> ),
+        İken(Option<usize>),
         Sayı { val: f64 },
         Bool { val: bool },
-        İse ( Option<usize> ),
-        Yoksa ( Option<usize> ),
+        İse(Option<usize>),
+        Yoksa(Option<usize>),
         Son { tp: usize },
         Identifier { id: String },
         İşlev { sonloc: Option<usize> },
@@ -43,7 +43,7 @@ pub mod tokentypes {
         Tipinde,
         EOF,
     }
-    
+
     #[derive(Debug, Clone)]
     pub enum LexerTokenType {
         İşlev,
@@ -96,30 +96,47 @@ pub mod tokentypes {
 
 #[derive(Debug, Clone)]
 pub struct LexerToken {
-    pub typ:    tokentypes::LexerTokenType,
+    pub typ: tokentypes::LexerTokenType,
     pub lexeme: String,
-    pub line:   usize,
-    pub col:    usize,
-    pub file:   String,
+    pub line: usize,
+    pub col: usize,
+    pub file: String,
 }
 
 impl LexerToken {
-    pub fn new(typ: tokentypes::LexerTokenType, lexeme: String, line: usize, col: usize, file: String) -> Self {
-        Self { typ, lexeme, line, col, file }
+    pub fn new(
+        typ: tokentypes::LexerTokenType,
+        lexeme: String,
+        line: usize,
+        col: usize,
+        file: String,
+    ) -> Self {
+        Self {
+            typ,
+            lexeme,
+            line,
+            col,
+            file,
+        }
     }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ParserToken {
-    pub typ:  tokentypes::ParserTokenType,
+    pub typ: tokentypes::ParserTokenType,
     pub line: usize,
-    pub col:  usize,
+    pub col: usize,
     pub file: String,
 }
 
 impl ParserToken {
     pub fn new(typ: tokentypes::ParserTokenType, line: usize, col: usize, file: String) -> Self {
-        Self { typ, line, col, file }
+        Self {
+            typ,
+            line,
+            col,
+            file,
+        }
     }
 
     pub fn repr(&self) -> String {
@@ -128,11 +145,9 @@ impl ParserToken {
             TokTyp::Artı => "+".to_string(),
             TokTyp::ArtıArtı => "++".to_string(),
             TokTyp::At => "at".to_string(),
-            TokTyp::Bool { val } => {
-                match val {
-                    true => "doğru".to_string(),
-                    false => "yanlış".to_string(),
-                }
+            TokTyp::Bool { val } => match val {
+                true => "doğru".to_string(),
+                false => "yanlış".to_string(),
             },
             TokTyp::Bölü => "/".to_string(),
             TokTyp::BüyükEşittir => ">=".to_string(),
@@ -147,23 +162,21 @@ impl ParserToken {
             TokTyp::Eşittir => "=".to_string(),
             TokTyp::Girdi => "girdi".to_string(),
             TokTyp::Identifier { ref id } => id.clone(),
-            TokTyp::İken (_) => "iken".to_string(),
+            TokTyp::İken(_) => "iken".to_string(),
             TokTyp::İkiNoktaNokta => ":.".to_string(),
             TokTyp::İse(_) => "ise".to_string(),
-            TokTyp::İşlev {..} => "işlev".to_string(),
-            TokTyp::İşlevSonlandır {..} => "son".to_string(),
+            TokTyp::İşlev { .. } => "işlev".to_string(),
+            TokTyp::İşlevSonlandır { .. } => "son".to_string(),
             TokTyp::Kopya => "kpy".to_string(),
             TokTyp::Koy => "->".to_string(),
             TokTyp::KüçükEşittir => "<=".to_string(),
             TokTyp::Küçüktür => "<".to_string(),
             TokTyp::Modulo => "%".to_string(),
-            TokTyp::Sayı { val } => {
-                match val.fract() == 0.0 {
-                    true => format!("{:.0?}", val),
-                    false => format!("{:?}", val),
-                }
+            TokTyp::Sayı { val } => match val.fract() == 0.0 {
+                true => format!("{:.0?}", val),
+                false => format!("{:?}", val),
             },
-            TokTyp::Son {..} => "son".to_string(),
+            TokTyp::Son { .. } => "son".to_string(),
             TokTyp::Takas => "tks".to_string(),
             TokTyp::Tipinde => "@".to_string(),
             TokTyp::Ve => "ve".to_string(),

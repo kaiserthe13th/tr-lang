@@ -1,2 +1,2 @@
 mod lexer;
-pub use lexer::Lexer as Lexer;
+pub use lexer::Lexer;
