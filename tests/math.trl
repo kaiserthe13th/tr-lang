@@ -8,6 +8,6 @@ işlev factorial
             1-kpy dön *tks
         son at
     yoksa
-        at 1
+        at at 1
     son
 son
