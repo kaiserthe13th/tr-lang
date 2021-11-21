@@ -938,8 +938,31 @@ impl Run {
                         }
                     },
                     None => {
-                        println!("bilinen değişkenler: {:?}", hashs);
-                        panic!("{} bulunamadı.", id);
+                        match get_lang() {
+                            SupportedLanguage::Turkish => {
+                                ErrorGenerator::error(
+                                    "BilinmeyenTanımlayıcı",
+                                    &format!("bilinmeyen değişken: `{}`, bu değişken bulunamamıştır", tokenc.repr()),
+                                    tokenc.line,
+                                    tokenc.col,
+                                    tokenc.file,
+                                    Box::new(||{}),
+                                );
+                            }
+                            SupportedLanguage::English => {
+                                ErrorGenerator::error(
+                                    "UnknownIdentifier",
+                                    &format!("unknown identifier: `{}`, this identifier could not be found", tokenc.repr()),
+                                    tokenc.line,
+                                    tokenc.col,
+                                    tokenc.file,
+                                    Box::new(||{
+                                        let mut hashc: Vec<String> = hashs.into_keys().collect();
+                                        hashc.sort();
+                                    }),
+                                );
+                            }
+                        };
                     }
                 },
                 TokenType::Koy => {
