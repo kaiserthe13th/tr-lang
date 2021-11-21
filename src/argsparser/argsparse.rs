@@ -1,6 +1,6 @@
 use std::env;
 use crate::util;
-use crate::store::SUPRESS_WARN;
+use crate::store::globarg::*;
 
 #[derive(Debug)]
 pub enum Subcommands {

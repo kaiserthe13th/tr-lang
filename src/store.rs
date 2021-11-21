@@ -1,6 +1,8 @@
 use cfg_if::cfg_if;
 
-pub static mut SUPRESS_WARN: bool = false;
+pub mod globarg {
+    pub static mut SUPRESS_WARN: bool = false;
+}
 pub const VERSION: &str = "0.3.1";
 pub const RELEASE: &str = "16.11.2021";
 cfg_if! {
