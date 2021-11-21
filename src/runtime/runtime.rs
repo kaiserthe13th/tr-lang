@@ -946,7 +946,20 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
+                                    {
+                                        let hashc = hashs.clone();
+                                        let id: String = id.clone();
+                                        Box::new(||{
+                                            let mut hashc: Vec<String> = hashc.into_keys().collect();
+                                            let id = id;
+                                            hashc.sort();
+                                            let n = match hashc[..].binary_search(&id) {
+                                                Ok(n) => n,
+                                                Err(n) => n,
+                                            };
+                                            println!("`{}` demek mi istediniz?", &hashc[n]);
+                                        })
+                                    },
                                 );
                             }
                             SupportedLanguage::English => {
@@ -958,9 +971,16 @@ impl Run {
                                     tokenc.file,
                                     {
                                         let hashc = hashs.clone();
+                                        let id: String = id.clone();
                                         Box::new(||{
                                             let mut hashc: Vec<String> = hashc.into_keys().collect();
+                                            let id = id;
                                             hashc.sort();
+                                            let n = match hashc[..].binary_search(&id) {
+                                                Ok(n) => n,
+                                                Err(n) => n,
+                                            };
+                                            println!("Maybe you meant `{}`?", &hashc[n]);
                                         })
                                     },
                                 );
