@@ -4,7 +4,7 @@ pub mod ErrorGenerator {
     use crate::store::SUPRESS_WARN;
     use crate::util::{ get_lang, SupportedLanguage };
 
-    pub fn error(name: &str, explanation: &str, line: usize, col: usize, file: String, after_f: Box<dyn Fn() -> ()>) -> ! {
+    pub fn error(name: &str, explanation: &str, line: usize, col: usize, file: String, after_f: Box<dyn FnOnce()>) -> ! {
         match get_lang() {
             SupportedLanguage::English => {
                 eprintln!("\n[ERROR] {}, Line {:?}, Column {:?}", file, line, col);
