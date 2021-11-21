@@ -956,10 +956,13 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{
-                                        let mut hashc: Vec<String> = hashs.clone().into_keys().collect();
-                                        hashc.sort();
-                                    }),
+                                    {
+                                        let hashc = hashs.clone();
+                                        Box::new(||{
+                                            let mut hashc: Vec<String> = hashc.into_keys().collect();
+                                            hashc.sort();
+                                        })
+                                    },
                                 );
                             }
                         };
