@@ -957,7 +957,7 @@ impl Run {
                                                 Ok(n) => n,
                                                 Err(n) => n,
                                             };
-                                            println!("`{}` demek mi istediniz?", &hashc[n]);
+                                            println!("    `{}` demek mi istediniz?", &hashc[n]);
                                         })
                                     },
                                 );
@@ -980,7 +980,7 @@ impl Run {
                                                 Ok(n) => n,
                                                 Err(n) => n,
                                             };
-                                            println!("Maybe you meant `{}`?", &hashc[n]);
+                                            println!("    Maybe you meant `{}`?", &hashc[n]);
                                         })
                                     },
                                 );
