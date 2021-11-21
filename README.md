@@ -61,4 +61,4 @@ for features use <span class="tag">`(enhancement | yükseltme)`</span> tag, for 
 # :scroll: Thanks
 
 - I give my thanks to user [Netwave](https://stackoverflow.com/users/1695172/netwave) from stackoverflow.com for helping fix a [bug](https://stackoverflow.com/questions/69635458/pattern-matching-does-not-allow-me-to-change-values/69636181#69636181) during the creation of the parser.
-- I give my thanks to user [Chayim Friedman](https://stackoverflow.com/users/7884305/chayim-friedman) from stackoverflow.com for helping me with closure magic [](https://stackoverflow.com/questions/70053866/rust-cloning-hashmapstring-object-without-moving-into-closure-solved) during the making of UnknownIdentifier error message.
+- I give my thanks to user [Chayim Friedman](https://stackoverflow.com/users/7884305/chayim-friedman) from stackoverflow.com for helping me with [closure magic](https://stackoverflow.com/questions/70053866/rust-cloning-hashmapstring-object-without-moving-into-closure-solved) during the making of UnknownIdentifier error message.
