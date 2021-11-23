@@ -221,7 +221,7 @@ impl Object {
         }
     }
     // Dönüşüm
-    fn dönüştür(&self, a: String) -> Self {
+    fn dönüştür(&self, a: String, line: usize, col: usize, file: String) -> Self {
         match a.to_lowercase().as_str() {
             "yazı" => match self {
                 Self::Bool(b) => match b {
@@ -245,7 +245,28 @@ impl Object {
                     Self::Yazı(s) => match s.as_str() {
                         "doğru" => Self::Bool(true),
                         "yanlış" => Self::Bool(false),
-                        _ => unimplemented!(), // SomeError
+                        _ => match get_lang() {
+                            SupportedLanguage::Turkish => {
+                                ErrorGenerator::error(
+                                    "DeğerHatası",
+                                    &format!("`{:?}` beklenen değerlerin arasında bulunmuyor", s),
+                                    line,
+                                    col,
+                                    file,
+                                    Box::new(||{}),
+                                );
+                            }
+                            SupportedLanguage::English => {
+                                ErrorGenerator::error(
+                                    "ValueError",
+                                    &format!("`{:?}` is not one of the expected values", s),
+                                    line,
+                                    col,
+                                    file,
+                                    Box::new(||{}),
+                                );
+                            }
+                        },
                     },
                     Self::İşlev(_) => unreachable!(),
                 }
@@ -258,7 +279,28 @@ impl Object {
                 Self::Sayı(_) => self.clone(),
                 Self::Yazı(s) => match s.parse::<f64>() {
                     Ok(m) => Self::Sayı(m),
-                    Err(_) => unimplemented!(),
+                    Err(_) => match get_lang() {
+                        SupportedLanguage::Turkish => {
+                            ErrorGenerator::error(
+                                "DeğerHatası",
+                                &format!("`{:?}` beklenen değerlerin arasında bulunmuyor", s),
+                                line,
+                                col,
+                                file,
+                                Box::new(||{}),
+                            );
+                        }
+                        SupportedLanguage::English => {
+                            ErrorGenerator::error(
+                                "ValueError",
+                                &format!("`{:?}` is not one of the expected values", s),
+                                line,
+                                col,
+                                file,
+                                Box::new(||{}),
+                            );
+                        }
+                    },
                 },
                 Self::İşlev(_) => unreachable!(),
             },
@@ -280,7 +322,7 @@ impl Run {
     pub fn run(&mut self, file: String) {
         let mut stack: Stack = vec![];
         let mut hashs: HashMap<String, Object> = HashMap::new();
-        // let mut warnings: Vec<Box<dyn Fn() -> ()>> = vec![]; // for later use
+        // let mut warnings: Vec<Box<dyn FnOnce()>> = vec![]; // for later use
         let mut işlev_derinliği: usize = 0;
 
         while self.program.len() > self.current {
@@ -294,7 +336,28 @@ impl Run {
                         TokenType::Identifier { id: ident } => {
                             hashs.insert(ident, Object::İşlev(self.current));
                         }
-                        _ => unimplemented!(), // SyntaxError
+                        _ => match get_lang() {
+                            SupportedLanguage::Turkish => {
+                                ErrorGenerator::error(
+                                    "BeklenmedikSimge",
+                                    &format!("tanımlayıcı beklenmişti ancak `{}` bulundu", id.repr()),
+                                    tokenc.line,
+                                    tokenc.col,
+                                    tokenc.file,
+                                    Box::new(||{}),
+                                );
+                            }
+                            SupportedLanguage::English => {
+                                ErrorGenerator::error(
+                                    "UnexpectedToken",
+                                    &format!("expected identifier, but found `{}`", id.repr()),
+                                    tokenc.line,
+                                    tokenc.col,
+                                    tokenc.file,
+                                    Box::new(||{}),
+                                );
+                            }
+                        },
                     }
                     let loc = match sonloc {
                         Some(a) => a,
@@ -312,7 +375,7 @@ impl Run {
                 TokenType::İşlevSonlandır { .. } => {
                     if işlev_derinliği < 1 {
                         let loc = match token.typ {
-                            TokenType::İşlevSonlandır { ref mut tp } => tp.pop().unwrap(),
+                            TokenType::İşlevSonlandır { ref mut tp } => tp.pop().unwrap(), // Safe to unwrap
                             _ => unreachable!(),
                         };
                         self.current = loc;
@@ -670,23 +733,23 @@ impl Run {
                                 None => match get_lang() {
                                     SupportedLanguage::Turkish => {
                                         ErrorGenerator::error(
-                                    "KümedeYeterliDeğişkenYok",
-                                    &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                            "KümedeYeterliDeğişkenYok",
+                                            &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
+                                            tokenc.line,
+                                            tokenc.col,
+                                            tokenc.file,
+                                            Box::new(||{}),
+                                        );
                                     }
                                     SupportedLanguage::English => {
                                         ErrorGenerator::error(
-                                    "NotEnoughVarsInStack",
-                                    &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                            "NotEnoughVarsInStack",
+                                            &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
+                                            tokenc.line,
+                                            tokenc.col,
+                                            tokenc.file,
+                                            Box::new(||{}),
+                                        );
                                     }
                                 },
                             };
@@ -698,7 +761,38 @@ impl Run {
                                         self.current = tp;
                                     }
                                 },
-                                a => panic!("ise'den önce stackte bir boolean olması lazım; şu anda {:?} var", a),
+                                _ => {
+                                    let b = match stack.pop() {
+                                        Some(a) => a,
+                                        None => match get_lang() {
+                                            SupportedLanguage::Turkish => {
+                                                ErrorGenerator::error(
+                                                    "KümedeYeterliDeğişkenYok",
+                                                    &format!("kümede yeterli değişken bulunmadığından dolayı `{}` anahtar kelimesi uygulanamamıştır", tokenc.repr()),
+                                                    tokenc.line,
+                                                    tokenc.col,
+                                                    tokenc.file,
+                                                    Box::new(||{}),
+                                                );
+                                            }
+                                            SupportedLanguage::English => {
+                                                ErrorGenerator::error(
+                                                    "NotEnoughVarsInStack",
+                                                    &format!("because there weren't enough variables in the stack, the keyword `{}` couldn't be used", tokenc.repr()),
+                                                    tokenc.line,
+                                                    tokenc.col,
+                                                    tokenc.file,
+                                                    Box::new(||{}),
+                                                );
+                                            }
+                                        },
+                                    };
+                                    match b.eşittir(a) {
+                                        Object::Bool(true) => self.current += 1,
+                                        Object::Bool(false) => self.current = tp,
+                                        _ => unreachable!(),
+                                    }
+                                },
                             }
                         } else {
                             unreachable!()
@@ -1541,7 +1635,7 @@ impl Run {
                             },
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
-                                    "BeklenmedikSimge",
+                                    "UnexpectedToken",
                                     &format!("expected Identifier but found {:?}", t),
                                     tokenc.line,
                                     tokenc.col,
@@ -1691,9 +1785,30 @@ impl Run {
                     let b = self.program.get_mut(self.current).unwrap();
                     match &b.typ {
                         TokenType::Identifier { id } => {
-                            stack.push(a.dönüştür(id.clone()));
+                            stack.push(a.dönüştür(id.clone(), b.line, b.col, b.file.clone()));
                         }
-                        _ => unimplemented!("hata: tip tanımlayıcı değil"),
+                        _ => match get_lang() {
+                            SupportedLanguage::Turkish => {
+                                ErrorGenerator::error(
+                                    "BeklenmedikSimge",
+                                    &format!("tanımlayıcı beklenmişti ancak `{}` bulundu", b.repr()),
+                                    tokenc.line,
+                                    tokenc.col,
+                                    tokenc.file,
+                                    Box::new(||{}),
+                                );
+                            }
+                            SupportedLanguage::English => {
+                                ErrorGenerator::error(
+                                    "UnexpectedToken",
+                                    &format!("expected identifier, but found `{}`", b.repr()),
+                                    tokenc.line,
+                                    tokenc.col,
+                                    tokenc.file,
+                                    Box::new(||{}),
+                                );
+                            }
+                        },
                     };
                     self.current += 1;
                 }
@@ -1748,7 +1863,7 @@ impl Run {
                             print!(", {}", o);
                         } else {
                             if stack.len() > 3 {
-                                print!("... {}", o);
+                                print!("...{}", o);
                             } else {
                                 print!("{}", o);
                             }
