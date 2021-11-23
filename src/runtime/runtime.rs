@@ -202,22 +202,106 @@ impl Object {
         }
     }
     // Mantık
-    fn ve(&self, a: Self) -> Self {
+    fn ve(&self, a: Self, line: usize, col: usize, file: String) -> Self {
         match self {
             Self::Bool(f) => match a {
                 Self::Bool(a) => Self::Bool(*f && a),
-                b => panic!("{:?} `ve` {:?} desteklenmiyor", f, b),
+                b => match get_lang() {
+                    SupportedLanguage::Turkish => {
+                        ErrorGenerator::error(
+                            "Desteklenmeyenİşlem",
+                            &format!("`{:?}` `ve` `{:?}` işlemi desteklemiyor", self, b),
+                            line,
+                            col,
+                            file,
+                            Box::new(||{}),
+                        );
+                    }
+                    SupportedLanguage::English => {
+                        ErrorGenerator::error(
+                            "UnsupportedOperation",
+                            &format!("`{:?}` `ve` `{:?}` operation is not supported", self, b),
+                            line,
+                            col,
+                            file,
+                            Box::new(||{}),
+                        );
+                    }
+                },
             },
-            b => panic!("{:?} `ve` anahtar kelimesini desteklemiyor", b),
+            b => match get_lang() {
+                SupportedLanguage::Turkish => {
+                    ErrorGenerator::error(
+                        "Desteklenmeyenİşlem",
+                        &format!("{:?} `veya` anahtar kelimesini desteklemiyor", b),
+                        line,
+                        col,
+                        file,
+                        Box::new(||{}),
+                    );
+                }
+                SupportedLanguage::English => {
+                    ErrorGenerator::error(
+                        "UnsupportedOperation",
+                        &format!("{:?} does not support the keyword `veya`", b),
+                        line,
+                        col,
+                        file,
+                        Box::new(||{}),
+                    );
+                }
+            },
         }
     }
-    fn veya(&self, a: Self) -> Self {
+    fn veya(&self, a: Self, line: usize, col: usize, file: String) -> Self {
         match self {
             Self::Bool(f) => match a {
                 Self::Bool(a) => Self::Bool(*f || a),
-                b => panic!("{:?} `ve` {:?} desteklenmiyor", f, b),
+                b => match get_lang() {
+                    SupportedLanguage::Turkish => {
+                        ErrorGenerator::error(
+                            "Desteklenmeyenİşlem",
+                            &format!("`{:?}` `veya` `{:?}` işlemi desteklemiyor", self, b),
+                            line,
+                            col,
+                            file,
+                            Box::new(||{}),
+                        );
+                    }
+                    SupportedLanguage::English => {
+                        ErrorGenerator::error(
+                            "UnsupportedOperation",
+                            &format!("`{:?}` `veya` `{:?}` operation is not supported", self, b),
+                            line,
+                            col,
+                            file,
+                            Box::new(||{}),
+                        );
+                    }
+                }
             },
-            b => panic!("{:?} `ve` anahtar kelimesini desteklemiyor", b),
+            b => match get_lang() {
+                SupportedLanguage::Turkish => {
+                    ErrorGenerator::error(
+                        "Desteklenmeyenİşlem",
+                        &format!("{:?} `veya` anahtar kelimesini desteklemiyor", b),
+                        line,
+                        col,
+                        file,
+                        Box::new(||{}),
+                    );
+                }
+                SupportedLanguage::English => {
+                    ErrorGenerator::error(
+                        "UnsupportedOperation",
+                        &format!("{:?} does not support the keyword `veya`", b),
+                        line,
+                        col,
+                        file,
+                        Box::new(||{}),
+                    );
+                }
+            },
         }
     }
     // Dönüşüm
@@ -304,7 +388,28 @@ impl Object {
                 },
                 Self::İşlev(_) => unreachable!(),
             },
-            a => panic!("bilinmeyen tip: {}", a),
+            a => match get_lang() {
+                SupportedLanguage::Turkish => {
+                    ErrorGenerator::error(
+                        "DeğerHatası",
+                        &format!("`{:?}` beklenen değerlerin arasında bulunmuyor", a),
+                        line,
+                        col,
+                        file,
+                        Box::new(||{}),
+                    );
+                }
+                SupportedLanguage::English => {
+                    ErrorGenerator::error(
+                        "ValueError",
+                        &format!("`{:?}` is not one of the expected values", a),
+                        line,
+                        col,
+                        file,
+                        Box::new(||{}),
+                    );
+                }
+            },
         }
     }
 }
@@ -1698,7 +1803,7 @@ impl Run {
                             }
                         },
                     };
-                    stack.push(b.ve(a));
+                    stack.push(b.ve(a, tokenc.line, tokenc.col, tokenc.file.clone()));
                     self.current += 1;
                 }
                 TokenType::Veya => {
@@ -1752,7 +1857,7 @@ impl Run {
                             }
                         },
                     };
-                    stack.push(b.veya(a));
+                    stack.push(b.veya(a, tokenc.line, tokenc.col, tokenc.file.clone()));
                     self.current += 1;
                 }
                 TokenType::Tipinde => {
