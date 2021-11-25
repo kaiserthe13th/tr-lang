@@ -141,10 +141,10 @@ pub fn print_help(exit_code: i32, prog_name: String) -> ! {
             println!("  -V -s --sürüm          sürümü göster ve çık");
             println!("  -o -ç --çıkış <DOSYA>  çıkışta buraya bytecode yaz");
             println!(
-                "  -l --lexer-çıktısı     lex süreci bittikten sonra lexer'ın çıktısını göster"
+                "  -l --lexer-çıktısı     lex sürecinden sonra lexer'ın çıktısını göster"
             );
             println!(
-                "  -p --parser-çıktısı    parse süreci bittikten sonra parser'ın çıktısını göster"
+                "  -p --parser-çıktısı    parse sürecinden sonra parser'ın çıktısını göster"
             );
             println!("  --                     bundan sonra argv ekleyin");
         }
@@ -161,7 +161,7 @@ pub fn print_help(exit_code: i32, prog_name: String) -> ! {
             println!("");
             println!("OPTIONS:");
             println!("    -h -y --yardım        print help and exit");
-            println!("    -V -s --sürüm         prin version and exit");
+            println!("    -V -s --sürüm         print version and exit");
             println!("    -o -ç --çıkış <file>  write bytecode at <file>");
             println!("    -l --lexer-çıktısı    after lexing show lexed tokens");
             println!("    -p --parser-çıktısı   after parsing show parsed tokens");
