@@ -36,6 +36,14 @@ impl Parser {
 
         for (ip, ptoken) in self.tokens.iter().enumerate() {
             match ptoken.typ {
+                LexTokenType::Ver => {
+                    parsed.push(Token::new(
+                        TokenType::Ver,
+                        ptoken.line,
+                        ptoken.col,
+                        ptoken.file.clone(),
+                    ));
+                },
                 LexTokenType::Yükle => unreachable!(),
                 LexTokenType::İşlev => {
                     blocktokens.push(BlockToken::İşlev(ip));

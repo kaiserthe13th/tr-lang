@@ -39,6 +39,7 @@ pub mod tokentypes {
         İşlev { sonloc: Option<usize> },
         İşlevSonlandır { tp: Vec<usize> },
         Koy,
+        Ver,
         At,
         Tipinde,
         EOF,
@@ -88,6 +89,7 @@ pub mod tokentypes {
         Girdi,
         Koy,
         At,
+        Ver,
         Yükle,
         Tipinde,
         EOF,
@@ -185,6 +187,7 @@ impl ParserToken {
             TokTyp::Yoksa(_) => "yoksa".to_string(),
             TokTyp::Çarpı => "*".to_string(),
             TokTyp::Üst => "üst".to_string(),
+            TokTyp::Ver => "ver".to_string(),
         }
     }
 }

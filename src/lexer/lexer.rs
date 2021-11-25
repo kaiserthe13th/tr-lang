@@ -504,6 +504,13 @@ impl Lexer {
                             self.col,
                             file.clone(),
                         )),
+                        "ver" => tokens.push(Token::new(
+                            TokenType::Ver,
+                            "ver".to_string(),
+                            self.line,
+                            self.col,
+                            file.clone(),
+                        )),
                         "de" => tokens.push(Token::new(
                             TokenType::De,
                             "de".to_string(),

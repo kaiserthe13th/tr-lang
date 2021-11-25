@@ -8,6 +8,20 @@ use std::path::PathBuf;
 
 use locale_config::Locale;
 
+#[macro_export]
+macro_rules! hashmap {
+    { $({$k:expr => $v:expr}),* } => {
+        {
+            #[allow(unused_mut)]
+            let mut m = std::collections::HashMap::new();
+            $(
+                m.insert($k, $v);
+            )*
+            m
+        }
+    };
+}
+
 #[derive(Debug)]
 pub enum FSErr {
     IsADir,
