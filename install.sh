@@ -1,4 +1,8 @@
 #!/bin/bash
+
+set GH_DEB_INST "tr-lang_0.3.1_amd64.deb"
+set GH_DEB_HREF "https://github.com/kaiserthe13th/tr-lang/releases/download/tr-lang-0.3.1/$GH_DEB_HREF"
+
 read -p "Do you wish to install tr-lang on your system[y/N]? " yn
 case $yn in
     [Yy]* ) ;;
@@ -27,10 +31,10 @@ elif [ -x "$(command -v brew)" ]; then
     brew install tr-lang
 elif [ -x "$(command -v dpkg)" -a -x "$(command -v wget)"]; then
     echo "using wget and dpkg to install..."
-    echo 'running: wget "https://github.com/kaiserthe13th/tr-lang/releases/download/tr-lang-0.3.1/tr-lang_0.3.1_amd64.deb"'
-    wget "https://github.com/kaiserthe13th/tr-lang/releases/download/tr-lang-0.3.1/tr-lang_0.3.1_amd64.deb"
-    echo 'running: sudo dpkg -i "tr-lang_0.3.1_amd64.deb"'
-    sudo dpkg -i "tr-lang_0.3.1_amd64.deb"
+    echo "running: wget \"$GH_DEB_HREF\""
+    wget $GH_DEB_HREF
+    echo "running: sudo dpkg -i \"$GH_DEB_INST\""
+    sudo dpkg -i "$GH_DEB_HREF"
 elif [ -x "$(command -v curl)" ]; then
     echo "No Installer found on your system."
     echo "To continue installation, tr-lang install script wants to install rust"
