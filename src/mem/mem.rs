@@ -6,12 +6,12 @@ pub type Stack = Vec<Object>;
 type GStack = Vec<Stack>;
 type GHash = Vec<HashMap<String, Object>>;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct StackMemory {
     gstack: GStack,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct HashMemory {
     ghashs: GHash,
 }
@@ -129,7 +129,7 @@ impl HashMemory {
 
     pub fn into_keys(&mut self) -> Vec<String> {
         let mut s: Vec<String> = vec![];
-        for i in self.ghashs.iter_mut() {
+        for i in self.ghashs.iter_mut().rev() {
             s.append(&mut i.clone().into_keys().collect::<Vec<String>>());
         }
         s

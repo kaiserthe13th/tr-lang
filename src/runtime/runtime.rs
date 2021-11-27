@@ -72,7 +72,7 @@ impl Run {
                         _ => unreachable!(),
                     }
                     işlev_derinliği += 1;
-                    self.current = loc;
+                    self.current = loc + 1;
                 }
                 TokenType::İşlevSonlandır { .. } => {
                     if işlev_derinliği < 1 {
@@ -85,6 +85,8 @@ impl Run {
                         işlev_derinliği -= 1;
                     }
                     self.current += 1;
+                    stack.del_stack();
+                    hashs.del_hash();
                 }
                 TokenType::De => {
                     if işlev_derinliği < 1 {
@@ -1213,89 +1215,89 @@ impl Run {
                     self.current += 1;
                 }
                 TokenType::İkiNoktaNokta | TokenType::EOF => self.current += 1,
-                TokenType::Identifier { id } => match hashs.clone().get_mut(&id) {
-                    Some(val) => match val {
-                        Object::Bool(_) | Object::Sayı(_) | Object::Yazı(_) => {
-                            stack.push(val.clone());
-                            self.current += 1;
-                        }
-                        Object::İşlev(tp) => {
-                            let işlev = self.program.get(*tp).unwrap();
-                            stack.new_stack();
-                            hashs.new_hash();
-                            match işlev.typ {
-                                TokenType::İşlev { sonloc: tpi } => {
-                                    let loc = match tpi {
-                                        Some(i) => i,
-                                        None => unreachable!(),
-                                    };
-                                    let işlevson = self.program.get_mut(loc).unwrap();
-                                    match &mut işlevson.typ {
-                                        TokenType::İşlevSonlandır { tp: ref mut tps } => {
-                                            tps.push(self.current);
+                    TokenType::Identifier { id } => {
+                        match hashs.clone().get_mut(&id) {
+                        Some(val) => match val {
+                            Object::Bool(_) | Object::Sayı(_) | Object::Yazı(_) => {
+                                stack.push(val.clone());
+                                self.current += 1;
+                            }
+                            Object::İşlev(tp) => {
+                                let işlev = self.program.get(*tp).unwrap();
+                                match işlev.typ {
+                                    TokenType::İşlev { sonloc: tpi } => {
+                                        let loc = match tpi {
+                                            Some(i) => i,
+                                            None => unreachable!(),
+                                        };
+                                        let işlevson = self.program.get_mut(loc).unwrap();
+                                        match &mut işlevson.typ {
+                                            TokenType::İşlevSonlandır { tp: ref mut tps } => {
+                                                tps.push(self.current);
+                                            }
+                                            _ => unreachable!(),
                                         }
-                                        _ => unreachable!(),
+                                        self.current = *tp + 2;
                                     }
-                                    self.current = *tp + 2;
+                                    _ => unreachable!(),
                                 }
-                                _ => unreachable!(),
+                                stack.new_stack();
+                                hashs.new_hash();
                             }
-                            stack.del_stack();
-                            hashs.del_hash();
+                        },
+                        None => {
+                            match get_lang() {
+                                SupportedLanguage::Turkish => {
+                                    ErrorGenerator::error(
+                                        "BilinmeyenTanımlayıcı",
+                                        &format!(
+                                            "bilinmeyen değişken: `{}`, bu değişken bulunamamıştır",
+                                            tokenc.repr()
+                                        ),
+                                        tokenc.line,
+                                        tokenc.col,
+                                        tokenc.file,
+                                        {
+                                            let hashc = hashs.clone().into_keys();
+                                            let id: String = id.clone();
+                                            Box::new(|| {
+                                                let mut hashc: Vec<String> = hashc;
+                                                let id = id;
+                                                hashc.sort();
+                                                let n = match hashc[..].binary_search(&id) {
+                                                    Ok(n) => n,
+                                                    Err(n) => n,
+                                                };
+                                                println!("    `{}` demek mi istediniz?", &hashc[n]);
+                                            })
+                                        },
+                                    );
+                                }
+                                SupportedLanguage::English => {
+                                    ErrorGenerator::error(
+                                        "UnknownIdentifier",
+                                        &format!("unknown identifier: `{}`, this identifier could not be found", tokenc.repr()),
+                                        tokenc.line,
+                                        tokenc.col,
+                                        tokenc.file,
+                                        {
+                                            let hashc = hashs.clone().into_keys();
+                                            let id: String = id.clone();
+                                            Box::new(||{
+                                                let mut hashc: Vec<String> = hashc;
+                                                let id = id;
+                                                hashc.sort();
+                                                let n = match hashc[..].binary_search(&id) {
+                                                    Ok(n) => n,
+                                                    Err(n) => n,
+                                                };
+                                                if !hashc.is_empty() { println!("    Maybe you meant `{}`?", &hashc[n]); }
+                                            })
+                                        },
+                                    );
+                                }
+                            };
                         }
-                    },
-                    None => {
-                        match get_lang() {
-                            SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
-                                    "BilinmeyenTanımlayıcı",
-                                    &format!(
-                                        "bilinmeyen değişken: `{}`, bu değişken bulunamamıştır",
-                                        tokenc.repr()
-                                    ),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
-                                    {
-                                        let hashc = hashs.clone().into_keys();
-                                        let id: String = id.clone();
-                                        Box::new(|| {
-                                            let mut hashc: Vec<String> = hashc;
-                                            let id = id;
-                                            hashc.sort();
-                                            let n = match hashc[..].binary_search(&id) {
-                                                Ok(n) => n,
-                                                Err(n) => n,
-                                            };
-                                            println!("    `{}` demek mi istediniz?", &hashc[n]);
-                                        })
-                                    },
-                                );
-                            }
-                            SupportedLanguage::English => {
-                                ErrorGenerator::error(
-                                    "UnknownIdentifier",
-                                    &format!("unknown identifier: `{}`, this identifier could not be found", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
-                                    {
-                                        let hashc = hashs.clone().into_keys();
-                                        let id: String = id.clone();
-                                        Box::new(||{
-                                            let mut hashc: Vec<String> = hashc;
-                                            let id = id;
-                                            hashc.sort();
-                                            let n = match hashc[..].binary_search(&id) {
-                                                Ok(n) => n,
-                                                Err(n) => n,
-                                            };
-                                            println!("    Maybe you meant `{}`?", &hashc[n]);
-                                        })
-                                    },
-                                );
-                            }
-                        };
                     }
                 },
                 TokenType::Koy => {
