@@ -154,12 +154,8 @@ pub fn print_help(exit_code: i32, prog_name: String) -> ! {
             println!("  -h -y --yardım         yardım göster ve çık");
             println!("  -V -s --sürüm          sürümü göster ve çık");
             println!("  -o -ç --çıkış <DOSYA>  çıkışta buraya bytecode yaz");
-            println!(
-                "  -l --lexer-çıktısı     lex sürecinden sonra lexer'ın çıktısını göster"
-            );
-            println!(
-                "  -p --parser-çıktısı    parse sürecinden sonra parser'ın çıktısını göster"
-            );
+            println!("  -l --lexer-çıktısı     lex sürecinden sonra lexer'ın çıktısını göster");
+            println!("  -p --parser-çıktısı    parse sürecinden sonra parser'ın çıktısını göster");
             println!("  --                     bundan sonra argv ekleyin");
         }
         SupportedLanguage::English => {

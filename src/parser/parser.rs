@@ -43,7 +43,7 @@ impl Parser {
                         ptoken.col,
                         ptoken.file.clone(),
                     ));
-                },
+                }
                 LexTokenType::Yükle => unreachable!(),
                 LexTokenType::İşlev => {
                     blocktokens.push(BlockToken::İşlev(ip));

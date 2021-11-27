@@ -1,5 +1,5 @@
-use crate::mem::Object;
 use crate::hashmap;
+use crate::mem::Object;
 use std::collections::HashMap;
 
 pub type Stack = Vec<Object>;
@@ -72,7 +72,7 @@ impl StackMemory {
 impl HashMemory {
     pub fn new() -> Self {
         Self {
-            ghashs: vec![hashmap!{}],
+            ghashs: vec![hashmap! {}],
         }
     }
 
@@ -100,7 +100,7 @@ impl HashMemory {
     }
 
     pub fn new_hash(&mut self) {
-        self.ghashs.push(hashmap!{});
+        self.ghashs.push(hashmap! {});
     }
 
     pub fn del_hash(&mut self) -> Option<HashMap<String, Object>> {

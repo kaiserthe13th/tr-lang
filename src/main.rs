@@ -14,8 +14,8 @@ pub mod parser;
 use parser::Parser;
 
 pub mod bytecode;
-pub mod store;
 pub mod mem;
+pub mod store;
 pub mod token;
 pub mod util;
 

@@ -1,5 +1,5 @@
 mod mem;
 mod object;
 
-pub use mem::{Stack, StackMemory, HashMemory};
+pub use mem::{HashMemory, Stack, StackMemory};
 pub use object::Object;

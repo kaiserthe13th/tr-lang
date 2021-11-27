@@ -1,5 +1,5 @@
-use crate::util::{get_lang, SupportedLanguage};
 use crate::errwarn::ErrorGenerator;
+use crate::util::{get_lang, SupportedLanguage};
 
 #[derive(Clone)]
 pub enum Object {
@@ -205,7 +205,7 @@ impl Object {
                             line,
                             col,
                             file,
-                            Box::new(||{}),
+                            Box::new(|| {}),
                         );
                     }
                     SupportedLanguage::English => {
@@ -215,7 +215,7 @@ impl Object {
                             line,
                             col,
                             file,
-                            Box::new(||{}),
+                            Box::new(|| {}),
                         );
                     }
                 },
@@ -228,7 +228,7 @@ impl Object {
                         line,
                         col,
                         file,
-                        Box::new(||{}),
+                        Box::new(|| {}),
                     );
                 }
                 SupportedLanguage::English => {
@@ -238,7 +238,7 @@ impl Object {
                         line,
                         col,
                         file,
-                        Box::new(||{}),
+                        Box::new(|| {}),
                     );
                 }
             },
@@ -256,7 +256,7 @@ impl Object {
                             line,
                             col,
                             file,
-                            Box::new(||{}),
+                            Box::new(|| {}),
                         );
                     }
                     SupportedLanguage::English => {
@@ -266,10 +266,10 @@ impl Object {
                             line,
                             col,
                             file,
-                            Box::new(||{}),
+                            Box::new(|| {}),
                         );
                     }
-                }
+                },
             },
             b => match get_lang() {
                 SupportedLanguage::Turkish => {
@@ -279,7 +279,7 @@ impl Object {
                         line,
                         col,
                         file,
-                        Box::new(||{}),
+                        Box::new(|| {}),
                     );
                 }
                 SupportedLanguage::English => {
@@ -289,7 +289,7 @@ impl Object {
                         line,
                         col,
                         file,
-                        Box::new(||{}),
+                        Box::new(|| {}),
                     );
                 }
             },
@@ -307,45 +307,43 @@ impl Object {
                 Self::Yazı(_) => self.clone(),
                 Self::İşlev(_) => unreachable!(),
             },
-            "bool" | "boolean" => {
-                match self {
-                    Self::Bool(_) => self.clone(),
-                    Self::Sayı(n) => {
-                        if n == &0. {
-                            Self::Bool(false)
-                        } else {
-                            Self::Bool(true)
-                        }
+            "bool" | "boolean" => match self {
+                Self::Bool(_) => self.clone(),
+                Self::Sayı(n) => {
+                    if n == &0. {
+                        Self::Bool(false)
+                    } else {
+                        Self::Bool(true)
                     }
-                    Self::Yazı(s) => match s.as_str() {
-                        "doğru" => Self::Bool(true),
-                        "yanlış" => Self::Bool(false),
-                        _ => match get_lang() {
-                            SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
-                                    "DeğerHatası",
-                                    &format!("`{:?}` beklenen değerlerin arasında bulunmuyor", s),
-                                    line,
-                                    col,
-                                    file,
-                                    Box::new(||{}),
-                                );
-                            }
-                            SupportedLanguage::English => {
-                                ErrorGenerator::error(
-                                    "ValueError",
-                                    &format!("`{:?}` is not one of the expected values", s),
-                                    line,
-                                    col,
-                                    file,
-                                    Box::new(||{}),
-                                );
-                            }
-                        },
-                    },
-                    Self::İşlev(_) => unreachable!(),
                 }
-            }
+                Self::Yazı(s) => match s.as_str() {
+                    "doğru" => Self::Bool(true),
+                    "yanlış" => Self::Bool(false),
+                    _ => match get_lang() {
+                        SupportedLanguage::Turkish => {
+                            ErrorGenerator::error(
+                                "DeğerHatası",
+                                &format!("`{:?}` beklenen değerlerin arasında bulunmuyor", s),
+                                line,
+                                col,
+                                file,
+                                Box::new(|| {}),
+                            );
+                        }
+                        SupportedLanguage::English => {
+                            ErrorGenerator::error(
+                                "ValueError",
+                                &format!("`{:?}` is not one of the expected values", s),
+                                line,
+                                col,
+                                file,
+                                Box::new(|| {}),
+                            );
+                        }
+                    },
+                },
+                Self::İşlev(_) => unreachable!(),
+            },
             "sayı" => match self {
                 Self::Bool(b) => match b {
                     true => Self::Sayı(1.),
@@ -362,7 +360,7 @@ impl Object {
                                 line,
                                 col,
                                 file,
-                                Box::new(||{}),
+                                Box::new(|| {}),
                             );
                         }
                         SupportedLanguage::English => {
@@ -372,7 +370,7 @@ impl Object {
                                 line,
                                 col,
                                 file,
-                                Box::new(||{}),
+                                Box::new(|| {}),
                             );
                         }
                     },
@@ -387,7 +385,7 @@ impl Object {
                         line,
                         col,
                         file,
-                        Box::new(||{}),
+                        Box::new(|| {}),
                     );
                 }
                 SupportedLanguage::English => {
@@ -397,7 +395,7 @@ impl Object {
                         line,
                         col,
                         file,
-                        Box::new(||{}),
+                        Box::new(|| {}),
                     );
                 }
             },
