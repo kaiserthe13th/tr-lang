@@ -43,6 +43,12 @@ impl StackMemory {
             first.push(a);
         }
     }
+    pub fn push_ret(&mut self, a: Object) {
+        let glen = self.gstack.len();
+        if let Some(ret) = self.gstack.get_mut(glen-2) {
+            ret.push(a);
+        }
+    }
     pub fn new_stack(&mut self) {
         self.gstack.push(vec![]);
     }

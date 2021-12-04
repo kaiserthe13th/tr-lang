@@ -28,7 +28,47 @@ impl Run {
             let token = self.program.get_mut(self.current).unwrap();
 
             match token.typ.clone() {
-                TokenType::Ver => (),
+                TokenType::Ver { tp } => {
+                    let a = match stack.pop() {
+                        Some(a) => a,
+                        None => match get_lang() {
+                            SupportedLanguage::Turkish => {
+                                ErrorGenerator::error(
+                            "KümedeYeterliDeğişkenYok",
+                            &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
+                            tokenc.line,
+                            tokenc.col,
+                            tokenc.file,
+                            Box::new(||{}),
+                        );
+                            }
+                            SupportedLanguage::English => {
+                                ErrorGenerator::error(
+                            "NotEnoughVarsInStack",
+                            &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
+                            tokenc.line,
+                            tokenc.col,
+                            tokenc.file,
+                            Box::new(||{}),
+                        );
+                            }
+                        },
+                    };
+                    stack.push_ret(a);
+                    if let Some(i) = tp {
+                        match self.program.get_mut(i).unwrap().typ {
+                            TokenType::İşlevSonlandır { ref mut tp } => {
+                                if let Some(u) = tp.pop() {
+                                    self.current = u;
+                                }
+                            },
+                            _ => unreachable!(),
+                        };
+                        self.current += 1;
+                        stack.del_stack();
+                        hashs.del_hash();
+                    } // error
+                },
                 TokenType::İşlev { sonloc } => {
                     let id = self.program.get(self.current + 1).unwrap();
                     match id.typ.clone() {

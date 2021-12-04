@@ -33,16 +33,20 @@ impl Parser {
     pub fn parse(&mut self) -> Vec<Token> {
         let mut parsed: Vec<Token> = vec![];
         let mut blocktokens: Vec<BlockToken> = vec![];
+        let mut rets: Vec<Vec<usize>> = vec![vec![]];
 
         for (ip, ptoken) in self.tokens.iter().enumerate() {
             match ptoken.typ {
                 LexTokenType::Ver => {
                     parsed.push(Token::new(
-                        TokenType::Ver,
+                        TokenType::Ver { tp: None },
                         ptoken.line,
                         ptoken.col,
                         ptoken.file.clone(),
                     ));
+                    if let Some(last) = rets.last_mut() {
+                        last.push(ip);
+                    } // error
                 }
                 LexTokenType::Yükle => unreachable!(),
                 LexTokenType::İşlev => {
@@ -53,6 +57,7 @@ impl Parser {
                         ptoken.col,
                         ptoken.file.clone(),
                     ));
+                    rets.push(vec![]);
                 }
                 LexTokenType::At => {
                     parsed.push(Token::new(
@@ -205,6 +210,16 @@ impl Parser {
                                 ptoken.col,
                                 ptoken.file.clone(),
                             ));
+                            let srets: Vec<usize> = rets.pop().unwrap();
+                            for u in srets.iter() {
+                                let sr = parsed.get_mut(*u).unwrap();
+                                match sr.typ {
+                                    TokenType::Ver { ref mut tp } => {
+                                        *tp = Some(ip);
+                                    },
+                                    _ => unreachable!(),
+                                }
+                            }
                         }
                         _ => unimplemented!(),
                     };
