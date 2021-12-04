@@ -42,11 +42,15 @@ pub mod tokentypes {
         Ver { tp: Option<usize> },
         At,
         Tipinde,
+        ParenL,
         EOF,
     }
 
     #[derive(Debug, Clone)]
     pub enum LexerTokenType {
+        ParenL,
+        ParenR,
+        Comma,
         İşlev,
         Yazı,
         Sayı,
@@ -100,6 +104,9 @@ pub mod tokentypes {
 pub enum Precedence {
     Precedence(usize),
     Reserved,
+    ParenL,
+    ParenR,
+    Comma,
     None,
 }
 
@@ -198,6 +205,7 @@ impl ParserToken {
             TokTyp::Çarpı => "*".to_string(),
             TokTyp::Üst => "üst".to_string(),
             TokTyp::Ver { .. } => "ver".to_string(),
+            TokTyp::ParenL => "(".to_string(),
         }
     }
 }

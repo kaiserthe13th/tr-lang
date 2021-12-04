@@ -48,7 +48,8 @@ impl Parser {
                         last.push(ip);
                     } // error
                 }
-                LexTokenType::Yükle => unreachable!(),
+                LexTokenType::Yükle | LexTokenType::ParenR | LexTokenType::Comma => unreachable!(),
+                LexTokenType::ParenL => unimplemented!("error: unclosed parenthesis"),
                 LexTokenType::İşlev => {
                     blocktokens.push(BlockToken::İşlev(ip));
                     parsed.push(Token::new(

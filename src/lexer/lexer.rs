@@ -71,7 +71,7 @@ impl Lexer {
                                 tokens.append(&mut nl.tokenize(visited, canon_path));
                             }
                         },
-                        TokenType::Identifier => {unimplemented!()},
+                        TokenType::Identifier => unimplemented!(),
                         _ => panic!("yükle anahtar kelimesinden sonra yazı veya tanımlayıcı bekleniyordu ancak bulunamadı"), // SyntaxError
                     }
                     current += 2;
@@ -85,7 +85,61 @@ impl Lexer {
         let prog = tokens;
         tokens = vec![];
         current = 0;
-        while current < prog.len() - 1 {}
+        let mut stack: Vec<Token> = vec![];
+        while current < prog.len() {
+            let i = prog.get(current).unwrap();
+            match i.precedence {
+                Precedence::None => {
+                    tokens.push(i.clone());
+                    current += 1;
+                }
+                Precedence::Reserved => {
+                    while !stack.is_empty() {
+                        tokens.push(stack.pop().unwrap());
+                    }
+                    tokens.push(i.clone());
+                    current += 1;
+                }
+                Precedence::Precedence(u) => {
+                    while !stack.is_empty() && 
+                        match stack.last().unwrap().precedence {
+                            Precedence::Precedence(x) => x > u,
+                            Precedence::ParenL => false,
+                            _ => unreachable!(),
+                    } {
+                        tokens.push(stack.pop().unwrap());
+                    }
+                    stack.push(i.clone());
+                    current += 1;
+                }
+                Precedence::ParenL => {
+                    stack.push(i.clone());
+                    current += 1;
+                }
+                Precedence::ParenR => {
+                    while !stack.is_empty() && match stack.last().unwrap().precedence {
+                            Precedence::ParenL => false,
+                            _ => true, 
+                    } {
+                        tokens.push(stack.pop().unwrap());
+                    }
+                    stack.pop().unwrap();
+                    current += 1;
+                }
+                Precedence::Comma => {
+                    while !stack.is_empty() && match stack.last().unwrap().precedence {
+                            Precedence::ParenL => false,
+                            _ => true, 
+                    } {
+                        tokens.push(stack.pop().unwrap());
+                    }
+                    current += 1;
+                }
+            }
+        }
+        while !stack.is_empty() {
+            tokens.push(stack.pop().unwrap());
+        }
         tokens
     }
     pub fn tokenize(&mut self, visited: &mut Vec<String>, file: String) -> Vec<Token> {
@@ -101,6 +155,21 @@ impl Lexer {
                         self.col += 1;
                     }
                     self.line += 1;
+                }
+                '(' => {
+                    self.current += 1;
+                    self.col += 1;
+                    tokens.push(Token::new(TokenType::ParenL, "(".to_string(), self.line, self.col, file.clone(), Precedence::ParenL))
+                }
+                ')' => {
+                    self.current += 1;
+                    self.col += 1;
+                    tokens.push(Token::new(TokenType::ParenR, ")".to_string(), self.line, self.col, file.clone(), Precedence::ParenR))
+                }
+                ',' => {
+                    self.current += 1;
+                    self.col += 1;
+                    tokens.push(Token::new(TokenType::Comma, ",".to_string(), self.line, self.col, file.clone(), Precedence::Comma))
                 }
                 '\'' | '"' => {
                     let mut buf = String::new();
@@ -193,6 +262,7 @@ impl Lexer {
                                 self.line,
                                 self.col,
                                 file.clone(),
+                                Precedence::None,
                             ))
                         } else {
                             tokens.push(Token::new(
@@ -201,6 +271,7 @@ impl Lexer {
                                 self.line,
                                 self.col,
                                 file.clone(),
+                                Precedence::Precedence(2),
                             ))
                         }
                     }
@@ -218,6 +289,7 @@ impl Lexer {
                                 self.line,
                                 self.col,
                                 file.clone(),
+                                Precedence::None,
                             ))
                         } else if self.currentc() == '*' {
                             loop {
@@ -261,6 +333,7 @@ impl Lexer {
                                 self.line,
                                 self.col,
                                 file.clone(),
+                                Precedence::Precedence(2),
                             ))
                         }
                     } else {
@@ -270,6 +343,7 @@ impl Lexer {
                             self.line,
                             self.col,
                             file.clone(),
+                            Precedence::Precedence(2),
                         ))
                     }
                 }
@@ -282,6 +356,7 @@ impl Lexer {
                         self.line,
                         self.col,
                         file.clone(),
+                        Precedence::Precedence(3),
                     ))
                 }
                 '/' => {
@@ -293,6 +368,7 @@ impl Lexer {
                         self.line,
                         self.col,
                         file.clone(),
+                        Precedence::Precedence(3),
                     ))
                 }
                 '%' => {
@@ -304,6 +380,7 @@ impl Lexer {
                         self.line,
                         self.col,
                         file.clone(),
+                        Precedence::Precedence(3),
                     ))
                 }
                 '>' => {
@@ -317,6 +394,7 @@ impl Lexer {
                                 self.line,
                                 self.col,
                                 file.clone(),
+                                Precedence::Precedence(1),
                             ));
                             self.col += 1;
                             self.current += 1;
@@ -327,6 +405,7 @@ impl Lexer {
                                 self.line,
                                 self.col,
                                 file.clone(),
+                                Precedence::Precedence(1),
                             ));
                         }
                     } else {
@@ -336,6 +415,7 @@ impl Lexer {
                             self.line,
                             self.col,
                             file.clone(),
+                            Precedence::Precedence(1),
                         ));
                     }
                 }
@@ -350,6 +430,7 @@ impl Lexer {
                                 self.line,
                                 self.col,
                                 file.clone(),
+                                Precedence::Precedence(1),
                             ));
                             self.col += 1;
                             self.current += 1;
@@ -360,6 +441,7 @@ impl Lexer {
                                 self.line,
                                 self.col,
                                 file.clone(),
+                                Precedence::Precedence(1),
                             ));
                         }
                     } else {
@@ -369,6 +451,7 @@ impl Lexer {
                             self.line,
                             self.col,
                             file.clone(),
+                            Precedence::Precedence(1),
                         ));
                     }
                 }
@@ -383,6 +466,7 @@ impl Lexer {
                                 self.line,
                                 self.col,
                                 file.clone(),
+                                Precedence::Precedence(1),
                             ));
                             self.col += 1;
                             self.current += 1;
@@ -393,6 +477,7 @@ impl Lexer {
                                 self.line,
                                 self.col,
                                 file.clone(),
+                                Precedence::Precedence(0),
                             ));
                         }
                     } else {
@@ -402,6 +487,7 @@ impl Lexer {
                             self.line,
                             self.col,
                             file.clone(),
+                            Precedence::Precedence(0),
                         ));
                     }
                 }
@@ -427,6 +513,7 @@ impl Lexer {
                                 self.line,
                                 self.col,
                                 file.clone(),
+                                Precedence::Precedence(1),
                             ));
                         }
                     } else {
@@ -436,6 +523,7 @@ impl Lexer {
                             self.line,
                             self.col,
                             file.clone(),
+                            Precedence::Precedence(1),
                         ));
                     }
                 }
@@ -612,6 +700,7 @@ impl Lexer {
                             self.line,
                             self.col,
                             file.clone(),
+                            Precedence::Precedence(1),
                         )),
                         "ve" => tokens.push(Token::new(
                             TokenType::Ve,
@@ -619,6 +708,7 @@ impl Lexer {
                             self.line,
                             self.col,
                             file.clone(),
+                            Precedence::Precedence(1),
                         )),
                         "dön" => tokens.push(Token::new(
                             TokenType::Döndür,
