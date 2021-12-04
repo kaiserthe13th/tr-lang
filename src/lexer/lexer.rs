@@ -1,6 +1,7 @@
 use crate::store::PATH_SEP;
 use crate::token::tokentypes::LexerTokenType as TokenType;
 use crate::token::LexerToken as Token;
+use crate::token::Precedence;
 use crate::util::{char_in_str, in_vec, read_file, FSErr};
 
 use std::fs::canonicalize;
@@ -70,7 +71,7 @@ impl Lexer {
                                 tokens.append(&mut nl.tokenize(visited, canon_path));
                             }
                         },
-                        TokenType::Identifier => {},
+                        TokenType::Identifier => {unimplemented!()},
                         _ => panic!("yükle anahtar kelimesinden sonra yazı veya tanımlayıcı bekleniyordu ancak bulunamadı"), // SyntaxError
                     }
                     current += 2;
@@ -81,6 +82,10 @@ impl Lexer {
                 }
             }
         }
+        let prog = tokens;
+        tokens = vec![];
+        current = 0;
+        while current < prog.len() - 1 {}
         tokens
     }
     pub fn tokenize(&mut self, visited: &mut Vec<String>, file: String) -> Vec<Token> {
@@ -138,6 +143,7 @@ impl Lexer {
                         self.line,
                         self.col,
                         file.clone(),
+                        Precedence::None,
                     ))
                 }
                 b if b.is_numeric() => {
@@ -166,6 +172,7 @@ impl Lexer {
                         self.line,
                         self.col,
                         file.clone(),
+                        Precedence::None,
                     ));
                 }
                 '\n' => {
@@ -245,6 +252,7 @@ impl Lexer {
                                 self.line,
                                 self.col,
                                 file.clone(),
+                                Precedence::Reserved,
                             ));
                         } else {
                             tokens.push(Token::new(
@@ -408,6 +416,7 @@ impl Lexer {
                                 self.line,
                                 self.col,
                                 file.clone(),
+                                Precedence::Reserved,
                             ));
                             self.col += 1;
                             self.current += 1;
@@ -441,6 +450,7 @@ impl Lexer {
                                 self.line,
                                 self.col,
                                 file.clone(),
+                                Precedence::Reserved,
                             ));
                             self.col += 1;
                             self.current += 1;
@@ -451,6 +461,7 @@ impl Lexer {
                                 self.line,
                                 self.col,
                                 file.clone(),
+                                Precedence::Reserved,
                             ));
                             self.col += 1;
                             self.current += 1;
@@ -468,6 +479,7 @@ impl Lexer {
                         self.line,
                         self.col,
                         file.clone(),
+                        Precedence::Reserved,
                     ));
                 }
                 '@' => {
@@ -479,6 +491,7 @@ impl Lexer {
                         self.line,
                         self.col,
                         file.clone(),
+                        Precedence::None,
                     ));
                 }
                 ' ' => {
@@ -503,6 +516,7 @@ impl Lexer {
                             self.line,
                             self.col,
                             file.clone(),
+                            Precedence::Reserved,
                         )),
                         "ver" => tokens.push(Token::new(
                             TokenType::Ver,
@@ -510,6 +524,7 @@ impl Lexer {
                             self.line,
                             self.col,
                             file.clone(),
+                            Precedence::Reserved,
                         )),
                         "de" => tokens.push(Token::new(
                             TokenType::De,
@@ -517,6 +532,7 @@ impl Lexer {
                             self.line,
                             self.col,
                             file.clone(),
+                            Precedence::Reserved,
                         )),
                         "ise" => tokens.push(Token::new(
                             TokenType::İse,
@@ -524,6 +540,7 @@ impl Lexer {
                             self.line,
                             self.col,
                             file.clone(),
+                            Precedence::Reserved,
                         )),
                         "son" => tokens.push(Token::new(
                             TokenType::Son,
@@ -531,6 +548,7 @@ impl Lexer {
                             self.line,
                             self.col,
                             file.clone(),
+                            Precedence::Reserved,
                         )),
                         "iken" => tokens.push(Token::new(
                             TokenType::İken,
@@ -538,6 +556,7 @@ impl Lexer {
                             self.line,
                             self.col,
                             file.clone(),
+                            Precedence::Reserved,
                         )),
                         "yoksa" => tokens.push(Token::new(
                             TokenType::Yoksa,
@@ -545,6 +564,7 @@ impl Lexer {
                             self.line,
                             self.col,
                             file.clone(),
+                            Precedence::Reserved,
                         )),
                         "doğru" => tokens.push(Token::new(
                             TokenType::Doğru,
@@ -552,6 +572,7 @@ impl Lexer {
                             self.line,
                             self.col,
                             file.clone(),
+                            Precedence::None,
                         )),
                         "yanlış" => tokens.push(Token::new(
                             TokenType::Yanlış,
@@ -559,6 +580,7 @@ impl Lexer {
                             self.line,
                             self.col,
                             file.clone(),
+                            Precedence::None,
                         )),
                         "kpy" => tokens.push(Token::new(
                             TokenType::Kopya,
@@ -566,6 +588,7 @@ impl Lexer {
                             self.line,
                             self.col,
                             file.clone(),
+                            Precedence::None,
                         )),
                         "tks" => tokens.push(Token::new(
                             TokenType::Takas,
@@ -573,6 +596,7 @@ impl Lexer {
                             self.line,
                             self.col,
                             file.clone(),
+                            Precedence::None,
                         )),
                         "üst" => tokens.push(Token::new(
                             TokenType::Üst,
@@ -580,6 +604,7 @@ impl Lexer {
                             self.line,
                             self.col,
                             file.clone(),
+                            Precedence::None,
                         )),
                         "veya" => tokens.push(Token::new(
                             TokenType::Veya,
@@ -601,6 +626,7 @@ impl Lexer {
                             self.line,
                             self.col,
                             file.clone(),
+                            Precedence::None,
                         )),
                         "girdi" => tokens.push(Token::new(
                             TokenType::Girdi,
@@ -608,6 +634,7 @@ impl Lexer {
                             self.line,
                             self.col,
                             file.clone(),
+                            Precedence::None,
                         )),
                         "işlev" => tokens.push(Token::new(
                             TokenType::İşlev,
@@ -615,6 +642,7 @@ impl Lexer {
                             self.line,
                             self.col,
                             file.clone(),
+                            Precedence::Reserved,
                         )),
                         "yükle" => tokens.push(Token::new(
                             TokenType::Yükle,
@@ -622,6 +650,7 @@ impl Lexer {
                             self.line,
                             self.col,
                             file.clone(),
+                            Precedence::Reserved,
                         )),
                         a => tokens.push(Token::new(
                             TokenType::Identifier,
@@ -629,6 +658,7 @@ impl Lexer {
                             self.line,
                             self.col,
                             file.clone(),
+                            Precedence::None,
                         )),
                     }
                 }
@@ -640,6 +670,7 @@ impl Lexer {
             self.line,
             self.col,
             file.clone(),
+            Precedence::Reserved,
         ));
         self.post_proc(tokens, visited, file)
     }

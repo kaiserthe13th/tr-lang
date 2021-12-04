@@ -97,12 +97,20 @@ pub mod tokentypes {
 }
 
 #[derive(Debug, Clone)]
+pub enum Precedence {
+    Precedence(usize),
+    Reserved,
+    None,
+}
+
+#[derive(Debug, Clone)]
 pub struct LexerToken {
     pub typ: tokentypes::LexerTokenType,
     pub lexeme: String,
     pub line: usize,
     pub col: usize,
     pub file: String,
+    pub precedence: Precedence,
 }
 
 impl LexerToken {
@@ -112,6 +120,7 @@ impl LexerToken {
         line: usize,
         col: usize,
         file: String,
+        precedence: Precedence,
     ) -> Self {
         Self {
             typ,
@@ -119,6 +128,7 @@ impl LexerToken {
             line,
             col,
             file,
+            precedence,
         }
     }
 }
