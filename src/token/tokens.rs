@@ -42,11 +42,15 @@ pub mod tokentypes {
         Ver { tp: Option<usize> },
         At,
         Tipinde,
+        ParenL,
         EOF,
     }
 
     #[derive(Debug, Clone)]
     pub enum LexerTokenType {
+        ParenL,
+        ParenR,
+        Comma,
         İşlev,
         Yazı,
         Sayı,
@@ -97,12 +101,23 @@ pub mod tokentypes {
 }
 
 #[derive(Debug, Clone)]
+pub enum Precedence {
+    Precedence(usize),
+    Reserved,
+    ParenL,
+    ParenR,
+    Comma,
+    None,
+}
+
+#[derive(Debug, Clone)]
 pub struct LexerToken {
     pub typ: tokentypes::LexerTokenType,
     pub lexeme: String,
     pub line: usize,
     pub col: usize,
     pub file: String,
+    pub precedence: Precedence,
 }
 
 impl LexerToken {
@@ -112,6 +127,7 @@ impl LexerToken {
         line: usize,
         col: usize,
         file: String,
+        precedence: Precedence,
     ) -> Self {
         Self {
             typ,
@@ -119,6 +135,7 @@ impl LexerToken {
             line,
             col,
             file,
+            precedence,
         }
     }
 }
@@ -188,6 +205,7 @@ impl ParserToken {
             TokTyp::Çarpı => "*".to_string(),
             TokTyp::Üst => "üst".to_string(),
             TokTyp::Ver { .. } => "ver".to_string(),
+            TokTyp::ParenL => "(".to_string(),
         }
     }
 }

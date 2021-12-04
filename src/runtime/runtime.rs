@@ -28,6 +28,7 @@ impl Run {
             let token = self.program.get_mut(self.current).unwrap();
 
             match token.typ.clone() {
+                TokenType::ParenL => unreachable!(),
                 TokenType::Ver { tp } => {
                     let a = match stack.pop() {
                         Some(a) => a,

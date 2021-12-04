@@ -1,15 +1,12 @@
 #!/home/linuxbrew/.linuxbrew/bin/tr-lang y
 -* mat modülü *-
 
-işlev faktoriyel
-    kpy 1-kpy dön *tks
-    kpy 0 > ise
-        :. kpy 1 > iken
-            1-kpy dön *tks
-        son at
-    yoksa
-        at at 1
+işlev faktoriyel -> a
+    1 -> x
+    :. a > 0 iken
+        a * x -> x
+        a -- -> a
     son
-    ver
+    x ver
 son
 
