@@ -23,3 +23,12 @@ serde = { version = "1.0", features = ["derive"] }
 bincode = "1.3.3"
 locale_config = "*"
 cfg-if = "1.0"
+
+[package.metadata.rpm]
+package = "tr-lang"
+
+[package.metadata.rpm.cargo]
+buildflags = ["--release"]
+
+[package.metadata.rpm.targets]
+tr-lang = { path = "/usr/bin/tr-lang" }
