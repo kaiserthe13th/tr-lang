@@ -10,13 +10,13 @@ tr-lang küme(stack) orantılı bir bellek yönetimine sahip.
 [İngilizce](README.md) görüntüle
 
 # :triangular_flag_on_post: İçindekiler
-- ### [:trophy: Dilin Hangi Parçaları Tamamlandı?](#trophy-dilin-hangi-parçaları-tamamlandı)
-- ### [:rocket: İndirme](#rocket-i̇ndirme)
-- ### [:book: Vikiye Bak](#book-vikiye-bak)
-- ### [:handshake: Katkıda Bulunma](#handshake-katkıda-bulunma)
-- ### [:scroll: Teşekkürler](#scroll-teşekkürler)
+- [🏆 Dilin Hangi Parçaları Tamamlandı?](#-dilin-hangi-parçaları-tamamlandı)
+- [🚀 İndirme](#-i̇ndirme)
+- [📖 Dokümantasyonu İncele](#-dokumantasyonu-incele)
+- [🤝 Katkıda Bulunma](#-katkıda-bulunma)
+- [📜 Teşekkürler](#-teşekkürler)
 
-# :trophy: Dilin Hangi Parçaları Tamamlandı?
+# 🏆 Dilin Hangi Parçaları Tamamlandı?
 
 
 ## ✔️ Dilin tüm parçaları tamamlanmış gözüküyor!
@@ -27,7 +27,7 @@ tr-lang küme(stack) orantılı bir bellek yönetimine sahip.
 #### ✔️ tr-lang bytecode okuyucu bitmiş gibi gözüküyor [İssue #4](https://github.com/kaiserthe13th/tr-lang/issues/4#issue-1027663331)<br>
 #### ✔️ tr-lang çalışma zamanı bitmiş gibi gözüküyor [İssue #5](https://github.com/kaiserthe13th/tr-lang/issues/5#issue-1027665033)<br>
 
-# :rocket: İndirme
+# 🚀 İndirme
 
 ## 🗃️ Debian Paketi
 Releases bölümünden tr-lang_x.x.x_amd64.deb paketini indirip onu sisteminize dpkg ile indirebilirsiniz
@@ -60,7 +60,7 @@ $ cargo build --release
 ```
 dosyanız `target/release/tr-lang`'da bulunacaktır
 
-# [📖 Vikiye Bak](https://tr-lang-docs.netlify.app/türkçe)
+# [📖 Dokümantasyonu İncele](https://tr-lang-docs.netlify.app/türkçe)
 
 # 🤝 Katkıda Bulunma
 bug raporlamak, yeni özellik tavsiye etmek veya dokümantasyonu güncellemek için [issue takipçisini](https://github.com/kaiserthe13th/tr-lang/issues) kullanın.
