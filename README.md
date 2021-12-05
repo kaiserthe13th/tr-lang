@@ -10,11 +10,11 @@ tr-lang is a stack based language and uses reverse-polish notation for maths.
 View in [Turkish](README-TR.md)
 
 # 🚩 Table of Contents
-- [🏆 What Has Been Implemented?](#trophy-what-has-been-implemented)
-- [🚀 Installation](#rocket-installation)
-- [📖 See the Docs](#book-see-the-wiki)
-- [🤝 Contributing](#handshake-contributing)
-- [📜 Thanks](#scroll-thanks)
+- [🏆 What Has Been Implemented?](#-what-has-been-implemented)
+- [🚀 Installation](#-installation)
+- [📖 See the Docs](#-see-the-wiki)
+- [🤝 Contributing](#-contributing)
+- [📜 Thanks](#-thanks)
 
 # 🏆 What Has Been Implemented?
 
