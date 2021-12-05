@@ -12,7 +12,7 @@ View in [Turkish](README-TR.md)
 # 🚩 Table of Contents
 - [🏆 What Has Been Implemented?](#-what-has-been-implemented)
 - [🚀 Installation](#-installation)
-- [📖 See the Docs](#-see-the-wiki)
+- [📖 See the Docs](#-see-the-docs)
 - [🤝 Contributing](#-contributing)
 - [📜 Thanks](#-thanks)
 
