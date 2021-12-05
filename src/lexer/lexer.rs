@@ -700,7 +700,7 @@ impl Lexer {
                             self.line,
                             self.col,
                             file.clone(),
-                            Precedence::Precedence(1),
+                            Precedence::Precedence(0),
                         )),
                         "ve" => tokens.push(Token::new(
                             TokenType::Ve,
@@ -708,7 +708,7 @@ impl Lexer {
                             self.line,
                             self.col,
                             file.clone(),
-                            Precedence::Precedence(1),
+                            Precedence::Precedence(0),
                         )),
                         "dön" => tokens.push(Token::new(
                             TokenType::Döndür,
