@@ -4,9 +4,8 @@
 
 ### ❤️ ile 🇹🇷 de yapılmıştır
 
-
 tr-lang programlama dili sözdizimini Türkçeye yaklaştırmayı amaçlayan bir programlama dilidir.
-tr-lang küme(stack) orantılı bir dil ve matematik için ters leh notasyonu kullanıyor.
+tr-lang küme(stack) orantılı bir bellek yönetimine sahip.
 
 [İngilizce](README.md) görüntüle
 
@@ -30,19 +29,29 @@ tr-lang küme(stack) orantılı bir dil ve matematik için ters leh notasyonu ku
 
 # :rocket: İndirme
 
-## :beer: Homebrew
+## 🗃️ Debian Paketi
+Releases bölümünden tr-lang_x.x.x_amd64.deb paketini indirip onu sisteminize dpkg ile indirebilirsiniz
+
+1. Releases bölümünden istediğiniz sürümü indirin
+2. Terminalden
+```console
+$ dpkg -i tr-lang_<x.x.x>_amd64.deb
+```
+> Not: Bazı Linux sistemlerinde sadece dosyaya iki veya bir kere tıklamanız yeterli olacaktır.
+
+## 🍺 Homebrew
 Homebrew kullanarak indirebilirsiniz
 ```console
 $ brew tap kaiserthe13th/tr-lang
 $ brew install tr-lang
 ```
 
-## :package: Cargo
+## 📦 Cargo
 ```console
 $ cargo install tr-lang
 ```
 
-## :gear: Kaynaktan Derleme
+## ⚙️ Kaynaktan Derleme
 gereksinimler: `rust, cargo`
 ```console
 $ git clone https://github.com/kaiserthe13th/tr-lang
@@ -51,18 +60,16 @@ $ cargo build --release
 ```
 dosyanız `target/release/tr-lang`'da bulunacaktır
 
-# [:book: Vikiye Bak](https://github.com/kaiserthe13th/tr-lang/wiki/Anasayfa---TR)
-- [Dil Spesifikasyonu](https://github.com/kaiserthe13th/tr-lang/wiki/Dil-Spesifikasyonu-TR)
+# [📖 Vikiye Bak](https://tr-lang-docs.netlify.app/türkçe)
 
-# :handshake: Katkıda Bulunma
+# 🤝 Katkıda Bulunma
 bug raporlamak, yeni özellik tavsiye etmek veya dokümantasyonu güncellemek için [issue takipçisini](https://github.com/kaiserthe13th/tr-lang/issues) kullanın.
 
 özellikler için <span class="tag">`(enhancement | yükseltme)`</span> etiketini, buglar için <span class="tag">`(bug)`</span> etiketini ve dokümantasyon güncellemeleri için <span class="tag">`(documentation | dökümantasyon)`</span> etiketini kullanın
 
-:+1: Bugfix PR'lerine açığız!
+👍 Bugfix PR'lerine açığız!
 
-# :scroll: Teşekkürler
+# 📜 Teşekkürler
 
 stackoverflow.com'dan [Netwave](https://stackoverflow.com/users/1695172/netwave) adlı kullanıcıya parser yapım sürecinde yaşanan bir [bug'ın](https://stackoverflow.com/questions/69635458/pattern-matching-does-not-allow-me-to-change-values/69636181#69636181) çözümündeki yardımından dolayı teşekkürlerimi sunarım.
 - I give my thanks to user [Chayim Friedman](https://stackoverflow.com/users/7884305/chayim-friedman) from stackoverflow.com for helping me with [closure magic](https://stackoverflow.com/questions/70053866/rust-cloning-hashmapstring-object-without-moving-into-closure-solved) during the making of UnknownIdentifier error message.
-
