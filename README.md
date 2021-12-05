@@ -9,14 +9,14 @@ tr-lang is a stack based language and uses reverse-polish notation for maths.
 
 View in [Turkish](README-TR.md)
 
-# :triangular_flag_on_post: Table of Contents
-- ### [:trophy: What Has Been Implemented?](#trophy-what-has-been-implemented)
-- ### [:rocket: Installation](#rocket-installation)
-- ### [:book: See the Docs](#book-see-the-wiki)
-- ### [:handshake: Contributing](#handshake-contributing)
-- ### [:scroll: Thanks](#scroll-thanks)
+# 🚩 Table of Contents
+- ### [🏆 What Has Been Implemented?](#trophy-what-has-been-implemented)
+- ### [🚀 Installation](#rocket-installation)
+- ### [📖 See the Docs](#book-see-the-wiki)
+- ### [🤝 Contributing](#handshake-contributing)
+- ### [📜 Thanks](#scroll-thanks)
 
-# :trophy: What Has Been Implemented?
+# 🏆 What Has Been Implemented?
 
 ## ✔️ All parts of the language seems like they are done!
 
@@ -26,20 +26,20 @@ View in [Turkish](README-TR.md)
 #### ✔️ tr-lang bytecode reader seems like its done [Issue #4](https://github.com/kaiserthe13th/tr-lang/issues/4#issue-1027663331)<br>
 #### ✔️ tr-lang runtime seems like its done [Issue #5](https://github.com/kaiserthe13th/tr-lang/issues/5#issue-1027665033)<br>
 
-# :rocket: Installation
+# 🚀 Installation
 
-## :beer: Homebrew
+## 🍺 Homebrew
 ```console
 $ brew tap kaiserthe13th/tr-lang
 $ brew install tr-lang
 ```
 
-## :package: Cargo
+## 📦 Cargo
 ```console
 $ cargo install tr-lang
 ```
 
-## :gear: Build from source
+## ⚙️ Build from source
 dependencies: `rust, cargo`
 
 ```console
@@ -49,16 +49,16 @@ $ cargo build --release
 ```
 your file will be in target/release/tr-lang
 
-# [:book: See the Docs](https://tr-lang-docs.netlify.app/english/)
+# [📖 See the Docs](https://tr-lang-docs.netlify.app/english/)
 
-# :handshake: Contributing
+# 🤝 Contributing
 To report bugs, suggest new features or update documentation use the [issue tracker](https://github.com/kaiserthe13th/tr-lang/issues)
 
 for features use <span class="tag">`(enhancement | yükseltme)`</span> tag, for bugs use <span class="tag">`(bug)`</span> tag and for documentation updates use <span class="tag">`(documentation | dökümantasyon)`</span> tag
 
-:+1: Bugfix PR's are welcome!
+👍 Bugfix PR's are welcome!
 
-# :scroll: Thanks
+# 📜 Thanks
 
 - I give my thanks to user [Netwave](https://stackoverflow.com/users/1695172/netwave) from stackoverflow.com for helping fix a [bug](https://stackoverflow.com/questions/69635458/pattern-matching-does-not-allow-me-to-change-values/69636181#69636181) during the creation of the parser.
 - I give my thanks to user [Chayim Friedman](https://stackoverflow.com/users/7884305/chayim-friedman) from stackoverflow.com for helping me with [closure magic](https://stackoverflow.com/questions/70053866/rust-cloning-hashmapstring-object-without-moving-into-closure-solved) during the making of UnknownIdentifier error message.
