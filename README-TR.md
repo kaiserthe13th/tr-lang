@@ -12,7 +12,7 @@ tr-lang küme(stack) orantılı bir bellek yönetimine sahip.
 # :triangular_flag_on_post: İçindekiler
 - [🏆 Dilin Hangi Parçaları Tamamlandı?](#-dilin-hangi-parçaları-tamamlandı)
 - [🚀 İndirme](#-i̇ndirme)
-- [📖 Dokümantasyonu İncele](#-dokumantasyonu-incele)
+- [📖 Dokümantasyonu İncele](#-dokümantasyonu-incele)
 - [🤝 Katkıda Bulunma](#-katkıda-bulunma)
 - [📜 Teşekkürler](#-teşekkürler)
 
