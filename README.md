@@ -28,26 +28,87 @@ View in [Turkish](README-TR.md)
 
 # 🚀 Installation
 
-## 🍺 Homebrew
-```console
-$ brew tap kaiserthe13th/tr-lang
-$ brew install tr-lang
-```
+## 🪟 Windows
 
-## 📦 Cargo
+### 📇 Pre-Compiled Executable
+For windows there is a pre-compiled binary.
+Just download it and you are ready to go!
+> Note: This binary won't be in the PATH environment variable by default
+> meaning it won't be globally usable across the system with 'tr-lang'
+>
+> If you want to add tr-lang to your PATH environment variable you can follow this [tutorial](https://www.architectryan.com/2018/03/17/add-to-the-path-on-windows-10/) by Ryan Hoffman
+
+### 📦 Cargo
 ```console
 $ cargo install tr-lang
 ```
 
-## ⚙️ Build from source
+### ⚙️ Build from source
 dependencies: `rust, cargo`
 
 ```console
 $ git clone https://github.com/kaiserthe13th/tr-lang
 $ cd tr-lang
-$ cargo build --release
+$ cargo install --path .
 ```
-your file will be in target/release/tr-lang
+> Note: If you just want to play you can change the last command to `cargo build --release`
+> your file will be in target/release/tr-lang
+
+## 🍎 MacOS
+
+### 🍺 Homebrew
+```console
+$ brew tap kaiserthe13th/tr-lang
+$ brew install tr-lang
+```
+
+### 📦 Cargo
+```console
+$ cargo install tr-lang
+```
+
+### ⚙️ Build from source
+dependencies: `rust, cargo`
+
+```console
+$ git clone https://github.com/kaiserthe13th/tr-lang
+$ cd tr-lang
+$ cargo install --path .
+```
+> Note: If you just want to play you can change the last command to `cargo build --release`
+> your file will be in target/release/tr-lang
+
+## 🐧 Linux
+
+### 🗃️ Debian Package
+1. Go to the Releases tab and download tr-lang_<x.x.x>_amd64.deb
+2. In the Terminal
+```console
+$ dpkg -i tr-lang_<x.x.x>_amd64.deb
+```
+> Note: On some linux systems just clicking or doubke clicking on the file would start install
+
+### 🍺 Homebrew
+```console
+$ brew tap kaiserthe13th/tr-lang
+$ brew install tr-lang
+```
+
+### 📦 Cargo
+```console
+$ cargo install tr-lang
+```
+
+### ⚙️ Build from source
+dependencies: `rust, cargo`
+
+```console
+$ git clone https://github.com/kaiserthe13th/tr-lang
+$ cd tr-lang
+$ cargo install --path .
+```
+> Note: If you just want to play you can change the last command to `cargo build --release`
+> your file will be in target/release/tr-lang
 
 # [📖 See the Docs](https://tr-lang-docs.netlify.app/english/)
 
