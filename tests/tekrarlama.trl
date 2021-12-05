@@ -2,6 +2,6 @@
 -* Tekrarlama için basit bir test *-
 
 10
-:. kpy 0 > iken
+:. kpy > 0 iken
     kpy de "\n" de --
 son
