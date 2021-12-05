@@ -71,5 +71,5 @@ bug raporlamak, yeni özellik tavsiye etmek veya dokümantasyonu güncellemek i�
 
 # 📜 Teşekkürler
 
-stackoverflow.com'dan [Netwave](https://stackoverflow.com/users/1695172/netwave) adlı kullanıcıya parser yapım sürecinde yaşanan bir [bug'ın](https://stackoverflow.com/questions/69635458/pattern-matching-does-not-allow-me-to-change-values/69636181#69636181) çözümündeki yardımından dolayı teşekkürlerimi sunarım.
-- I give my thanks to user [Chayim Friedman](https://stackoverflow.com/users/7884305/chayim-friedman) from stackoverflow.com for helping me with [closure magic](https://stackoverflow.com/questions/70053866/rust-cloning-hashmapstring-object-without-moving-into-closure-solved) during the making of UnknownIdentifier error message.
+- stackoverflow.com'dan [Netwave](https://stackoverflow.com/users/1695172/netwave) adlı kullanıcıya parser yapım sürecinde yaşanan bir [bug'ın](https://stackoverflow.com/questions/69635458/pattern-matching-does-not-allow-me-to-change-values/69636181#69636181) çözümündeki yardımından dolayı teşekkürlerimi sunarım.
+- stackoverflow.com'dan [Chayim Friedman](https://stackoverflow.com/users/7884305/chayim-friedman) adlı kullanıcıya BilinmeyenTanımlayıcı hatasının yapımında [closure büyüleri](https://stackoverflow.com/questions/70053866/rust-cloning-hashmapstring-object-without-moving-into-closure-solved) hakkında yardımı için teşekkür ederim.
