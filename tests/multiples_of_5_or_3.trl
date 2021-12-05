@@ -1,16 +1,13 @@
 #!/home/linuxbrew/.linuxbrew/bin/tr-lang y
-işlev sum-multiples-of-5-or-3
-    0 tks -* 0 18 *-
-    :. kpy 0 > iken
-        --
-        kpy 3 % 0 = ise
-            tks üst + tks
-        yoksa
-            kpy 5 % 0 = ise
-                tks üst + tks
-            son
+işlev sum-multiples-of-5-or-3 -> x
+    0 -> r
+    :. x > 0 iken
+        x % 5 = 0 veya x % 3 = 0 ise
+            x + r -> r
         son
-    son at
+        x -- -> x
+    son
+    r ver
 son
 
 10 sum-multiples-of-5-or-3 de "\n" de
