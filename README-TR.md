@@ -31,6 +31,11 @@ tr-lang küme(stack) orantılı bir bellek yönetimine sahip.
 
 ## 🪟 Windows
 
+### 📇 tr-lang_Setup.exe
+Windows için programın bir indirici var.
+Sadece indirip çalıştırın.
+Sadece talimatları takip edin ve hazırsınız!
+
 ### 📇 Önden Derlenmiş Program
 Windows için programın önden derlenmiş hali var.
 Sadece indirin ve bitti!

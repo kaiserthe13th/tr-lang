@@ -30,9 +30,14 @@ View in [Turkish](README-TR.md)
 
 ## 🪟 Windows
 
+### 📇 tr-lang_Setup.exe
+For windows there is a setup program.
+Just download it and run it.
+Follow the instructions and you are ready to go!
+
 ### 📇 Pre-Compiled Executable
 For windows there is a pre-compiled binary.
-Just download it and you are ready to go!
+Just download it, extract the zip and you are ready to go!
 > Note: This binary won't be in the PATH environment variable by default
 > meaning it won't be globally usable across the system with 'tr-lang'
 >
