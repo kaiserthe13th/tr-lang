@@ -29,7 +29,58 @@ tr-lang küme(stack) orantılı bir bellek yönetimine sahip.
 
 # 🚀 İndirme
 
-## 🗃️ Debian Paketi
+## 🪟 Windows
+
+### 📇 Önden Derlenmiş Program
+Windows için programın önden derlenmiş hali var.
+Sadece indirin ve bitti!
+> Not: Bu program hazır olarak PATH ortam değişkeninde olmayacaktır
+> bu tüm sistem içerisinde sadece 'tr-lang' yazarak programa erişemiyexeğiniz anlamına gelir
+>
+> Eğer tr-lang'ı PATH ortam değişkenine eklemek istiyorsanız Ryan Hoffman tarafından yazılmış bu [öğretici makaleye](https://www.architectryan.com/2018/03/17/add-to-the-path-on-windows-10/) göz atın
+
+### 📦 Cargo
+```console
+$ cargo install tr-lang
+```
+
+### ⚙️ Kaynaktan Derleme
+gereksinimler: `rust, cargo`
+```console
+$ git clone https://github.com/kaiserthe13th/tr-lang
+$ cd tr-lang
+$ cargo install --path .
+```
+> Not: sadece tr-lang'la oynamak istiyorsanız son komutu `cargo build --release` ile değiştirebilirsiniz
+> bu durumda dosyanız `target/release/tr-lang`'da bulunacaktır
+
+## 🍎 MacOS
+
+### 🍺 Homebrew
+Homebrew kullanarak indirebilirsiniz
+```console
+$ brew tap kaiserthe13th/tr-lang
+$ brew install tr-lang
+```
+
+### 📦 Cargo
+```console
+$ cargo install tr-lang
+```
+
+### ⚙️ Kaynaktan Derleme
+gereksinimler: `rust, cargo`
+```console
+$ git clone https://github.com/kaiserthe13th/tr-lang
+$ cd tr-lang
+$ cargo install --path .
+```
+> Not: sadece tr-lang'la oynamak istiyorsanız son komutu `cargo build --release` ile değiştirebilirsiniz
+> bu durumda dosyanız `target/release/tr-lang`'da bulunacaktır
+
+## 🐧 Linux
+
+### 🗃️ Debian Paketi
 Releases bölümünden tr-lang_x.x.x_amd64.deb paketini indirip onu sisteminize dpkg ile indirebilirsiniz
 
 1. Releases bölümünden istediğiniz sürümü indirin
@@ -39,26 +90,27 @@ $ dpkg -i tr-lang_<x.x.x>_amd64.deb
 ```
 > Not: Bazı Linux sistemlerinde sadece dosyaya iki veya bir kere tıklamanız yeterli olacaktır.
 
-## 🍺 Homebrew
+### 🍺 Homebrew
 Homebrew kullanarak indirebilirsiniz
 ```console
 $ brew tap kaiserthe13th/tr-lang
 $ brew install tr-lang
 ```
 
-## 📦 Cargo
+### 📦 Cargo
 ```console
 $ cargo install tr-lang
 ```
 
-## ⚙️ Kaynaktan Derleme
+### ⚙️ Kaynaktan Derleme
 gereksinimler: `rust, cargo`
 ```console
 $ git clone https://github.com/kaiserthe13th/tr-lang
 $ cd tr-lang
-$ cargo build --release
+$ cargo install --path .
 ```
-dosyanız `target/release/tr-lang`'da bulunacaktır
+> Not: sadece tr-lang'la oynamak istiyorsanız son komutu `cargo build --release` ile değiştirebilirsiniz
+> bu durumda dosyanız `target/release/tr-lang`'da bulunacaktır
 
 # [📖 Dokümantasyonu İncele](https://tr-lang-docs.netlify.app/türkçe)
 
