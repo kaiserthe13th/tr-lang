@@ -88,10 +88,18 @@ $ cargo install --path .
 ### 🗃️ Debian Paketi
 Releases bölümünden tr-lang_x.x.x_amd64.deb paketini indirip onu sisteminize dpkg ile indirebilirsiniz
 
-1. Releases bölümünden istediğiniz sürümü indirin
+1. Releases bölümünden istediğiniz sürümü (örnek: `tr-lang_<x.x.x>_amd64.deb`) indirin
 2. Terminalden
 ```console
 $ dpkg -i tr-lang_<x.x.x>_amd64.deb
+```
+> Not: Bazı Linux sistemlerinde sadece dosyaya iki veya bir kere tıklamanız yeterli olacaktır.
+
+### 🎩 RPM Package
+1. Releases bölümüne gidin ve istediğiniz sürümü (örnek: `tr-lang_<x.x.x>.x86_64.rpm`) indirin
+2. Terminalden
+```console
+$ rpm -i tr-lang_<x.x.x>.x86_64.rpm
 ```
 > Not: Bazı Linux sistemlerinde sadece dosyaya iki veya bir kere tıklamanız yeterli olacaktır.
 

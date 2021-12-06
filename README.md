@@ -93,6 +93,14 @@ $ dpkg -i tr-lang_<x.x.x>_amd64.deb
 ```
 > Note: On some linux systems just clicking or doubke clicking on the file would start install
 
+### 🎩 RPM Package
+1. Go to the Releases tab and download tr-lang_<x.x.x>.x86_64.rpm
+2. In the Terminal
+```console
+$ rpm -i tr-lang_<x.x.x>.x86_64.rpm
+```
+> Note: On some linux systems just clicking or doubke clicking on the file would start install
+
 ### 🍺 Homebrew
 ```console
 $ brew tap kaiserthe13th/tr-lang
