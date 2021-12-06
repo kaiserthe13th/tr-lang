@@ -7,7 +7,7 @@ Summary: A programming language made to bring syntax closer to Turkish
 Version: @@VERSION@@
 Release: @@RELEASE@@%{?dist}
 License: MIT
-Group: Applications/System
+Group: Development/Languages
 Source0: %{name}-%{version}.tar.gz
 URL: https://github.com/kaiserthe13th/tr-lang
 
