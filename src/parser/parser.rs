@@ -21,7 +21,9 @@ pub struct Parser {
 
 impl Parser {
     pub fn new(tokens: Vec<LexToken>) -> Self {
-        Self { tokens: Self::preproc(tokens) }
+        Self {
+            tokens: Self::preproc(tokens),
+        }
     }
 
     pub fn from_lexer(lexer: &mut lexer::Lexer, file: String) -> Self {
@@ -52,12 +54,13 @@ impl Parser {
                     current += 1;
                 }
                 Precedence::Precedence(u) => {
-                    while !stack.is_empty() && 
-                        match stack.last().unwrap().precedence {
+                    while !stack.is_empty()
+                        && match stack.last().unwrap().precedence {
                             Precedence::Precedence(x) => x > u,
                             Precedence::ParenL => false,
                             _ => unreachable!(),
-                    } {
+                        }
+                    {
                         tokens.push(stack.pop().unwrap());
                     }
                     stack.push(i.clone());
@@ -68,20 +71,24 @@ impl Parser {
                     current += 1;
                 }
                 Precedence::ParenR => {
-                    while !stack.is_empty() && match stack.last().unwrap().precedence {
+                    while !stack.is_empty()
+                        && match stack.last().unwrap().precedence {
                             Precedence::ParenL => false,
                             _ => true,
-                    } {
+                        }
+                    {
                         tokens.push(stack.pop().unwrap());
                     }
                     stack.pop().unwrap();
                     current += 1;
                 }
                 Precedence::Comma => {
-                    while !stack.is_empty() && match stack.last().unwrap().precedence {
+                    while !stack.is_empty()
+                        && match stack.last().unwrap().precedence {
                             Precedence::ParenL => false,
                             _ => true,
-                    } {
+                        }
+                    {
                         tokens.push(stack.pop().unwrap());
                     }
                     current += 1;
@@ -281,7 +288,7 @@ impl Parser {
                                 match sr.typ {
                                     TokenType::Ver { ref mut tp } => {
                                         *tp = Some(ip);
-                                    },
+                                    }
                                     _ => unreachable!(),
                                 }
                             }

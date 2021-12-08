@@ -101,17 +101,38 @@ impl Lexer {
                 '(' => {
                     self.current += 1;
                     self.col += 1;
-                    tokens.push(Token::new(TokenType::ParenL, "(".to_string(), self.line, self.col, file.clone(), Precedence::ParenL))
+                    tokens.push(Token::new(
+                        TokenType::ParenL,
+                        "(".to_string(),
+                        self.line,
+                        self.col,
+                        file.clone(),
+                        Precedence::ParenL,
+                    ))
                 }
                 ')' => {
                     self.current += 1;
                     self.col += 1;
-                    tokens.push(Token::new(TokenType::ParenR, ")".to_string(), self.line, self.col, file.clone(), Precedence::ParenR))
+                    tokens.push(Token::new(
+                        TokenType::ParenR,
+                        ")".to_string(),
+                        self.line,
+                        self.col,
+                        file.clone(),
+                        Precedence::ParenR,
+                    ))
                 }
                 ',' => {
                     self.current += 1;
                     self.col += 1;
-                    tokens.push(Token::new(TokenType::Comma, ",".to_string(), self.line, self.col, file.clone(), Precedence::Comma))
+                    tokens.push(Token::new(
+                        TokenType::Comma,
+                        ",".to_string(),
+                        self.line,
+                        self.col,
+                        file.clone(),
+                        Precedence::Comma,
+                    ))
                 }
                 '\'' | '"' => {
                     let mut buf = String::new();

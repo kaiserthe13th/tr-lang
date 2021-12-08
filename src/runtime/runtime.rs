@@ -62,14 +62,14 @@ impl Run {
                                 if let Some(u) = tp.pop() {
                                     self.current = u;
                                 }
-                            },
+                            }
                             _ => unreachable!(),
                         };
                         self.current += 1;
                         stack.del_stack();
                         hashs.del_hash();
                     } // error
-                },
+                }
                 TokenType::İşlev { sonloc } => {
                     let id = self.program.get(self.current + 1).unwrap();
                     match id.typ.clone() {
