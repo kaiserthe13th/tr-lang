@@ -21,13 +21,77 @@ pub struct Parser {
 
 impl Parser {
     pub fn new(tokens: Vec<LexToken>) -> Self {
-        Self { tokens }
+        Self { tokens: Self::preproc(tokens) }
     }
 
     pub fn from_lexer(lexer: &mut lexer::Lexer, file: String) -> Self {
         Self {
-            tokens: lexer.tokenize(&mut vec![], file),
+            tokens: Self::preproc(lexer.tokenize(&mut vec![], file)),
         }
+    }
+
+    fn preproc(prog: Vec<LexToken>) -> Vec<LexToken> {
+        use crate::token::Precedence;
+
+        let mut stack: Vec<LexToken> = vec![];
+        let mut current = 0;
+        let mut tokens = vec![];
+
+        while current < prog.len() {
+            let i = prog.get(current).unwrap();
+            match i.precedence {
+                Precedence::None => {
+                    tokens.push(i.clone());
+                    current += 1;
+                }
+                Precedence::Reserved => {
+                    while !stack.is_empty() {
+                        tokens.push(stack.pop().unwrap());
+                    }
+                    tokens.push(i.clone());
+                    current += 1;
+                }
+                Precedence::Precedence(u) => {
+                    while !stack.is_empty() && 
+                        match stack.last().unwrap().precedence {
+                            Precedence::Precedence(x) => x > u,
+                            Precedence::ParenL => false,
+                            _ => unreachable!(),
+                    } {
+                        tokens.push(stack.pop().unwrap());
+                    }
+                    stack.push(i.clone());
+                    current += 1;
+                }
+                Precedence::ParenL => {
+                    stack.push(i.clone());
+                    current += 1;
+                }
+                Precedence::ParenR => {
+                    while !stack.is_empty() && match stack.last().unwrap().precedence {
+                            Precedence::ParenL => false,
+                            _ => true,
+                    } {
+                        tokens.push(stack.pop().unwrap());
+                    }
+                    stack.pop().unwrap();
+                    current += 1;
+                }
+                Precedence::Comma => {
+                    while !stack.is_empty() && match stack.last().unwrap().precedence {
+                            Precedence::ParenL => false,
+                            _ => true,
+                    } {
+                        tokens.push(stack.pop().unwrap());
+                    }
+                    current += 1;
+                }
+            }
+        }
+        while !stack.is_empty() {
+            tokens.push(stack.pop().unwrap());
+        }
+        tokens
     }
 
     pub fn parse(&mut self) -> Vec<Token> {
