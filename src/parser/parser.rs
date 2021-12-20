@@ -77,9 +77,8 @@ impl Parser {
                             _ => true,
                         }
                     {
-                        tokens.push(stack.pop().unwrap());
+                        stack.pop().unwrap();
                     }
-                    stack.pop().unwrap();
                     current += 1;
                 }
                 Precedence::Comma => {
