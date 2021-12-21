@@ -1,0 +1,19 @@
+{
+  "name": "highlight",
+  "version": "0.1.0",
+  "description": "Highlighter for tr-lang",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
+  },
+  "keywords": [
+    "highlighting",
+    "programming-language"
+  ],
+  "author": "Kerem Göksu <superkerem13@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^4.5.4"
+  }
+}
