@@ -6,7 +6,7 @@ function isNumeric(a: string): boolean {
 enum HighlightTemplate {
     HTMLDocument,
     CodeBlock,
-    None
+    None,
 }
 
 export class Highlighter {
@@ -18,7 +18,9 @@ export class Highlighter {
         this.current = 0;
     }
 
-    public highlight(template: HighlightTemplate = HighlightTemplate.None): string {
+    public highlight(
+        template: HighlightTemplate = HighlightTemplate.None
+    ): string {
         let result = '';
 
         switch (template) {
@@ -35,7 +37,8 @@ export class Highlighter {
             case HighlightTemplate.HTMLDocument:
                 result += '';
                 break;
-            case HighlightTemplate.None: break;
+            case HighlightTemplate.None:
+                break;
         }
 
         while (this.current < this.src.length) {
