@@ -1,0 +1,21 @@
+:root {
+    --code-font: 'Jetbrains Mono', 'Fira Code', 'Ubuntu Mono', 'Courier New', Courier, monospace;
+
+    --bg-code: #272928;
+    --fg-default: #e2dfdf;
+
+    --fg-keyword: #e75a79;
+
+    --fg-string: #aae230;
+
+    --fg-number: #3897e0;
+
+    --fg-comment: #8d8d8d;
+
+    --bg-error: #db5353;
+    --fg-error: #2e2e2e;
+}
+
+.keyword {
+    font-weight: 700;
+}
