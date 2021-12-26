@@ -44,19 +44,23 @@ syn region trlComment start="#" end="$"
 "" Block Comment
 syn region trlComment start="-\*" end="\*-"
 
+" Shebang
+syn region trlShebang start="\%^#!" end="$"
+
 " Strings
 "" Double-Quoted String
 syn region trlString start=/\v"/ skip=/\v\\[tnr"'\\\n\t]/ end=/\v"/
 "" Single-Quoted String
 syn region trlString start=/\v'/ skip=/\v\\[tnr"'\\\n\t]/ end=/\v'/
 
+hi def link trlSingleCharOp Operator
 hi def link trlBoolean      Boolean
 hi def link trlKeyword      Keyword
 hi def link trlComment      Comment
+hi def link trlShebang      SpecialComment
 hi def link trlNumber       Number
 hi def link trlString       String
-hi def link trlSingleCharOp Operator
-hi def link trlType         Type
 hi def link trlMinus        Operator
+hi def link trlType         Type
 
 let b:current_syntax = "tr-lang"
