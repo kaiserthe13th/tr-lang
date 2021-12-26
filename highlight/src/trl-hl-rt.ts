@@ -1,4 +1,4 @@
-export function copyToClipboard(
+function copyToClipboard(
     ele: HTMLElement,
     msgEle?: HTMLElement
 ): boolean {
@@ -23,4 +23,12 @@ export function copyToClipboard(
             }
         });
     return result;
+}
+
+function loadTheme(path_to_theme: string) {
+    var theme: HTMLLinkElement = <HTMLLinkElement>document.getElementById('theme-trl-hl');
+
+    if (theme) {
+        theme.href = path_to_theme;
+    }
 }

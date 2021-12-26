@@ -1,9 +1,9 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.copyToClipboard = void 0;
 function copyToClipboard(ele, msgEle) {
     let result = false;
-    navigator.clipboard.writeText(ele.innerText).then(_ => {
+    navigator.clipboard
+        .writeText(ele.innerText)
+        .then(_ => {
         if (msgEle) {
             msgEle.innerHTML = 'Copied!';
             setTimeout(() => {
@@ -11,7 +11,8 @@ function copyToClipboard(ele, msgEle) {
             }, 5000);
         }
         result = true;
-    }).catch(_ => {
+    })
+        .catch(_ => {
         if (msgEle) {
             msgEle.innerHTML = 'Failed to Copy';
             setTimeout(() => {
@@ -21,4 +22,9 @@ function copyToClipboard(ele, msgEle) {
     });
     return result;
 }
-exports.copyToClipboard = copyToClipboard;
+function loadTheme(path_to_theme) {
+    var theme = document.getElementById('theme-trl-hl');
+    if (theme) {
+        theme.href = path_to_theme;
+    }
+}
