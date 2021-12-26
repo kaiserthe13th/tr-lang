@@ -1,2 +1,2 @@
-#!/home/linuxbrew/.linuxbrew/bin/tr-lang y
+#!/usr/bin/env tr-lang y
 'Hello, World!\n' de

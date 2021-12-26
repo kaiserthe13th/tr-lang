@@ -1,4 +1,4 @@
-#!/home/linuxbrew/.linuxbrew/bin/tr-lang y
+#!/usr/bin/env tr-lang y
 "123.321"@sayı -> x 
 "Enter a number: " de x + girdi@sayı de "\n" de
 1923@bool@yazı de "\n" de
