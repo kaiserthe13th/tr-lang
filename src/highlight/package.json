@@ -4,7 +4,7 @@
   "description": "Highlighter for tr-lang",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "tsc && node out/test/test.js",
     "build": "tsc"
   },
   "keywords": [
@@ -15,5 +15,6 @@
   "license": "MIT",
   "devDependencies": {
     "typescript": "^4.5.4"
-  }
+  },
+  "types": "out/*.d.ts"
 }
