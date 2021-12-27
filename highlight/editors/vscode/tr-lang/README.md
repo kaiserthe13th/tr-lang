@@ -5,10 +5,10 @@ tr-lang is the official extension for tr-lang programming language. It includes 
 ## Features
 
 ### Syntax Highlighting
-![Syntax Highlighting](img/hl.png)
+![Syntax Highlighting](https://user-images.githubusercontent.com/73602377/147505198-2eadb864-e4e1-4061-af3c-50e5cf7613fa.png)
 
 ### Snippets
-![Snippets](img/snippet-trl.gif)
+![Snippets](https://user-images.githubusercontent.com/73602377/147505294-4133614d-c100-4ed5-ba83-abdae6f3840c.gif)
 - <small>Theme Credits go to [Min Theme](https://marketplace.visualstudio.com/items?itemName=miguelsolorio.min-theme) by [Miguel Solorio](https://marketplace.visualstudio.com/publishers/miguelsolorio)</small>
 
 ## Release Notes
