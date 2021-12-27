@@ -2,6 +2,7 @@
     "name": "tr-lang",
     "displayName": "tr-lang",
     "description": "tr-lang language support for Visual Studio Code",
+    "publisher": "kaiserthe13th",
     "version": "0.0.2",
     "engines": {
         "vscode": "^1.63.0"
