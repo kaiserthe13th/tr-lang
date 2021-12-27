@@ -15,6 +15,7 @@ tr-lang is the official extension for tr-lang programming language. It includes 
 
 ### [0.0.2] - 2021-12-27
 
+- Extension Icon added
 - Some snippets for tr-lang
 
 ### [0.0.1] - 2021-12-26

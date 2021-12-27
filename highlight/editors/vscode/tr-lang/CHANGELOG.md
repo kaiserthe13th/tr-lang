@@ -6,6 +6,7 @@ All notable changes to the "tr-lang" extension will be documented in this file.
 
 ## [0.0.2] - 2021-12-27
 
+- Extension Icon added
 - Some snippets for tr-lang
 
 ## [0.0.1] - 2021-12-26
