@@ -5,16 +5,11 @@ tr-lang is the official extension for tr-lang programming language. It includes 
 ## Features
 
 ### Syntax Highlighting
-![Syntax Highlighting in Picture](img/hl.png)
-<small>Theme Credits go to [Min Theme](https://marketplace.visualstudio.com/items?itemName=miguelsolorio.min-theme) by [Miguel Solorio](https://marketplace.visualstudio.com/publishers/miguelsolorio)</small>
+![Syntax Highlighting](img/hl.png)
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
-
-For example if there is an image subfolder under your extension project workspace:
-
-\!\[feature X\]\(images/feature-x.png\)
-
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+### Snippets
+![Snippets](img/snippet-trl.gif)
+- <small>Theme Credits go to [Min Theme](https://marketplace.visualstudio.com/items?itemName=miguelsolorio.min-theme) by [Miguel Solorio](https://marketplace.visualstudio.com/publishers/miguelsolorio)</small>
 
 ## Release Notes
 
