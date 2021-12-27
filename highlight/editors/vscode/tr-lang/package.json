@@ -8,20 +8,28 @@
     },
     "homepage": "https://github.com/kaiserthe13th/tr-lang",
     "categories": [
-        "Programming Languages"
+        "Programming Languages",
+        "Snippets"
     ],
+    "icon": "img/icon.png",
     "license": "MIT",
     "contributes": {
         "languages": [{
             "id": "tr-lang",
-            "aliases": ["trl"],
-            "extensions": [".trl"],
+            "aliases": ["tr-lang", "trl"],
+            "extensions": [".trl", ".tr-lang"],
             "configuration": "./language-configuration.json"
         }],
         "grammars": [{
             "language": "tr-lang",
             "scopeName": "source.tr-lang",
             "path": "./syntaxes/tr-lang.tmLanguage.json"
-        }]
+        }],
+        "snippets": [
+            {
+                "language": "tr-lang",
+                "path": "./snippets/tr-lang.json"
+            }
+        ]
     }
 }
