@@ -1,0 +1,27 @@
+{
+    "name": "tr-lang",
+    "displayName": "tr-lang",
+    "description": "tr-lang language support for Visual Studio Code",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.63.0"
+    },
+    "homepage": "https://github.com/kaiserthe13th/tr-lang",
+    "categories": [
+        "Programming Languages"
+    ],
+    "license": "MIT",
+    "contributes": {
+        "languages": [{
+            "id": "tr-lang",
+            "aliases": ["trl"],
+            "extensions": [".trl"],
+            "configuration": "./language-configuration.json"
+        }],
+        "grammars": [{
+            "language": "tr-lang",
+            "scopeName": "source.tr-lang",
+            "path": "./syntaxes/tr-lang.tmLanguage.json"
+        }]
+    }
+}

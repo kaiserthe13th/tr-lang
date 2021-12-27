@@ -1,0 +1,120 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "tr-lang",
+	"patterns": [
+		{
+			"include": "#keywords"
+		},
+		{
+			"include": "#booleans"
+		},
+		{
+			"include": "#numbers"
+		},
+		{
+			"include": "#comparison-operators"
+		},
+		{
+			"include": "#assignment-operator"
+		},
+		{
+			"include": "#operators"
+		},
+		{
+			"include": "#comment-block"
+		},
+		{
+			"include": "#minus-operator"
+		},
+		{
+			"include": "#strings"
+		},
+		{
+			"include": "#comments"
+		}
+	],
+	"repository": {
+		"keywords": {
+			"patterns": [{
+				"name": "keyword.control.tr-lang",
+				"match": "\\b(at|ver|de|ise|son|iken|yoksa|kpy|tks|üst|veya|ve|dön|girdi|işlev|yükle)\\b"
+			}]
+		},
+		"strings": {
+			"patterns": [
+				{
+					"include": "#string-double"
+				},
+				{
+					"include": "#string-single"
+				}
+			]
+		},
+		"string-double": {
+			"name": "string.quoted.double.tr-lang",
+			"begin": "\"",
+			"end": "\"",
+			"patterns": [
+				{
+					"name": "constant.character.escape.tr-lang",
+					"match": "\\\\[tnr\\\\\"'\\n\\t]"
+				}
+			]
+		},
+		"string-single": {
+			"name": "string.quoted.single.tr-lang",
+			"begin": "'",
+			"end": "'",
+			"patterns": [
+				{
+					"name": "constant.character.escape.tr-lang",
+					"match": "\\\\[tnr\\\\\"'\\n\\t]"
+				}
+			]
+		},
+		"booleans": {
+            "match": "\\b(doğru|yanlış)\\b",
+            "name": "constant.language.boolean.tr-lang"
+        },
+		"assignment-operator": {
+            "match": "->",
+            "name": "keyword.operator.assignment.tr-lang"
+        },
+		"comparison-operators": {
+            "match": "=|!=|>|<|>=|<=|!",
+            "name": "keyword.operator.comparison.tr-lang"
+        },
+		"numbers": {
+			"match": "(\\d+\\.\\d*|\\d+)",
+			"name": "constant.numeric.float.tr-lang"
+		},
+		"operators": {
+			"match": "[@\\+\\*%\\>=!\\<]",
+			"name": "keyword.operator.tr-lang"
+		},
+		"minus-operator": {
+			"match": "(?<=(\\s|^))-",
+			"name": "keyword.operator.tr-lang"
+		},
+		"comments": {
+			"patterns": [
+				{
+					"include": "#comment-line"
+				},
+				{
+					"include": "#comment-block"
+				}
+			]
+		},
+		"comment-line": {
+			"match": "#.*$",
+			"name": "comment.line.tr-lang"
+		},
+		"comment-block": {
+			"begin": "-\\*",
+			"end": "\\*-",
+			"name": "comment.block.tr-lang"
+		}
+	},
+	"scopeName": "source.tr-lang"
+}
