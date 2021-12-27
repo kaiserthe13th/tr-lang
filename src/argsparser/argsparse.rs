@@ -1,6 +1,7 @@
 use crate::store::globarg::*;
 use crate::util;
 use std::env;
+use crate::highlight::HighlightType;
 
 #[derive(Debug)]
 pub enum Subcommands {
@@ -21,6 +22,8 @@ pub struct Options {
     pub version: bool,
     pub lex_out: bool,
     pub prs_out: bool,
+    pub hl: bool,
+    pub hl_type: HighlightType,
     pub argv: Vec<String>,
 }
 

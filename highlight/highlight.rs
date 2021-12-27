@@ -1,182 +1,185 @@
-use crate::store::PATH_SEP;
 use crate::token::tokentypes::LexerTokenType as TokenType;
 use crate::token::LexerToken as Token;
-use crate::token::Precedence;
-use crate::util::{char_in_str, in_vec, read_file, FSErr};
+use crate::util::{char_in_str, in_vec;
 
-use std::fs::canonicalize;
-use std::path::PathBuf;
+const HTML_TEMPLATE_START: &str = "\
+<doctype! html>
+<html>
+    <head>
+        <title>tr-lang</title>
+        <link rel=\"stylesheet\" href=\"trl-highlight.css\">
+    </head>
+    <body>
+    <div class=\"cb-header\">
+        <div>tr-lang</div>
+        <div>
+            <button class=\"nobg\" onclick=\"copyInnerText(this.parentElement.parentElement.children[1])\">Copy</button>
+        </div>
+    </div>
+    </pre class=\"code\">";
 
-#[derive(Clone)]
-pub struct Lexer {
-    source: Vec<char>,
-    current: usize,
-    line: usize,
-    col: usize,
+const HTML_TEMPLATE_END: &str = "</pre><script src=\"trl-highlight.js\"></script></body>
+</html>";
+
+struct SpanClasses {
+    line_comment: String,
+    paren_left: String,
+    paren_right: String,
+    comma: String,
+    single_quoted_string: String,
+    double_quoted_string: String,
+    string_escape: String,
+    number_int: String,
+    number_float: String,
+    plus: String,
+    plus_plus: String,
+    minus: String,
+    minus_minus: String,
+    block_comment: String,
+    assign_op: String,
+    mul_sign: String,
+    div_sign: String,
+    modulo: String,
+    greater: String,
+    greater_eq: String,
+    lesser: String,
+    lesser_eq: String,
+    not_equal: String,
+    not: String,
+    equals: String,
+    question_mark_end: String,
+    question_mark_else: String,
+    question_mark_if: String,
+    question_mark: String,
+    double_dot_dot: String,
+    convert_to: String,
+    identifier: String,
+    key_at: String,
+    key_ver: String,
+    key_de: String,
+    key_ise: String,
+    key_son: String,
+    key_iken: String,
+    key_yoksa: String,
+    key_doğru: String,
+    key_yanlış: String,
+    key_kpy: String,
+    key_tks: String,
+    key_üst: String,
+    key_veya: String,
+    key_ve: String,
+    key_dön: String,
+    key_girdi: String,
+    key_işlev: String,
+    key_yükle: String,
 }
 
-impl Lexer {
-    pub fn new(content: String) -> Self {
+pub enum HighlighterType {
+    HTMLSpanTag(SpanClasses),
+    ANSIEscapeSequence,
+}
+
+#[derive(Clone)]
+pub struct Highlighter {
+    source: Vec<char>,
+    current: usize,
+    typ: HighlighterType,
+    use_template: bool,
+}
+
+impl Highlighter {
+    pub fn escape_char(c: char) -> &str {
+        match c {
+            '&' => "&amp;",
+            '<' => "&lt;",
+            '>' => "&gt;",
+            '"' => "&quot;",
+            '\'' => "&#x27;",
+            '/' => "&x#2F;",
+            c => &format!("{}", c),
+        }
+    }
+    pub fn new(content: String, typ: HighlighterType) -> Self {
         Self {
             source: content.chars().collect(),
             current: 0,
-            line: 1,
-            col: 1,
+            typ
         }
     }
-    fn post_proc(&self, prog: Vec<Token>, visited: &mut Vec<String>, file: String) -> Vec<Token> {
-        let mut tokens: Vec<Token> = vec![];
-        let mut current: usize = 0;
-
-        while current < prog.len() - 1 {
-            let c: Token = prog.get(current).unwrap().clone();
-
-            match c.typ {
-                TokenType::Yükle => {
-                    let next_tok = prog.get(current + 1).unwrap().clone();
-                    match next_tok.typ {
-                        TokenType::Yazı => {
-                            let pathstr = next_tok.lexeme;
-                            let path = PathBuf::from(pathstr.clone());
-                            let canon_path: String = if path.has_root() {
-                                match canonicalize(&path) {
-                                    Ok(a) => a.as_path().display().to_string(),
-                                    Err(e) => panic!("`{}` adlı dosya yüklenemedi: `{}`", pathstr, e),
-                                }
-                            } else {
-                                match canonicalize(match canonicalize(file.clone()) {
-                                    Ok(a) => {
-                                        let mut a = a;
-                                        a.pop();
-                                        a.as_path().display().to_string()
-                                    },
-                                    Err(e) => panic!("`{}` adlı dosya yüklenemedi: {}", pathstr, e),
-                                } + &PATH_SEP.to_string() + &pathstr) {
-                                    Ok(a) => a.as_path().display().to_string(),
-                                    Err(e) => panic!("`{}` adlı dosya yüklenemedi: {}", pathstr, e),
-                                }
-                            };
-
-                            let mut path = PathBuf::from(canon_path.clone());
-                            if !in_vec(&canon_path, &visited) {
-                                visited.push(canon_path.clone());
-
-                                let mut nl = Self::new(match read_file(&path) {
-                                    Ok(f) => f,
-                                    Err(FSErr::IsADir) => {
-                                        path.push("main.trl");
-                                        read_file(&path).unwrap()
-                                    },
-                                });
-                                tokens.append(&mut nl.tokenize(visited, canon_path));
-                            }
-                        },
-                        TokenType::Identifier => unimplemented!(),
-                        _ => panic!("yükle anahtar kelimesinden sonra yazı veya tanımlayıcı bekleniyordu ancak bulunamadı"), // SyntaxError
-                    }
-                    current += 2;
-                }
-                _ => {
-                    tokens.push(c);
-                    current += 1;
-                }
-            }
-        }
-        tokens
-    }
-    pub fn tokenize(&mut self, visited: &mut Vec<String>, file: String) -> Vec<Token> {
-        let mut tokens: Vec<Token> = vec![];
+    pub fn highlight(&mut self) -> String {
+        let mut result: String::from(if self.use_template {HTML_TEMPLATE_START} else {""});
 
         while self.current < self.source.len() {
             let c: char = self.currentc();
 
             match c {
                 '#' => {
-                    while self.current < self.source.len() && self.currentc() != '\n' {
-                        self.current += 1;
-                        self.col += 1;
+                    match self.typ {
+                        HighlighterType::HTMLSpanTag(sc) => result.push_str(&format!("<span class=\"{}\">", sc.line_comment)),
+                        _ => unimplemented!("tr-lang highlighter only supports HTMLSpanTag mode for now"),
                     }
-                    self.line += 1;
+                    while self.current < self.source.len() && self.currentc() != '\n' {
+                        result.push(self.currentc());
+                        self.current += 1;
+                    }
+                    match self.typ {
+                        HighlighterType::HTMLSpanTag(_) => result.push_str("</span>"),
+                        _ => unimplemented!("tr-lang highlighter only supports HTMLSpanTag mode for now"),
+                    }
                 }
                 '(' => {
                     self.current += 1;
-                    self.col += 1;
-                    tokens.push(Token::new(
-                        TokenType::ParenL,
-                        "(".to_string(),
-                        self.line,
-                        self.col,
-                        file.clone(),
-                        Precedence::ParenL,
-                    ))
+                    match self.typ {
+                        HighlighterType::HTMLSpanTag(sc) => result.push_str("<span class=\"{}\">(</span>", sc.paren_left),
+                        _ => unimplemented!("tr-lang highlighter only supports HTMLSpanTag mode for now"),
+                    }
                 }
                 ')' => {
                     self.current += 1;
-                    self.col += 1;
-                    tokens.push(Token::new(
-                        TokenType::ParenR,
-                        ")".to_string(),
-                        self.line,
-                        self.col,
-                        file.clone(),
-                        Precedence::ParenR,
-                    ))
+                    match self.typ {
+                        HighlighterType::HTMLSpanTag(sc) => result.push_str("<span class=\"{}\">)</span>", sc.paren_right),
+                        _ => unimplemented!("tr-lang highlighter only supports HTMLSpanTag mode for now"),
+                    }
                 }
                 ',' => {
                     self.current += 1;
-                    self.col += 1;
-                    tokens.push(Token::new(
-                        TokenType::Comma,
-                        ",".to_string(),
-                        self.line,
-                        self.col,
-                        file.clone(),
-                        Precedence::Comma,
-                    ))
+                    match self.typ {
+                        HighlighterType::HTMLSpanTag(sc) => result.push_str("<span class=\"{}\">,</span>", sc.comma),
+                        _ => unimplemented!("tr-lang highlighter only supports HTMLSpanTag mode for now"),
+                    }
                 }
                 '\'' | '"' => {
-                    let mut buf = String::new();
-
+                    match self.typ {
+                        HighlighterType::HTMLSpanTag(sc) => result.push_str("<span class=\"{}\">", match c {
+                            '\'' => sc.single_quoted_string,
+                            '"' => sc.double_quoted_string,
+                            _ => unreacheable!(),
+                        }),
+                        _ => unimplemented!("tr-lang highlighter only supports HTMLSpanTag mode for now"),
+                    }
+                    result.push_str(self.escape_char(c));
                     self.current += 1;
                     while self.currentc() != c {
-                        if self.currentc() == '\n' {
-                            self.line += 1;
-                            self.col = 1;
-                        } else {
-                            self.col += 1;
-                        }
                         if self.currentc() != '\\' {
-                            buf.push(self.currentc());
+                            result.push(self.escape_char(self.currentc()));
                             self.current += 1;
                         } else {
                             self.current += 1;
-                            self.col += 1;
                             match self.currentc() {
-                                't' => buf.push('\t'),
-                                'n' => buf.push('\n'),
-                                'r' => buf.push('\r'),
-                                '"' => buf.push('"'),
-                                '\'' => buf.push('\''),
-                                '\\' => buf.push('\\'),
-                                '\n' | '\t' => (),
+                                't' | 'n' | 'r' | '"' | '\'' | '\\' | '\n' | '\t' => {
+                                    match self.typ {
+                                        HTMLSpanTag(sc) => result.push_str(&format!("<span class=\"{}\">\\{}</span>", sc.string_escape, self.escape_char(self.currentc()))),
+                                    _ => unimplemented!("tr-lang highlighter only supports HTMLSpanTag mode for now"),
+                                },
                                 _ => {
-                                    buf.push('\\');
-                                    buf.push(self.currentc())
+                                    buf.push("\\");
+                                    buf.push(self.escape_char(self.currentc()));
                                 }
                             }
-                            self.col += 1;
                             self.current += 1;
                         }
                     }
                     self.current += 1;
-                    tokens.push(Token::new(
-                        TokenType::Yazı,
-                        buf,
-                        self.line,
-                        self.col,
-                        file.clone(),
-                        Precedence::None,
-                    ))
                 }
                 b if b.is_numeric() => {
                     let mut buf = String::new();
@@ -196,7 +199,6 @@ impl Lexer {
                             }
                         }
                         self.current += 1;
-                        self.col += 1;
                     }
                     tokens.push(Token::new(
                         TokenType::Sayı,
@@ -209,16 +211,13 @@ impl Lexer {
                 }
                 '\n' => {
                     self.current += 1;
-                    self.line += 1;
                     self.col = 1;
                 }
                 '+' => {
-                    self.col += 1;
                     self.current += 1;
                     if self.source.len() > self.current {
                         if self.currentc() == '+' {
                             self.current += 1;
-                            self.col += 1;
                             tokens.push(Token::new(
                                 TokenType::ArtıArtı,
                                 "++".to_string(),
@@ -240,12 +239,10 @@ impl Lexer {
                     }
                 }
                 '-' => {
-                    self.col += 1;
                     self.current += 1;
                     if self.source.len() > self.current {
                         if self.currentc() == '-' {
                             self.current += 1;
-                            self.col += 1;
                             tokens.push(Token::new(
                                 TokenType::EksiEksi,
                                 "--".to_string(),
@@ -257,20 +254,16 @@ impl Lexer {
                         } else if self.currentc() == '*' {
                             loop {
                                 self.current += 1;
-                                self.col += 1;
                                 if self.current > self.source.len() {
                                     panic!("unterminated comment");
                                 }
                                 if self.currentc() == '\n' {
-                                    self.line += 1;
                                     self.col = 1;
                                 } else if self.currentc() == '*' {
                                     self.current += 1;
-                                    self.col += 1;
                                     if self.source.len() > self.current {
                                         if self.currentc() == '-' {
                                             self.current += 1;
-                                            self.col += 1;
                                             break;
                                         }
                                     } else {
@@ -280,7 +273,6 @@ impl Lexer {
                             }
                         } else if self.currentc() == '>' {
                             self.current += 1;
-                            self.col += 1;
                             tokens.push(Token::new(
                                 TokenType::Koy,
                                 "->".to_string(),
@@ -311,7 +303,6 @@ impl Lexer {
                     }
                 }
                 '*' => {
-                    self.col += 1;
                     self.current += 1;
                     tokens.push(Token::new(
                         TokenType::Çarpı,
@@ -323,7 +314,6 @@ impl Lexer {
                     ))
                 }
                 '/' => {
-                    self.col += 1;
                     self.current += 1;
                     tokens.push(Token::new(
                         TokenType::Bölü,
@@ -335,7 +325,6 @@ impl Lexer {
                     ))
                 }
                 '%' => {
-                    self.col += 1;
                     self.current += 1;
                     tokens.push(Token::new(
                         TokenType::Modulo,
@@ -347,7 +336,6 @@ impl Lexer {
                     ))
                 }
                 '>' => {
-                    self.col += 1;
                     self.current += 1;
                     if self.source.len() > self.current {
                         if self.currentc() == '=' {
@@ -359,7 +347,6 @@ impl Lexer {
                                 file.clone(),
                                 Precedence::Precedence(1),
                             ));
-                            self.col += 1;
                             self.current += 1;
                         } else {
                             tokens.push(Token::new(
@@ -383,7 +370,6 @@ impl Lexer {
                     }
                 }
                 '<' => {
-                    self.col += 1;
                     self.current += 1;
                     if self.source.len() > self.current {
                         if self.currentc() == '=' {
@@ -395,7 +381,6 @@ impl Lexer {
                                 file.clone(),
                                 Precedence::Precedence(1),
                             ));
-                            self.col += 1;
                             self.current += 1;
                         } else {
                             tokens.push(Token::new(
@@ -419,7 +404,6 @@ impl Lexer {
                     }
                 }
                 '!' => {
-                    self.col += 1;
                     self.current += 1;
                     if self.source.len() > self.current {
                         if self.currentc() == '=' {
@@ -431,7 +415,6 @@ impl Lexer {
                                 file.clone(),
                                 Precedence::Precedence(1),
                             ));
-                            self.col += 1;
                             self.current += 1;
                         } else {
                             tokens.push(Token::new(
@@ -455,7 +438,6 @@ impl Lexer {
                     }
                 }
                 '=' => {
-                    self.col += 1;
                     self.current += 1;
                     if self.source.len() > self.current {
                         if self.currentc() == '?' {
@@ -467,7 +449,6 @@ impl Lexer {
                                 file.clone(),
                                 Precedence::Reserved,
                             ));
-                            self.col += 1;
                             self.current += 1;
                         } else {
                             tokens.push(Token::new(
@@ -491,7 +472,6 @@ impl Lexer {
                     }
                 }
                 ':' => {
-                    self.col += 1;
                     self.current += 1;
                     if self.source.len() > self.current {
                         if self.currentc() == '.' {
@@ -503,7 +483,6 @@ impl Lexer {
                                 file.clone(),
                                 Precedence::Reserved,
                             ));
-                            self.col += 1;
                             self.current += 1;
                         } else if self.currentc() == '?' {
                             tokens.push(Token::new(
@@ -514,7 +493,6 @@ impl Lexer {
                                 file.clone(),
                                 Precedence::Reserved,
                             ));
-                            self.col += 1;
                             self.current += 1;
                         } else {
                             unimplemented!("':' operatorü implemente edilmiş değil");
@@ -523,7 +501,6 @@ impl Lexer {
                 }
                 '?' => {
                     self.current += 1;
-                    self.col += 1;
                     tokens.push(Token::new(
                         TokenType::İse,
                         "?".to_string(),
@@ -535,7 +512,6 @@ impl Lexer {
                 }
                 '@' => {
                     self.current += 1;
-                    self.col += 1;
                     tokens.push(Token::new(
                         TokenType::Tipinde,
                         "@".to_string(),
@@ -547,17 +523,15 @@ impl Lexer {
                 }
                 ' ' => {
                     self.current += 1;
-                    self.col += 1;
                 }
                 _ => {
                     let mut buf = String::new();
 
                     while self.source.len() > self.current
-                        && !char_in_str(self.currentc(), "\t\r \n\"':?=<>!/%*@,")
+                        && !char_in_str(self.currentc(), "\t\r \n\"':?=<>!/%*@")
                     {
                         buf.push(self.currentc());
                         self.current += 1;
-                        self.col += 1;
                     }
 
                     match buf.as_str() {
@@ -725,7 +699,6 @@ impl Lexer {
             file.clone(),
             Precedence::Reserved,
         ));
-        self.post_proc(tokens, visited, file)
     }
     fn currentc(&self) -> char {
         *self.source.get(self.current).unwrap()

@@ -1,0 +1,181 @@
+.keyword\:de {
+    color: var(--fg-keyword\:de);
+    background-color: var(--bg-keyword\:de);
+}
+
+.keyword\:ise {
+    color: var(--fg-keyword\:ise);
+    background-color: var(--bg-keyword\:ise);
+}
+
+.keyword\:at {
+    color: var(--fg-keyword\:ar);
+    background-color: var(--bg-keyword\:ar);
+}
+
+.keyword\:ver {
+    color: var(--fg-keyword\:ver);
+    background-color: var(--bg-keyword\:ver);
+}
+
+.keyword\:son {
+    color: var(--fg-keyword\:son);
+    background-color: var(--bg-keyword\:son);
+}
+
+.keyword\:iken {
+    color: var(--fg-keyword\:iken);
+    background-color: var(--bg-keyword\:iken);
+}
+
+.keyword\:yoksa {
+    color: var(--fg-keyword\:yoksa);
+    background-color: var(--bg-keyword\:yoksa);
+}
+
+.keyword\:doğru {
+    color: var(--fg-keyword\:doğru);
+    background-color: var(--bg-keyword\:doğru);
+}
+
+.keyword\:yanlış {
+    color: var(--fg-keyword\:yanlış);
+    background-color: var(--bg-keyword\:yanlış);
+}
+
+.keyword\:kpy {
+    color: var(--fg-keyword\:kpy);
+    background-color: var(--bg-keyword\:kpy);
+}
+
+.keyword\:tks {
+    color: var(--fg-keyword\:tks);
+    background-color: var(--bg-keyword\:tks);
+}
+
+.keyword\:üst {
+    color: var(--fg-keyword\:üst);
+    background-color: var(--bg-keyword\:üst);
+}
+
+.keyword\:veya {
+    color: var(--fg-keyword\:veya);
+    background-color: var(--bg-keyword\:veya);
+}
+
+.keyword\:ve {
+    color: var(--fg-keyword\:ve);
+    background-color: var(--bg-keyword\:ve);
+}
+
+.keyword\:dön {
+    color: var(--fg-keyword\:dön);
+    background-color: var(--bg-keyword\:dön);
+}
+
+.keyword\:girdi {
+    color: var(--fg-keyword\:girdi);
+    background-color: var(--bg-keyword\:girdi);
+}
+
+.keyword\:işlev {
+    color: var(--fg-keyword\:işlev);
+    background-color: var(--bg-keyword\:işlev);
+}
+
+.keyword\:yükle {
+    color: var(--fg-keyword\:yükle);
+    background-color: var(--bg-keyword\:yükle);
+}
+
+.keyword {
+    color: var(--fg-keyword);
+    background-color: var(--bg-keyword);
+}
+
+.identifier {
+    color: var(--fg-identifier);
+    background-color: var(--bg-identifier);
+}
+
+.number\:float {
+    color: var(--fg-number\:float);
+    background-color: var(--bg-number\:float);
+}
+
+.number\:int {
+    color: var(--fg-number\:int);
+    background-color: var(--bg-number\:int);
+}
+
+.number {
+    color: var(--fg-number);
+    background-color: var(--bg-number);
+}
+
+.comma {
+    color: var(--fg-comma);
+    background-color: var(--bg-comma);
+}
+
+.string\:double-quoted {
+    color: var(--fg-string\:double-quoted);
+    background-color: var(--bg-string\:double-quoted);
+}
+
+.string\:single-quoted {
+    color: var(--fg-string\:single-quoted);
+    background-color: var(--bg-string\:single-quoted);
+}
+
+.string\:escape {
+    color: var(--fg-string\:escape);
+    background-color: var(--bg-string\:escape);
+}
+
+.string {
+    color: var(--fg-string);
+    background-color: var(--bg-string);
+}
+
+.comment\:line {
+    color: var(--fg-comment\:line);
+    background-color: var(--bg-comment\:line);
+}
+
+.comment\:block {
+    color: var(--fg-comment\:block);
+    background-color: var(--bg-comment\:block);
+}
+
+.comment {
+    color: var(--fg-comment);
+    background-color: var(--bg-comment);
+}
+
+.paren\:left {
+    color: var(--fg-paren\:left);
+    background-color: var(--bg-paren\:left);
+}
+
+.paren\:right {
+    color: var(--fg-paren\:right);
+    background-color: var(--bg-paren\:right);
+}
+
+.paren {
+    color: var(--fg-paren);
+    background-color: var(--bg-paren);
+}
+
+.code {
+    color: var(--fg-default);
+    background-color: var(--bg-code);
+    font-family: var(--code-font);
+    padding: 8px;
+}
+
+.error {
+    color: var(--fg-error);
+    background-color: var(--bg-error);
+}

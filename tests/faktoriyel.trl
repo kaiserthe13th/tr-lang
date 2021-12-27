@@ -1,4 +1,4 @@
-#!/home/linuxbrew/.linuxbrew/bin/tr-lang y
+#!/usr/bin/env tr-lang y
 -* tr-lang'da sterilize edilmemiş faktoriyel implementasyonu *-
 
 yükle "mat.trl"

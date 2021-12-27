@@ -1,0 +1,37 @@
+{
+    "işlev": {
+        "prefix": ["işlev", "function"],
+        "body": ["işlev ${1:name} -> ${2:param}", "\t$0", "son"],
+        "description": "A function"
+    },
+    "ise": {
+        "prefix": ["ise", "if"],
+        "body": ["ise", "\t$0", "son"],
+        "description": "An if statement"
+    },
+    "iken": {
+        "prefix": ["iken", "while"],
+        "body": [":. ${1:condition} iken", "\t$0", "son"],
+        "description": "A while statement"
+    },
+    "ise-yoksa": {
+        "prefix": ["ise-yoksa", "if-else"],
+        "body": ["ise", "\t$1", "yoksa", "\t$0", "son"],
+        "description": "An if-else statement"
+    },
+    "yükle": {
+        "prefix": ["yükle", "include", "load"],
+        "body": ["yükle $0"],
+        "description": "An include statement(yükle)"
+    },
+    "dön": {
+        "prefix": ["dön", "turn", "spin"],
+        "body": ["dön"],
+        "description": "An turn statement(dön)"
+    },
+    "üst": {
+        "prefix": ["üst", "top"],
+        "body": ["üst"],
+        "description": "A top statement(üst)"
+    }
+}
