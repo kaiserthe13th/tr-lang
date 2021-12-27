@@ -13,6 +13,11 @@
     ],
     "icon": "https://user-images.githubusercontent.com/73602377/147505093-ceaea568-e38d-4dd8-90a6-3be0df280bd7.png",
     "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/kaiserthe13th/tr-lang",
+        "directory": "highlight/editors/vscode/tr-lang"
+    },
     "contributes": {
         "languages": [{
             "id": "tr-lang",
