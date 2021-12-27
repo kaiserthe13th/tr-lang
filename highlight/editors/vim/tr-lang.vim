@@ -49,9 +49,9 @@ syn region trlShebang start="\%^#!" end="$"
 
 " Strings
 "" Double-Quoted String
-syn region trlString start=/\v"/ skip=/\v\\\\[tnr"'\\\n\t]/ end=/\v"/
+syn region trlString start=/\v"/ skip=/\v\\[tnr"'\\\n\t]/ end=/\v"/
 "" Single-Quoted String
-syn region trlString start=/\v'/ skip=/\v\\\\[tnr"'\\\n\t]/ end=/\v'/
+syn region trlString start=/\v'/ skip=/\v\\[tnr"'\\\n\t]/ end=/\v'/
 
 hi def link trlSingleCharOp Operator
 hi def link trlBoolean      Boolean
