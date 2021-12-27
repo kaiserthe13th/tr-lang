@@ -11,7 +11,7 @@
         "Programming Languages",
         "Snippets"
     ],
-    "icon": "./img/icon.png",
+    "icon": "img/icon.png",
     "license": "MIT",
     "repository": {
         "type": "git",
