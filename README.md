@@ -12,6 +12,7 @@ View in [Turkish](README-TR.md)
 # 🚩 Table of Contents
 - [🏆 What Has Been Implemented?](#-what-has-been-implemented)
 - [🚀 Installation](#-installation)
+- [💻 Editor Support](#-editor-support)
 - [📖 See the Docs](#-see-the-docs)
 - [🤝 Contributing](#-contributing)
 - [📜 Thanks](#-thanks)
@@ -122,6 +123,13 @@ $ cargo install --path .
 ```
 > Note: If you just want to play you can change the last command to `cargo build --release`
 > your file will be in target/release/tr-lang
+
+# 💻 Editor Support
+|  | VS Code | Sublime | Atom | Vim/Neovim | Emacs |
+|---|---|---|---|---|---|
+| **Highlighthing** | With tr-lang Extension | Planned | No | With tr-lang.vim | No |
+| **Snippets** | With tr-lang Extension | No | No | No | No |
+> Note: Feel free to help!
 
 # [📖 See the Docs](https://tr-lang-docs.netlify.app/english/)
 

@@ -12,6 +12,7 @@ tr-lang küme(stack) orantılı bir bellek yönetimine sahip.
 # :triangular_flag_on_post: İçindekiler
 - [🏆 Dilin Hangi Parçaları Tamamlandı?](#-dilin-hangi-parçaları-tamamlandı)
 - [🚀 İndirme](#-i̇ndirme)
+- [💻 Editör Desteği](#-edit%C3%B6r-deste%C4%9Fi)
 - [📖 Dokümantasyonu İncele](#-dok%C3%BCmantasyonu-i%CC%87ncele)
 - [🤝 Katkıda Bulunma](#-katkıda-bulunma)
 - [📜 Teşekkürler](#-teşekkürler)
@@ -126,6 +127,13 @@ $ cargo install --path .
 > bu durumda dosyanız `target/release/tr-lang`'da bulunacaktır
 
 # [📖 Dokümantasyonu İncele](https://tr-lang-docs.netlify.app/türkçe)
+
+# 💻 Editör Desteği
+|  | VS Code | Sublime | Atom | Vim/Neovim | Emacs |
+|---|---|---|---|---|---|
+| **Renklendirme** | tr-lang Eklentisi İle | Planlanıyor | Hayır | tr-lang.vim İle | Hayır |
+| **Snippetlar** | tr-lang Eklentisi İle | Hayır | Hayır | Hayır | Hayır |
+> Not: Yardım etmekten çekinmeyin!
 
 # 🤝 Katkıda Bulunma
 bug raporlamak, yeni özellik tavsiye etmek veya dokümantasyonu güncellemek için [issue takipçisini](https://github.com/kaiserthe13th/tr-lang/issues) kullanın.
