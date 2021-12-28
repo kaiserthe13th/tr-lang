@@ -131,7 +131,7 @@ $ cargo install --path .
 # 💻 Editör Desteği
 |  | VS Code | Sublime | Atom | Vim/Neovim | Emacs |
 |---|---|---|---|---|---|
-| **Renklendirme** | tr-lang Eklentisi İle | Planlanıyor | Hayır | tr-lang.vim İle | Hayır |
+| **Renklendirme** | tr-lang Eklentisi İle | Planlanıyor | Hayır | [tr-lang.vim](highlight/editors/vim) İle | Hayır |
 | **Snippetlar** | tr-lang Eklentisi İle | Hayır | Hayır | Hayır | Hayır |
 > Not: Yardım etmekten çekinmeyin!
 

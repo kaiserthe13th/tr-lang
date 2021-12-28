@@ -127,7 +127,7 @@ $ cargo install --path .
 # 💻 Editor Support
 |  | VS Code | Sublime | Atom | Vim/Neovim | Emacs |
 |---|---|---|---|---|---|
-| **Highlighthing** | With tr-lang Extension | Planned | No | With tr-lang.vim | No |
+| **Highlighthing** | With tr-lang Extension | Planned | No | With [tr-lang.vim](highlight/editors/vim) | No |
 | **Snippets** | With tr-lang Extension | No | No | No | No |
 > Note: Feel free to help!
 
