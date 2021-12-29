@@ -22,6 +22,7 @@ pub struct Options {
     pub lex_out: bool,
     pub prs_out: bool,
     pub argv: Vec<String>,
+    pub license: bool,
 }
 
 pub fn parse_args() -> Options {
@@ -46,6 +47,7 @@ pub fn parse_args() -> Options {
                         util::print_version(name);
                     }
                     "-h" | "-y" | "--yardım" => util::print_help(0, name),
+                    "-L" | "--license" | "--lisans" => util::print_license(),
                     _ => (),
                 }
             }
@@ -63,11 +65,15 @@ pub fn parse_args() -> Options {
         "-V" | "-s" | "--sürüm" => {
             util::print_version(name);
         }
+        "-L" | "--license" | "--lisans" => {
+            util::print_license();
+        }
         a => util::error_print("unknown subcommand", format!("{}", a)),
     };
     args.remove(0);
 
     let mut outs = false;
+    let mut license = false;
 
     let file = args.get(0).unwrap().to_string();
     args = args[1..].to_vec();
@@ -90,6 +96,7 @@ pub fn parse_args() -> Options {
                 outs = true;
                 prd_out = true;
             }
+            "-L" | "--license" | "--lisans" => license = true,
             "--" => argv_m = true,
             a => util::error_print("unknown argument", format!("{}", a)),
         }
@@ -106,6 +113,7 @@ pub fn parse_args() -> Options {
         outfile,
         file,
         sub_cmd,
+        license,
         help_exitc: 0,
     }
 }

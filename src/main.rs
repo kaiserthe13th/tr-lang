@@ -32,6 +32,9 @@ fn main() {
     if args.version {
         util::print_version(args.name);
     }
+    if args.license {
+        util::print_license();
+    }
 
     match args.sub_cmd {
         argsparser::Subcommands::Byt => {

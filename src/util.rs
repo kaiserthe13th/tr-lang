@@ -1,5 +1,5 @@
 use crate::exit;
-use crate::store::{RELEASE, VERSION};
+use crate::store::{RELEASE, VERSION, LICENSE};
 
 use std::fs::File;
 use std::io::ErrorKind::IsADirectory;
@@ -151,12 +151,13 @@ pub fn print_help(exit_code: i32, prog_name: String) -> ! {
             println!("    yb yürbyt  bytecode DOSYA'sını yürüt");
             println!("");
             println!("SEÇENEKLER:");
-            println!("  -h -y --yardım         yardım göster ve çık");
-            println!("  -V -s --sürüm          sürümü göster ve çık");
-            println!("  -o -ç --çıkış <DOSYA>  çıkışta buraya bytecode yaz");
-            println!("  -l --lexer-çıktısı     lex sürecinden sonra lexer'ın çıktısını göster");
-            println!("  -p --parser-çıktısı    parse sürecinden sonra parser'ın çıktısını göster");
-            println!("  --                     bundan sonra argv ekleyin");
+            println!("    -h -y --yardım         yardım göster ve çık");
+            println!("    -V -s --sürüm          sürümü göster ve çık");
+            println!("    -o -ç --çıkış <DOSYA>  çıkışta buraya bytecode yaz");
+            println!("    -l --lexer-çıktısı     lex sürecinden sonra lexer'ın çıktısını göster");
+            println!("    -p --parser-çıktısı    parse sürecinden sonra parser'ın çıktısını göster");
+            println!("    -L --license --lisans  projenin lisansını göster ve çık");
+            println!("    --                     bundan sonra argv ekleyin");
         }
         SupportedLanguage::English => {
             println!("{} version {}, released at {}", prog_name, VERSION, RELEASE);
@@ -170,11 +171,12 @@ pub fn print_help(exit_code: i32, prog_name: String) -> ! {
             println!("    yb yürbyt  run bytecode FILE");
             println!("");
             println!("OPTIONS:");
-            println!("    -h -y --yardım        print help and exit");
-            println!("    -V -s --sürüm         print version and exit");
-            println!("    -o -ç --çıkış <file>  write bytecode at <file>");
-            println!("    -l --lexer-çıktısı    after lexing show lexed tokens");
-            println!("    -p --parser-çıktısı   after parsing show parsed tokens");
+            println!("    -h -y --yardım         print help and exit");
+            println!("    -V -s --sürüm          print version and exit");
+            println!("    -o -ç --çıkış <file>   write bytecode at <file>");
+            println!("    -l --lexer-çıktısı     after lexing show lexed tokens");
+            println!("    -p --parser-çıktısı    after parsing show parsed tokens");
+            println!("    -L --license --lisans  print license and exit");
             println!("    --                    add argv after this");
         }
     }
@@ -191,5 +193,10 @@ pub fn print_version(prog_name: String) -> ! {
             println!("{} version {}, released at {}", prog_name, VERSION, RELEASE)
         }
     }
+    exit(0);
+}
+
+pub fn print_license() -> ! {
+    println!("{}", LICENSE);
     exit(0);
 }
