@@ -6,7 +6,7 @@ pub mod globarg {
 
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 pub const LICENSE: &str = include_str!("../LICENSE");
-pub const RELEASE: &str = "29.12.2021";
+pub const RELEASE: &str = env!("RELEASE_DATE");
 
 cfg_if! {
     if #[cfg(windows)] {
