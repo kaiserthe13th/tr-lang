@@ -1,9 +1,10 @@
 {
   "name": "highlightjs-tr-lang",
   "version": "0.1.0",
-  "description": "highlight.js support for tr-lang",
+  "description": "highlight.js syntax definition for tr-lang",
   "type": "module",
   "main": "src/tr-lang.js",
+  "readme": "README.md",
   "scripts": {
     "test": "node test/test.js"
   },
@@ -13,6 +14,12 @@
     "highlight.js": "^11.3.1",
     "express.js": "^1.0.0"
   },
+  "keywords": [
+    "tr-lang",
+    "highlight.js",
+    "highlightjs",
+    "syntax"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/kaiserthe13th/tr-lang",
