@@ -1,13 +1,11 @@
 console.log("Test Script Started");
 
-console.log("Setting up highlight.js with tr-lang package");
+console.log("Setting up highlight.js with tr-lang package...");
 // highlight.js setup
 import hljs from "highlight.js/lib/core";
 import trl from "../src/languages/tr-lang.js";
 
 hljs.registerLanguage('tr-lang', trl);
-
-// Highlight
 
 const CODE = `12.321 de '\\n' de -* A Block
 Comment *-
@@ -17,6 +15,7 @@ son
 # Line Comment 1`;
 
 // server setup
+console.log("Setting up express server...");
 import express from 'express';
 
 const app = express();
@@ -80,5 +79,5 @@ app.get('/', (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Listening for requests at http://localhost:${port}`);
+  console.log(`Listening for requests at http://localhost:${port}...`);
 });

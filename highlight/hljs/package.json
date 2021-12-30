@@ -1,18 +1,15 @@
 {
   "name": "highlightjs-tr-lang",
-  "version": "0.4.0-rc1",
+  "version": "0.1.0",
   "description": "highlight.js support for tr-lang",
   "type": "module",
-  "main": "tr-lang.js",
   "scripts": {
     "test": "node test/test.js"
   },
   "author": "Kerem Göksu <superkerem13@gmail.com>",
   "license": "MIT",
-  "dependencies": {
-    "highlight.js": "^11.3.1"
-  },
   "devDependencies": {
+    "highlight.js": "^11.3.1",
     "express.js": "^1.0.0"
   },
   "repository": {
