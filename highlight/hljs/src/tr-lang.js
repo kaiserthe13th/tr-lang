@@ -5,29 +5,29 @@ Website: https://github.com/kaiserthe13th/tr-lang
 Author: Kerem Göksu <superkerem13@gmail.com>
 */
 
-export default function(hljs) {
+export default function (hljs) {
     const IDENT = {
         match: /[^\t\r \n"':?=<>!\/%\*@,\d-][^\t\r \n"':?=<>!\/%\*@,]+/i,
-        scope: 'variable'
+        scope: 'variable',
     };
 
     const RESERVED_WORDS = [
-        "at",
-        "ver",
-        "de",
-        "ise",
-        "son",
-        "iken",
-        "yoksa",
-        "kpy",
-        "tks",
-        "üst",
-        "veya",
-        "ve",
-        "dön",
-        "girdi",
-        "işlev",
-        "yükle",
+        'at',
+        'ver',
+        'de',
+        'ise',
+        'son',
+        'iken',
+        'yoksa',
+        'kpy',
+        'tks',
+        'üst',
+        'veya',
+        've',
+        'dön',
+        'girdi',
+        'işlev',
+        'yükle',
     ];
 
     const LINE_COMMENT = {
@@ -48,10 +48,7 @@ export default function(hljs) {
 
     const COMMON_OPS = {
         className: 'operator',
-        variants: [
-            MULTI_CHAR_OPS,
-            SINGLE_CHAR_OPS,
-        ],
+        variants: [MULTI_CHAR_OPS, SINGLE_CHAR_OPS],
     };
 
     const BLOCK_COMMENT = {
@@ -66,10 +63,7 @@ export default function(hljs) {
         begin: /\d+(\.\d*)?/,
     };
 
-    const LITERALS = [
-        'doğru',
-        'yanlış'
-    ]
+    const LITERALS = ['doğru', 'yanlış'];
 
     const KEYWORDS = {
         $pattern: IDENT.match,
@@ -86,27 +80,20 @@ export default function(hljs) {
     const SINGLE_QUOTE_STR = {
         begin: "'",
         end: "'",
-        contains: [
-            STR_ESC
-        ],
+        contains: [STR_ESC],
     };
 
     const DOUBLE_QUOTE_STR = {
         scope: 'string',
         begin: '"',
         end: '"',
-        contains: [
-            STR_ESC
-        ],
+        contains: [STR_ESC],
     };
 
     const STRING = {
         className: 'string',
-        contains: [ STR_ESC ],
-        variants: [
-            SINGLE_QUOTE_STR,
-            DOUBLE_QUOTE_STR,
-        ]
+        contains: [STR_ESC],
+        variants: [SINGLE_QUOTE_STR, DOUBLE_QUOTE_STR],
     };
 
     return {
@@ -114,12 +101,6 @@ export default function(hljs) {
         aliases: ['trl'],
         unicodeRegex: true,
         keywords: KEYWORDS,
-        contains: [
-            STRING,
-            COMMON_OPS,
-            NUMBER,
-            LINE_COMMENT,
-            BLOCK_COMMENT,
-        ],
+        contains: [STRING, COMMON_OPS, NUMBER, LINE_COMMENT, BLOCK_COMMENT],
     };
 }

@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "highlight.js support for tr-lang",
   "type": "module",
+  "main": "src/tr-lang.js",
   "scripts": {
     "test": "node test/test.js"
   },

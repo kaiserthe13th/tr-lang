@@ -1,9 +1,9 @@
-console.log("Test Script Started");
+console.log('Test Script Started');
 
-console.log("Setting up highlight.js with tr-lang package...");
+console.log('Setting up highlight.js with tr-lang package...');
 // highlight.js setup
-import hljs from "highlight.js/lib/core";
-import trl from "../src/languages/tr-lang.js";
+import hljs from 'highlight.js/lib/core';
+import trl from '../src/tr-lang.js';
 
 hljs.registerLanguage('tr-lang', trl);
 
@@ -15,7 +15,7 @@ son
 # Line Comment 1`;
 
 // server setup
-console.log("Setting up express server...");
+console.log('Setting up express server...');
 import express from 'express';
 
 const app = express();
@@ -68,16 +68,18 @@ const RES = `<html>
         <div class="cblock">
             Test
             <div class="hljs">
-                <pre class="hljs"><code class="hljs-code lang-tr-lang">${hljs.highlightAuto(CODE).value}</code></pre>
+                <pre class="hljs"><code class="hljs-code lang-tr-lang">${
+                    hljs.highlightAuto(CODE).value
+                }</code></pre>
             </div>
         </div>
     </body>
 </html>`;
 
 app.get('/', (req, res) => {
-  res.send(RES);
+    res.send(RES);
 });
 
 app.listen(port, () => {
-  console.log(`Listening for requests at http://localhost:${port}...`);
+    console.log(`Listening for requests at http://localhost:${port}...`);
 });
