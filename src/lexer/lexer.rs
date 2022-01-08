@@ -553,7 +553,7 @@ impl Lexer {
                     let mut buf = String::new();
 
                     while self.source.len() > self.current
-                        && !char_in_str(self.currentc(), "\t\r \n\"':?=<>!/%*@,")
+                        && !char_in_str(self.currentc(), "\t\r \n\"':?=<>!/%*@,()")
                     {
                         buf.push(self.currentc());
                         self.current += 1;
