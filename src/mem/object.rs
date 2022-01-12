@@ -1,5 +1,29 @@
 use crate::errwarn::ErrorGenerator;
 use crate::util::{get_lang, SupportedLanguage};
+use std::collections::HashMap;
+use std::fmt;
+
+#[derive(Clone)]
+pub struct List {
+    pub ls: Vec<Object>,
+}
+
+impl fmt::Debug for List {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        Ok(write!(f, "{:?}", self.ls)?)
+    }
+}
+
+#[derive(Clone)]
+pub struct Map {
+    pub map: HashMap<String, Object>,
+}
+
+impl fmt::Debug for Map {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        Ok(write!(f, "{:?}", self.map)?)
+    }
+}
 
 #[derive(Clone)]
 pub enum Object {
@@ -7,25 +31,30 @@ pub enum Object {
     Yazı(String),
     Bool(bool),
     İşlev(usize),
+    Liste(List),
+    Harita(Map),
 }
 
-impl std::fmt::Debug for Object {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Debug for Object {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Sayı(n) => {
-                if n == &((*n as i128) as f64) {
-                    write!(f, "{:.0?}", n)
+                if n.fract() == 0. {
+                    write!(f, "{:.0?}", n)?
                 } else {
-                    write!(f, "{:?}", n)
+                    write!(f, "{:?}", n)?
                 }
             }
             Self::Bool(b) => match b {
-                true => write!(f, "doğru"),
-                false => write!(f, "yanlış"),
+                true => write!(f, "doğru")?,
+                false => write!(f, "yanlış")?,
             },
-            Self::Yazı(s) => write!(f, "{}", s),
-            Self::İşlev(loc) => write!(f, "<işlev: {:?}>", loc),
+            Self::Yazı(s) => write!(f, "{}", s)?,
+            Self::İşlev(loc) => write!(f, "<işlev: {:?}>", loc)?,
+            Self::Liste(ls) => write!(f, "{:?}", ls)?,
+            Self::Harita(map) => write!(f, "{:?}", map)?,
         }
+        Ok(())
     }
 }
 
@@ -46,6 +75,36 @@ impl Object {
                 c => panic!("{:?} `=` {:?} operatörü desteklemiyor", s, c),
             },
             Self::İşlev(_) => unreachable!(),
+            Self::Liste(l) => match a {
+                Self::Liste(m) => Self::Bool(
+                    l.ls.len() == m.ls.len()
+                        && l.ls.iter().enumerate().all(|(k, v)| {
+                            match v.eşittir(m.ls.get(k).unwrap().clone()) {
+                                Self::Bool(b) => b,
+                                _ => unreachable!(),
+                            }
+                        }),
+                ),
+                c => panic!("{:?} `=` {:?} operatörü desteklemiyor", l, c),
+            },
+            Self::Harita(m) => match a {
+                Self::Harita(n) => Self::Bool(
+                    m.map.len() == n.map.len()
+                        && m.map.keys().all(|k| {
+                            n.map.contains_key(k)
+                                && match m
+                                    .map
+                                    .get(k)
+                                    .unwrap()
+                                    .eşittir(n.map.get(k).unwrap().clone())
+                                {
+                                    Self::Bool(b) => b,
+                                    _ => unreachable!(),
+                                }
+                        }),
+                ),
+                c => panic!("{:?} `=` {:?} operatörü desteklemiyor", m, c),
+            },
         }
     }
     pub fn eşit_değildir(&self, a: Self) -> Self {
@@ -63,6 +122,36 @@ impl Object {
                 c => panic!("{:?} `!=` {:?} operatörü desteklemiyor", s, c),
             },
             Self::İşlev(_) => unreachable!(),
+            Self::Liste(l) => match a {
+                Self::Liste(m) => Self::Bool(
+                    l.ls.len() != m.ls.len()
+                        || l.ls.iter().enumerate().any(|(k, v)| {
+                            match v.eşit_değildir(m.ls.get(k).unwrap().clone()) {
+                                Self::Bool(b) => b,
+                                _ => unreachable!(),
+                            }
+                        }),
+                ),
+                c => panic!("{:?} `!=` {:?} operatörü desteklemiyor", l, c),
+            },
+            Self::Harita(m) => match a {
+                Self::Harita(n) => Self::Bool(
+                    m.map.len() != n.map.len()
+                        || m.map.keys().any(|k| {
+                            !n.map.contains_key(k)
+                                || match m
+                                    .map
+                                    .get(k)
+                                    .unwrap()
+                                    .eşit_değildir(n.map.get(k).unwrap().clone())
+                                {
+                                    Self::Bool(b) => b,
+                                    _ => unreachable!(),
+                                }
+                        }),
+                ),
+                c => panic!("{:?} `!=` {:?} operatörü desteklemiyor", m, c),
+            },
         }
     }
     pub fn büyüktür(&self, a: Self) -> Self {
@@ -123,7 +212,16 @@ impl Object {
                 }
                 f => panic!("{:?} `+` {:?} desteklenmiyor", s, f),
             },
+            Self::Liste(l) => match a {
+                Self::Liste(mut m) => {
+                    let mut l = l.clone();
+                    l.ls.append(&mut m.ls);
+                    Self::Liste(l)
+                }
+                f => panic!("{:?} `+` {:?} desteklenmiyor", l, f),
+            },
             Self::Bool(b) => panic!("{:?} `+` operatörünü desteklemiyor", b),
+            Self::Harita(m) => panic!("{:?} `+` operatörünü desteklemiyor", m),
             Self::İşlev(_) => unreachable!(),
         }
     }
@@ -306,6 +404,8 @@ impl Object {
                 Self::Sayı(n) => Self::Yazı(format!("{:?}", n)),
                 Self::Yazı(_) => self.clone(),
                 Self::İşlev(_) => unreachable!(),
+                Self::Liste(l) => Self::Yazı(format!("{:?}", l)),
+                Self::Harita(m) => Self::Yazı(format!("{:?}", m)),
             },
             "bool" | "boolean" => match self {
                 Self::Bool(_) => self.clone(),
@@ -343,6 +443,7 @@ impl Object {
                     },
                 },
                 Self::İşlev(_) => unreachable!(),
+                Self::Liste(_) | Self::Harita(_) => panic!("unsupported conversion"),
             },
             "sayı" => match self {
                 Self::Bool(b) => match b {
@@ -376,6 +477,7 @@ impl Object {
                     },
                 },
                 Self::İşlev(_) => unreachable!(),
+                Self::Liste(_) | Self::Harita(_) => panic!("unsupported conversion"),
             },
             a => match get_lang() {
                 SupportedLanguage::Turkish => {
