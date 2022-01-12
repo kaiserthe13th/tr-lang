@@ -1193,7 +1193,7 @@ impl Run {
                 TokenType::İkiNoktaNokta | TokenType::EOF => self.current += 1,
                 TokenType::Identifier { id } => match hashs.clone().get_mut(&id) {
                     Some(val) => match val {
-                        Object::Bool(_) | Object::Sayı(_) | Object::Yazı(_) => {
+                        Object::Bool(_) | Object::Sayı(_) | Object::Yazı(_) | Object::Liste(_) | Object::Harita(_) => {
                             stack.push(val.clone());
                             self.current += 1;
                         }
@@ -1513,7 +1513,7 @@ impl Run {
                     for (i, o) in stack.iter_vec().iter().rev().take(3).rev().enumerate() {
                         let o = match o {
                             Object::Yazı(s) => format!("{:?}", s),
-                            Object::Bool(_) | Object::Sayı(_) => format!("{:?}", o),
+                            Object::Bool(_) | Object::Sayı(_) | Object::Liste(_) | Object::Harita(_) => format!("{:?}", o),
                             Object::İşlev(_) => unreachable!(),
                         };
                         if i > 0 {
@@ -1540,7 +1540,7 @@ impl Run {
                     for (i, o) in stack.iter_vec().iter().rev().take(3).rev().enumerate() {
                         let o = match o {
                             Object::Yazı(s) => format!("{:?}", s),
-                            Object::Bool(_) | Object::Sayı(_) => format!("{:?}", o),
+                            Object::Bool(_) | Object::Sayı(_) | Object::Liste(_) | Object::Harita(_) => format!("{:?}", o),
                             Object::İşlev(_) => unreachable!(),
                         };
                         if i > 0 {
