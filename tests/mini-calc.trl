@@ -1,0 +1,28 @@
+#!/usr/bin/env tr-lang y
+-* Minimal Interactive Calculator *
+ * by Kerem Göksu                 *-
+
+işlev sty -> a
+    a de '\n' de
+son
+
+"Enter first number: " de
+girdi@sayı -> a
+"Enter operation(+-*/): " de
+girdi -> işlem
+"Enter second number: " de
+girdi@sayı -> b
+
+işlem = "+" ise
+    (a + b)sty
+yoksa
+    işlem = "-" ise
+        (a - b)sty
+    yoksa
+        işlem = "*" ise
+            (a * b)sty
+        yoksa
+            (a / b)sty
+        son
+    son
+son
