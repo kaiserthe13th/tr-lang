@@ -45,6 +45,9 @@ fn main() {
                     path.push("main.trl");
                     util::read_file(&path).unwrap()
                 }
+                Err(util::FSErr::NotSupported) => {
+                    exit(1);
+                }
             });
             if args.lex_out {
                 let canon_path = match canonicalize(args.file.clone()) {
@@ -82,6 +85,9 @@ fn main() {
                 Err(util::FSErr::IsADir) => {
                     path.push("main.trl");
                     util::read_file(&path).unwrap()
+                }
+                Err(util::FSErr::NotSupported) => {
+                    exit(1);
                 }
             });
             if args.lex_out {
