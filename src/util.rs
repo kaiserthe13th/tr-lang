@@ -1,5 +1,5 @@
 use crate::exit;
-use crate::store::{RELEASE, VERSION, LICENSE};
+use crate::store::{LICENSE, RELEASE, VERSION};
 
 use std::fs::File;
 use std::io::ErrorKind::IsADirectory;
@@ -25,6 +25,7 @@ macro_rules! hashmap {
 #[derive(Debug)]
 pub enum FSErr {
     IsADir,
+    NotSupported,
 }
 
 pub enum SupportedLanguage {
@@ -155,7 +156,9 @@ pub fn print_help(exit_code: i32, prog_name: String) -> ! {
             println!("    -V -s --sürüm          sürümü göster ve çık");
             println!("    -o -ç --çıkış <DOSYA>  çıkışta buraya bytecode yaz");
             println!("    -l --lexer-çıktısı     lex sürecinden sonra lexer'ın çıktısını göster");
-            println!("    -p --parser-çıktısı    parse sürecinden sonra parser'ın çıktısını göster");
+            println!(
+                "    -p --parser-çıktısı    parse sürecinden sonra parser'ın çıktısını göster"
+            );
             println!("    -L --license --lisans  projenin lisansını göster ve çık");
             println!("    --                     bundan sonra argv ekleyin");
         }
@@ -177,7 +180,7 @@ pub fn print_help(exit_code: i32, prog_name: String) -> ! {
             println!("    -l --lexer-çıktısı     after lexing show lexed tokens");
             println!("    -p --parser-çıktısı    after parsing show parsed tokens");
             println!("    -L --license --lisans  print license and exit");
-            println!("    --                    add argv after this");
+            println!("    --                     add argv after this");
         }
     }
     exit(exit_code);
