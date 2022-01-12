@@ -1,4 +1,5 @@
 use crate::store::PATH_SEP;
+use crate::exit;
 use crate::token::tokentypes::LexerTokenType as TokenType;
 use crate::token::LexerToken as Token;
 use crate::token::Precedence;
@@ -67,6 +68,9 @@ impl Lexer {
                                         path.push("main.trl");
                                         read_file(&path).unwrap()
                                     },
+                                    Err(FSErr::NotSupported) => {
+                                        exit(1);
+                                    }
                                 });
                                 tokens.append(&mut nl.tokenize(visited, canon_path));
                             }
