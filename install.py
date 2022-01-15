@@ -21,8 +21,12 @@ def is_root() -> bool:
 def ex_input(prompt: str = "") -> str:
     try:
         g = input(str(prompt)+f"{Fore.GREEN}: ") if prompt else input(f"{Fore.GREEN}> ")
-    except EOFError: exit()
-    except KeyboardInterrupt: exit()
+    except EOFError:
+        print()
+        exit()
+    except KeyboardInterrupt:
+        print()
+        exit()
     print(end="")
     return g
 
@@ -53,7 +57,9 @@ def does_prog_exist(prog):
     return which(prog) is not None
 
 if not is_root():
-    print(f"{Fore.RED}Script requires you to be root. Please rerun with sudo ./install.py{Style.RESET_ALL}")
+    print(f"""{Fore.RED}Script requires you to be root. Please rerun as root:{Style.BRIGHT+Fore.GREEN}
+    ${Fore.BLUE} sudo su{Fore.MAGENTA} -m {Fore.RESET+Style.DIM}# -m preserves environment{Style.RESET_ALL+Style.BRIGHT+Fore.YELLOW}
+    #{Fore.BLUE} ./install.py{Style.RESET_ALL}""", file=stderr)
     exit(1)
 
 install_options = []
