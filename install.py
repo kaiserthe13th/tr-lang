@@ -31,7 +31,7 @@ def ex_input(prompt: str = "") -> str:
     return g
 
 def run(code: str) -> int:
-    print(f"running {code}")
+    print(f"{Fore.BLUE+Style.BRIGHT}=>{Style.RESET_ALL} {code}")
     return os_system(code)
 
 def choice_prompt_numbered(choices: list, prompt: str = "") -> str:
@@ -58,7 +58,8 @@ def does_prog_exist(prog):
 
 if not is_root():
     print(f"""{Fore.RED}Script requires you to be root. Please rerun as root:{Style.BRIGHT+Fore.GREEN}
-    ${Fore.BLUE} sudo su{Fore.MAGENTA} -m {Fore.RESET+Style.DIM}# -m preserves environment{Style.RESET_ALL+Style.BRIGHT+Fore.YELLOW}
+    ${Fore.BLUE} sudo su{Fore.YELLOW} -m   \
+{Fore.RESET+Style.DIM}# -m preserves environment{Style.RESET_ALL+Style.BRIGHT+Fore.GREEN}
     #{Fore.BLUE} ./install.py{Style.RESET_ALL}""", file=stderr)
     exit(1)
 
@@ -70,12 +71,12 @@ if does_prog_exist("wget"):
 if does_prog_exist("cargo"):
     install_options.append("cargo(install)")
     if path.exists("Cargo.toml") and path.isdir("src"):
-        install_options.append("cargo(install from local)")
-    install_options.append("cargo(install from git[may be unstable])")
+        install_options.append("cargo(local)")
+    install_options.append("cargo(git[may be unstable|broken])")
 if does_prog_exist("curl") and not does_prog_exist("cargo"):
-    install_options.append("install rust using curl & cargo(install)")
+    install_options.append("install rust with curl then cargo(install)")
 
-if len(install_options) > 1:
+if install_options:
     print(f"""{Fore.YELLOW+Style.BRIGHT}<!>{Style.RESET_ALL+Fore.GREEN} \
 You can exit using {Style.RESET_ALL}\
 {Style.BRIGHT}Ctrl+D{Style.RESET_ALL+Fore.GREEN} or {Fore.RESET+Style.BRIGHT}Ctrl+C""")
@@ -127,7 +128,14 @@ You can exit using {Style.RESET_ALL}\
                 run(f"rpm -U {TRL_GH_RELEASES_LATEST_PRE_RPM}")
             else:
                 run(f"rpm -i {TRL_GH_RELEASES_LATEST_PRE_RPM}")
-
-elif install_options:
-    print(f"The only install method found is {install_options[0]}")
-
+    elif method == "cargo(install)":
+        run("cargo install tr-lang")
+    elif method == "cargo(local)":
+        run("cargo install tr-lang --path .")
+    elif method == "cargo(git[may be unstable|broken])":
+        run("cargo install tr-lang --git https://github.com/kaiserthe13th/tr-lang.git")
+    elif method == "install rust with curl then cargo(install)":
+        run("curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh")
+else:
+    print(f"{Fore.RED}No installation method found.{Style.RESET_ALL}", file=stderr)
+    exit(1)
