@@ -3,6 +3,7 @@ from shutil import which
 from os import system as os_system, path, geteuid
 from sys import stderr
 from colorama import init as colorama_init, Fore, Style
+import re
 
 # Use default format method to format it
 TRL_GH_RELEASES_B_STR = "https://github.com/kaiserthe13th/tr-lang/releases/download/tr-lang-{version}/{file}"
@@ -30,9 +31,24 @@ def ex_input(prompt: str = "") -> str:
     print(end="")
     return g
 
-def run(code: str) -> int:
-    print(f"{Fore.BLUE+Style.BRIGHT}=>{Style.RESET_ALL} {code}")
-    return os_system(code)
+LINK_REGEX = r"\b((?:https?://)?(?:(?:www\.)?(?:[\da-z\.-]+)\.(?:[a-z]{2,6})|(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)|(?:(?:[0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:){1,7}:|(?:[0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:){1,5}(?::[0-9a-fA-F]{1,4}){1,2}|(?:[0-9a-fA-F]{1,4}:){1,4}(?::[0-9a-fA-F]{1,4}){1,3}|(?:[0-9a-fA-F]{1,4}:){1,3}(?::[0-9a-fA-F]{1,4}){1,4}|(?:[0-9a-fA-F]{1,4}:){1,2}(?::[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:(?:(?::[0-9a-fA-F]{1,4}){1,6})|:(?:(?::[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(?::[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(?:ffff(?::0{1,4}){0,1}:){0,1}(?:(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])|(?:[0-9a-fA-F]{1,4}:){1,4}:(?:(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])))(?::[0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])?(?:/[\w\.-]*)*/?)\b"
+def highlight_links(s: str) -> str:
+    r = ""
+    lidx = 0
+    matches = re.finditer(LINK_REGEX, s, re.MULTILINE)
+    for m in matches:
+        r += s[lidx:m.start()]
+        r += f'{Fore.YELLOW}{s[m.start():m.end()]}{Fore.RESET}'
+        lidx = m.end()
+    r += s[lidx:]
+    return r
+
+def run(code: str) -> bool:
+    styled_code = highlight_links(code)
+    print(f"{Fore.BLUE+Style.BRIGHT}.---{'-'*len(code)}-.")
+    print(f"{Fore.BLUE+Style.BRIGHT}|=>{Style.RESET_ALL} {styled_code} {Fore.BLUE+Style.BRIGHT}|")
+    print(f"{Fore.BLUE+Style.BRIGHT}'---{'-'*len(code)}-'")
+    return not os_system(code)
 
 def choice_prompt_numbered(choices: list, prompt: str = "") -> str:
     for i, choice in enumerate(choices):
@@ -98,8 +114,11 @@ You can exit using {Style.RESET_ALL}\
             exit(1)
 
         if installer == "dpkg":
-            run(f"wget {TRL_GH_RELEASES_B_STR.format(version=TRL_GH_RELEASES_LATEST_V, file=TRL_GH_RELEASES_LATEST_DEB)}")
-            run(f"dpkg -i {TRL_GH_RELEASES_LATEST_DEB}")
+            run(
+                f"wget {TRL_GH_RELEASES_B_STR.format(version=TRL_GH_RELEASES_LATEST_V, file=TRL_GH_RELEASES_LATEST_DEB)}"
+            ) and run(
+                f"dpkg -i {TRL_GH_RELEASES_LATEST_DEB}"
+            )
         ### disabled because no rpm method for 0.3.1 ###
         # elif installer == "rpm":
         #     run(f"wget {TRL_GH_RELEASES_B_STR.format(version=TRL_GH_RELEASES_LATEST_V, file=TRL_GH_RELEASES_LATEST_RPM)}")
