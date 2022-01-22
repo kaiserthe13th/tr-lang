@@ -1,2 +1,2 @@
-#!/usr/bin/env tr-lang y
+#!/usr/bin/env -S tr-lang y
 3 + 4 * 2 de

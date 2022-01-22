@@ -1,7 +1,7 @@
-#!/usr/bin/env tr-lang y
+#!/usr/bin/env -S tr-lang y
 -* Tekrarlama için basit bir test *-
 
 10
 :. kpy > 0 iken
     kpy de "\n" de --
-son
+son at

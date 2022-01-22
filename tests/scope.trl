@@ -1,6 +1,7 @@
-#!/usr/bin/env tr-lang y
+#!/usr/bin/env -S tr-lang y
 işlev lol
     3 -> x
+    x de
 son
 1 -> x
 lol

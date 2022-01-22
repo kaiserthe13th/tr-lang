@@ -1,4 +1,4 @@
-#!/usr/bin/env tr-lang y
+#!/usr/bin/env -S tr-lang y
 -* unsanitized factorial implementation in tr-lang *-
 
 yükle "math.trl"

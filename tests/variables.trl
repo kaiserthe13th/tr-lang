@@ -1,4 +1,4 @@
-#!/usr/bin/env tr-lang y
+#!/usr/bin/env -S tr-lang y
 -* In this file we show variable types and definition *-
 
 "Hello, World!\n"

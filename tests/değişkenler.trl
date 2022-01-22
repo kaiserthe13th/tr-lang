@@ -1,4 +1,4 @@
-#!/usr/bin/env tr-lang y
+#!/usr/bin/env -S tr-lang y
 -* Bu dosyada değişken tipleri gösteriliyor *-
 
 "Merhaba, Dünya!\n"

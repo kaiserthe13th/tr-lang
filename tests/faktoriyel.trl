@@ -1,4 +1,4 @@
-#!/usr/bin/env tr-lang y
+#!/usr/bin/env -S tr-lang y
 -* tr-lang'da sterilize edilmemiş faktoriyel implementasyonu *-
 
 yükle "mat.trl"

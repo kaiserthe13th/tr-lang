@@ -1,0 +1,10 @@
+işlev fonksiyon -> parametre            # Bir işlev(def) bloğunun başı
+    parametre = 0 ise                   # Bir ise(if) bloğunun başı
+        0 ver
+    yoksa                               # Bir yoksa(else) bloğunun başı
+        :. parametre > 0 iken           # Bir iken(while) bloğunun başı
+            parametre de
+            parametre - 1 -> parametre
+        son                             # iken(while) bloğunun sonu
+    son                                 # ise-yoksa(if-else) bloğunun sonu
+son                                     # işlev(def) bloğunun sonu

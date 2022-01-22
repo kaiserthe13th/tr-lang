@@ -1,2 +1,2 @@
-#!/usr/bin/env tr-lang y
+#!/usr/bin/env -S tr-lang y
 'Merhaba, Dünya!\n' de

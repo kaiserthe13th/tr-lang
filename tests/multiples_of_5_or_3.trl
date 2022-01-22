@@ -1,4 +1,4 @@
-#!/usr/bin/env tr-lang y
+#!/usr/bin/env -S tr-lang y
 işlev sum-multiples-of-5-or-3 -> x
     0 -> r
     :. x > 0 iken
