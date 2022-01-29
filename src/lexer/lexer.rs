@@ -1,5 +1,5 @@
-use crate::store::PATH_SEP;
 use crate::exit;
+use crate::store::PATH_SEP;
 use crate::token::tokentypes::LexerTokenType as TokenType;
 use crate::token::LexerToken as Token;
 use crate::token::Precedence;

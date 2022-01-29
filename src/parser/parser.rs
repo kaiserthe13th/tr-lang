@@ -79,8 +79,9 @@ impl Parser {
                     {
                         tokens.push(stack.pop().unwrap());
                     }
-                    if !stack.is_empty() &&
-                        matches!(stack.last().unwrap().precedence, Precedence::ParenL) {
+                    if !stack.is_empty()
+                        && matches!(stack.last().unwrap().precedence, Precedence::ParenL)
+                    {
                         stack.pop().unwrap();
                     }
                     current += 1;
@@ -123,7 +124,9 @@ impl Parser {
                     } // error
                 }
                 LexTokenType::Yükle | LexTokenType::Comma => unreachable!(),
-                LexTokenType::ParenR | LexTokenType::ParenL => unimplemented!("error: unclosed parenthesis"),
+                LexTokenType::ParenR | LexTokenType::ParenL => {
+                    unimplemented!("error: unclosed parenthesis")
+                }
                 LexTokenType::İşlev => {
                     blocktokens.push(BlockToken::İşlev(ip));
                     parsed.push(Token::new(
