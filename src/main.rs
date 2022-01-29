@@ -118,5 +118,13 @@ fn main() {
             let mut run = runtime::Run::new(parsed);
             run.run(args.file);
         }
+        argsparser::Subcommands::Command => {
+            runtime::Run::new(
+                Parser::from_lexer(
+                    &mut Lexer::new(args.file),
+                    "<args>".to_string()
+                ).parse()
+            ).run("<args>".to_string())
+        }
     }
 }

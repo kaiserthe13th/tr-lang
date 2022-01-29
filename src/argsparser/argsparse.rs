@@ -7,6 +7,7 @@ pub enum Subcommands {
     Run,
     Byt,
     RunBytes,
+    Command,
 }
 
 #[derive(Debug)]
@@ -59,6 +60,7 @@ pub fn parse_args() -> Options {
         "y" | "yürüt" => Subcommands::Run,
         "b" | "byt" => Subcommands::Byt,
         "yb" | "yürbyt" => Subcommands::RunBytes,
+        "k" | "komut" => Subcommands::Command,
         "-h" | "-y" | "--yardım" => {
             util::print_help(0, name);
         }
@@ -75,7 +77,9 @@ pub fn parse_args() -> Options {
     let mut outs = false;
     let mut license = false;
 
-    let file = args.get(0).unwrap().to_string();
+    let file = args.get(0)
+        .expect("couldn't get <FILE>")
+        .to_string();
     args = args[1..].to_vec();
 
     for arg in args {
