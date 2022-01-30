@@ -9,11 +9,11 @@ pub use parser::Parser;
 pub mod bytecode;
 pub mod errwarn;
 pub mod mem;
-pub mod store;
+pub(crate) mod store;
 pub mod token;
-pub mod util;
+pub(crate) mod util;
 
 pub mod runtime;
 pub use runtime::Run;
 
-pub use std::process::exit;
+pub(crate) use std::process::exit;

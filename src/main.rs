@@ -17,7 +17,8 @@ pub mod bytecode;
 pub mod mem;
 pub mod store;
 pub mod token;
-pub mod util;
+mod util;
+mod utilbin;
 
 pub mod errwarn;
 pub mod runtime;
@@ -27,13 +28,13 @@ mod argsparser;
 fn main() {
     let args = argsparser::parse_args();
     if args.help == true {
-        util::print_help(args.help_exitc, args.name);
+        utilbin::print_help(args.help_exitc, args.name);
     }
     if args.version {
-        util::print_version(args.name);
+        utilbin::print_version(args.name);
     }
     if args.license {
-        util::print_license();
+        utilbin::print_license();
     }
 
     match args.sub_cmd {
@@ -44,9 +45,6 @@ fn main() {
                 Err(util::FSErr::IsADir) => {
                     path.push("main.trl");
                     util::read_file(&path).unwrap()
-                }
-                Err(util::FSErr::NotSupported) => {
-                    exit(1);
                 }
             });
             if args.lex_out {
@@ -86,9 +84,6 @@ fn main() {
                     path.push("main.trl");
                     util::read_file(&path).unwrap()
                 }
-                Err(util::FSErr::NotSupported) => {
-                    exit(1);
-                }
             });
             if args.lex_out {
                 let canon_path = match canonicalize(args.file.clone()) {
@@ -112,7 +107,7 @@ fn main() {
         }
         argsparser::Subcommands::RunBytes => {
             let path = PathBuf::from(args.file.clone());
-            let con = util::read_file_to_vec_u8(&path);
+            let con = utilbin::read_file_to_vec_u8(&path);
             let parsed = bytecode::from_bytecode(&con[..]);
 
             let mut run = runtime::Run::new(parsed);

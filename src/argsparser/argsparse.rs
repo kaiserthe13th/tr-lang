@@ -1,5 +1,6 @@
 use crate::store::globarg::*;
 use crate::util;
+use crate::utilbin;
 use std::env;
 
 #[derive(Debug)]
@@ -45,15 +46,15 @@ pub fn parse_args() -> Options {
             for arg in &args {
                 match arg.as_str() {
                     "-V" | "-s" | "--sürüm" => {
-                        util::print_version(name);
+                        utilbin::print_version(name);
                     }
-                    "-h" | "-y" | "--yardım" => util::print_help(0, name),
-                    "-L" | "--license" | "--lisans" => util::print_license(),
+                    "-h" | "-y" | "--yardım" => utilbin::print_help(0, name),
+                    "-L" | "--license" | "--lisans" => utilbin::print_license(),
                     _ => (),
                 }
             }
         }
-        util::print_help(1, name)
+        utilbin::print_help(1, name)
     }
 
     let sub_cmd = match args.get(0).unwrap().as_str() {
@@ -62,13 +63,13 @@ pub fn parse_args() -> Options {
         "yb" | "yürbyt" => Subcommands::RunBytes,
         "k" | "komut" => Subcommands::Command,
         "-h" | "-y" | "--yardım" => {
-            util::print_help(0, name);
+            utilbin::print_help(0, name);
         }
         "-V" | "-s" | "--sürüm" => {
-            util::print_version(name);
+            utilbin::print_version(name);
         }
         "-L" | "--license" | "--lisans" => {
-            util::print_license();
+            utilbin::print_license();
         }
         a => util::error_print("unknown subcommand", format!("{}", a)),
     };
