@@ -1245,7 +1245,7 @@ impl Run {
                                         if hashk.is_empty() {
                                             None
                                         } else {
-                                            Some(format!("{}", hashk[n]))
+                                            Some(format!("`{}` demek mi istediniz?", hashk[n]))
                                         }
                                     }
                                 )
@@ -1264,7 +1264,7 @@ impl Run {
                                             if hashk.is_empty() {
                                                 None
                                             } else {
-                                                Some(format!("{}", hashk[n]))
+                                                Some(format!("maybe you meant {}?", hashk[n]))
                                             }
                                         },
                                     )
