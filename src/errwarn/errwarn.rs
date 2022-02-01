@@ -1,6 +1,51 @@
+use crate::util::{get_lang, SupportedLanguage};
+use std::process::exit;
+
+trait Callable {
+    fn call_once_safe(&mut self);
+}
+
+impl<F: FnOnce()> Callable for Option<F> {
+    fn call_once_safe(&mut self) {
+        if let Some(func) = self.take() {
+            func()
+        }
+    }
+}
+
+pub struct Error {
+    name: String,
+    explanation: String,
+    position: (usize, usize, String),
+    after_note: Option<String>,
+}
+impl Error {
+    pub fn error(&self) -> ! {
+        self.eprint();
+        if let Some(note) = self.after_note.clone() {
+            for line in note.lines() {
+                println!("{line}");
+            }
+        }
+        exit(1);
+    }
+    pub fn eprint(&self) {
+        match get_lang() {
+            SupportedLanguage::English => {
+                eprintln!("\n[ERROR] {}, Line {:?}, Column {:?}", self.position.0, self.position.1, self.position.2);
+                eprintln!("    {}: {}", self.name, self.explanation);
+            }
+            SupportedLanguage::Turkish => {
+                eprintln!("\n[HATA] {}, Satır {:?}, Sütun {:?}", self.position.0, self.position.1, self.position.2);
+                eprintln!("    {}: {}", self.name, self.explanation);
+            }
+        }
+    }
+}
+
 #[allow(non_snake_case)]
 pub mod ErrorGenerator {
-    use crate::exit;
+    use super::Error;
     use crate::store::globarg::SUPRESS_WARN;
     use crate::util::{get_lang, SupportedLanguage};
 
@@ -10,20 +55,14 @@ pub mod ErrorGenerator {
         line: usize,
         col: usize,
         file: String,
-        after_f: Box<dyn FnOnce()>,
-    ) -> ! {
-        match get_lang() {
-            SupportedLanguage::English => {
-                eprintln!("\n[ERROR] {}, Line {:?}, Column {:?}", file, line, col);
-                eprintln!("    {}: {}", name, explanation);
-            }
-            SupportedLanguage::Turkish => {
-                eprintln!("\n[HATA] {}, Satır {:?}, Sütun {:?}", file, line, col);
-                eprintln!("    {}: {}", name, explanation);
-            }
+        after_note: Option<String>,
+    ) -> Error {
+        Error {
+            name: name.to_string(),
+            explanation: explanation.to_string(),
+            position: (line, col, file),
+            after_note,
         }
-        after_f();
-        exit(1);
     }
     pub fn warning(
         name: &'static str,

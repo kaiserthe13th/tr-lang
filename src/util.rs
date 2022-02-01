@@ -1,4 +1,4 @@
-use crate::exit;
+use std::process::exit;
 use std::fs::File;
 use std::io::ErrorKind::IsADirectory;
 use std::io::Read;

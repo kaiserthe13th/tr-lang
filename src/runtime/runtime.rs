@@ -4,6 +4,7 @@ use crate::store::globarg::SUPRESS_WARN;
 use crate::token::{tokentypes::ParserTokenType as TokenType, ParserToken as Token};
 use crate::util::{get_lang, SupportedLanguage};
 use std::io::{self, prelude::*};
+use crate::errwarn::Error;
 
 pub struct Run {
     program: Vec<Token>,
@@ -18,7 +19,7 @@ impl Run {
         }
     }
 
-    pub fn run(&mut self, file: String) {
+    pub fn run(&mut self, file: String) -> Result<(), Error> {
         let mut stack = StackMemory::new();
         let mut hashs = HashMemory::new();
         // let mut warnings: Vec<Box<dyn FnOnce()>> = vec![]; // for later use
@@ -32,7 +33,7 @@ impl Run {
                 TokenType::Ver { tp } => {
                     let a = match stack.pop() {
                         Some(a) => a,
-                        None => match get_lang() {
+                        None => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                             "KümedeYeterliDeğişkenYok",
@@ -40,8 +41,8 @@ impl Run {
                             tokenc.line,
                             tokenc.col,
                             tokenc.file,
-                            Box::new(||{}),
-                        );
+                            None,
+                        )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -50,10 +51,10 @@ impl Run {
                             tokenc.line,
                             tokenc.col,
                             tokenc.file,
-                            Box::new(||{}),
-                        );
+                            None,
+                        )
                             }
-                        },
+                        }),
                     };
                     stack.push_ret(a);
                     if let Some(i) = tp {
@@ -76,7 +77,7 @@ impl Run {
                         TokenType::Identifier { id: ident } => {
                             hashs.insert(ident, Object::İşlev(self.current));
                         }
-                        _ => match get_lang() {
+                        _ => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "BeklenmedikSimge",
@@ -87,8 +88,8 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(|| {}),
-                                );
+                                    None,
+                                )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -97,10 +98,10 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(|| {}),
-                                );
+                                    None,
+                                )
                             }
-                        },
+                        }),
                     }
                     let loc = match sonloc {
                         Some(a) => a,
@@ -129,7 +130,7 @@ impl Run {
                         "{:?}",
                         match stack.pop() {
                             Some(a) => a,
-                            None => match get_lang() {
+                            None => return Err(match get_lang() {
                                 SupportedLanguage::Turkish => {
                                     ErrorGenerator::error(
                                 "KümedeYeterliDeğişkenYok",
@@ -137,8 +138,8 @@ impl Run {
                                 tokenc.line,
                                 tokenc.col,
                                 tokenc.file,
-                                Box::new(||{}),
-                            );
+                                None,
+                            )
                                 }
                                 SupportedLanguage::English => {
                                     ErrorGenerator::error(
@@ -147,10 +148,10 @@ impl Run {
                                 tokenc.line,
                                 tokenc.col,
                                 tokenc.file,
-                                Box::new(||{}),
-                            );
+                                None,
+                            )
                                 }
-                            },
+                            }),
                         }
                     );
                     io::stdout().flush().unwrap();
@@ -159,7 +160,7 @@ impl Run {
                 TokenType::Artı => {
                     let b = match stack.pop() {
                         Some(a) => a,
-                        None => match get_lang() {
+                        None => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                 "KümedeYeterliDeğişkenYok",
@@ -167,8 +168,8 @@ impl Run {
                                 tokenc.line,
                                 tokenc.col,
                                 tokenc.file,
-                                Box::new(||{}),
-                            );
+                                None,
+                            )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -177,14 +178,14 @@ impl Run {
                                 tokenc.line,
                                 tokenc.col,
                                 tokenc.file,
-                                Box::new(||{}),
-                            );
+                                None,
+                            )
                             }
-                        },
+                        }),
                     };
                     let a = match stack.pop() {
                         Some(a) => a,
-                        None => match get_lang() {
+                        None => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                 "KümedeYeterliDeğişkenYok",
@@ -192,8 +193,8 @@ impl Run {
                                 tokenc.line,
                                 tokenc.col,
                                 tokenc.file,
-                                Box::new(||{}),
-                            );
+                                None,
+                            )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -202,18 +203,18 @@ impl Run {
                                 tokenc.line,
                                 tokenc.col,
                                 tokenc.file,
-                                Box::new(||{}),
-                            );
+                                None,
+                            )
                             }
-                        },
+                        }),
                     };
-                    stack.push(a.ekle(b));
+                    stack.push(match a.ekle(b) { Ok(a) => a, Err(e) => return Err(e) });
                     self.current += 1;
                 }
                 TokenType::ArtıArtı => {
                     let a = match stack.pop() {
                         Some(a) => a,
-                        None => match get_lang() {
+                        None => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
@@ -221,8 +222,8 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -231,18 +232,18 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
-                        },
+                        }),
                     };
-                    stack.push(a.ekle(Object::Sayı(1.0)));
+                    stack.push(match a.ekle(Object::Sayı(1.0)) { Ok(a) => a, Err(e) => return Err(e) });
                     self.current += 1;
                 }
                 TokenType::Eksi => {
                     let a = match stack.pop() {
                         Some(a) => a,
-                        None => match get_lang() {
+                        None => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
@@ -250,8 +251,8 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -260,14 +261,14 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
-                        },
+                        }),
                     };
                     let b = match stack.pop() {
                         Some(a) => a,
-                        None => match get_lang() {
+                        None => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
@@ -275,8 +276,8 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -285,18 +286,18 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
-                        },
+                        }),
                     };
-                    stack.push(b.çıkar(a));
+                    stack.push(match b.çıkar(a) { Ok(a) => a, Err(e) => return Err(e) });
                     self.current += 1;
                 }
                 TokenType::EksiEksi => {
                     let a = match stack.pop() {
                         Some(a) => a,
-                        None => match get_lang() {
+                        None => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
@@ -304,8 +305,8 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -314,18 +315,18 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
-                        },
+                        }),
                     };
-                    stack.push(a.çıkar(Object::Sayı(1.0)));
+                    stack.push(match a.çıkar(Object::Sayı(1.0)) { Ok(a) => a, Err(e) => return Err(e) });
                     self.current += 1;
                 }
                 TokenType::Çarpı => {
                     let b = match stack.pop() {
                         Some(a) => a,
-                        None => match get_lang() {
+                        None => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
@@ -333,8 +334,8 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -343,14 +344,14 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
-                        },
+                        }),
                     };
                     let a = match stack.pop() {
                         Some(a) => a,
-                        None => match get_lang() {
+                        None => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
@@ -358,8 +359,8 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -368,18 +369,18 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
-                        },
+                        }),
                     };
-                    stack.push(a.çarp(b));
+                    stack.push(match a.çarp(b) { Ok(a) => a, Err(e) => return Err(e) });
                     self.current += 1;
                 }
                 TokenType::Bölü => {
                     let a = match stack.pop() {
                         Some(a) => a,
-                        None => match get_lang() {
+                        None => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
@@ -387,8 +388,8 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -397,14 +398,14 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
-                        },
+                        }),
                     };
                     let b = match stack.pop() {
                         Some(a) => a,
-                        None => match get_lang() {
+                        None => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
@@ -412,8 +413,8 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -422,12 +423,12 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
-                        },
+                        }),
                     };
-                    stack.push(b.böl(a));
+                    stack.push(match b.böl(a) { Ok(a) => a, Err(e) => return Err(e) });
                     self.current += 1;
                 }
                 TokenType::Sayı { val } => {
@@ -449,7 +450,7 @@ impl Run {
                     if let Some(tp) = yoksa {
                         let a = match stack.pop() {
                             Some(a) => a,
-                            None => match get_lang() {
+                            None => return Err(match get_lang() {
                                 SupportedLanguage::Turkish => {
                                     ErrorGenerator::error(
                                             "KümedeYeterliDeğişkenYok",
@@ -457,8 +458,8 @@ impl Run {
                                             tokenc.line,
                                             tokenc.col,
                                             tokenc.file,
-                                            Box::new(||{}),
-                                        );
+                                            None,
+                                        )
                                 }
                                 SupportedLanguage::English => {
                                     ErrorGenerator::error(
@@ -467,10 +468,10 @@ impl Run {
                                             tokenc.line,
                                             tokenc.col,
                                             tokenc.file,
-                                            Box::new(||{}),
-                                        );
+                                            None,
+                                        )
                                 }
-                            },
+                            }),
                         };
                         match a {
                             Object::Bool(b) => {
@@ -483,7 +484,7 @@ impl Run {
                             _ => {
                                 let b = match stack.pop() {
                                     Some(a) => a,
-                                    None => match get_lang() {
+                                    None => return Err(match get_lang() {
                                         SupportedLanguage::Turkish => {
                                             ErrorGenerator::error(
                                                     "KümedeYeterliDeğişkenYok",
@@ -491,8 +492,8 @@ impl Run {
                                                     tokenc.line,
                                                     tokenc.col,
                                                     tokenc.file,
-                                                    Box::new(||{}),
-                                                );
+                                                    None,
+                                                )
                                         }
                                         SupportedLanguage::English => {
                                             ErrorGenerator::error(
@@ -501,15 +502,16 @@ impl Run {
                                                     tokenc.line,
                                                     tokenc.col,
                                                     tokenc.file,
-                                                    Box::new(||{}),
-                                                );
+                                                    None,
+                                                )
                                         }
-                                    },
+                                    }),
                                 };
                                 match b.eşittir(a) {
-                                    Object::Bool(true) => self.current += 1,
-                                    Object::Bool(false) => self.current = tp,
-                                    _ => unreachable!(),
+                                    Ok(Object::Bool(true)) => self.current += 1,
+                                    Ok(Object::Bool(false)) => self.current = tp,
+                                    Ok(_) => unreachable!(),
+                                    Err(e) => return Err(e),
                                 }
                             }
                         }
@@ -520,7 +522,7 @@ impl Run {
                 TokenType::Kopya => {
                     let last = match stack.pop() {
                         Some(a) => a,
-                        None => match get_lang() {
+                        None => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
@@ -528,8 +530,8 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -538,10 +540,10 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
-                        },
+                        }),
                     };
                     stack.push(last.clone());
                     stack.push(last);
@@ -550,7 +552,7 @@ impl Run {
                 TokenType::Büyüktür => {
                     let a = match stack.pop() {
                         Some(a) => a,
-                        None => match get_lang() {
+                        None => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
@@ -558,8 +560,8 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -568,14 +570,14 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
-                        },
+                        }),
                     };
                     let b = match stack.pop() {
                         Some(a) => a,
-                        None => match get_lang() {
+                        None => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
@@ -583,8 +585,8 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -593,18 +595,18 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
-                        },
+                        }),
                     };
-                    stack.push(b.büyüktür(a));
+                    stack.push(match b.büyüktür(a) { Ok(a) => a, Err(e) => return Err(e) });
                     self.current += 1;
                 }
                 TokenType::BüyükEşittir => {
                     let a = match stack.pop() {
                         Some(a) => a,
-                        None => match get_lang() {
+                        None => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
@@ -612,8 +614,8 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -622,14 +624,14 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
-                        },
+                        }),
                     };
                     let b = match stack.pop() {
                         Some(a) => a,
-                        None => match get_lang() {
+                        None => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
@@ -637,8 +639,8 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -647,18 +649,18 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
-                        },
+                        }),
                     };
-                    stack.push(b.büyük_eşittir(a));
+                    stack.push(match b.büyük_eşittir(a) { Ok(a) => a, Err(e) => return Err(e) });
                     self.current += 1;
                 }
                 TokenType::Küçüktür => {
                     let a = match stack.pop() {
                         Some(a) => a,
-                        None => match get_lang() {
+                        None => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
@@ -666,8 +668,8 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -676,14 +678,14 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
-                        },
+                        }),
                     };
                     let b = match stack.pop() {
                         Some(a) => a,
-                        None => match get_lang() {
+                        None => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
@@ -691,8 +693,8 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -701,18 +703,18 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
-                        },
+                        }),
                     };
-                    stack.push(b.küçüktür(a));
+                    stack.push(match b.küçüktür(a) { Ok(a) => a, Err(e) => return Err(e) });
                     self.current += 1;
                 }
                 TokenType::KüçükEşittir => {
                     let a = match stack.pop() {
                         Some(a) => a,
-                        None => match get_lang() {
+                        None => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
@@ -720,8 +722,8 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -730,14 +732,14 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
-                        },
+                        }),
                     };
                     let b = match stack.pop() {
                         Some(a) => a,
-                        None => match get_lang() {
+                        None => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
@@ -745,8 +747,8 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -755,18 +757,18 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
-                        },
+                        }),
                     };
-                    stack.push(b.küçük_eşittir(a));
+                    stack.push(match b.küçük_eşittir(a) { Ok(a) => a, Err(e) => return Err(e) });
                     self.current += 1;
                 }
                 TokenType::Eşittir => {
                     let a = match stack.pop() {
                         Some(a) => a,
-                        None => match get_lang() {
+                        None => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
@@ -774,8 +776,8 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -784,14 +786,14 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
-                        },
+                        }),
                     };
                     let b = match stack.pop() {
                         Some(a) => a,
-                        None => match get_lang() {
+                        None => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
@@ -799,8 +801,8 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -809,18 +811,18 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
-                        },
+                        }),
                     };
-                    stack.push(b.eşittir(a));
+                    stack.push(match b.eşittir(a) { Ok(a) => a, Err(e) => return Err(e) });
                     self.current += 1;
                 }
                 TokenType::EşitDeğildir => {
                     let a = match stack.pop() {
                         Some(a) => a,
-                        None => match get_lang() {
+                        None => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
@@ -828,8 +830,8 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -838,14 +840,14 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
-                        },
+                        }),
                     };
                     let b = match stack.pop() {
                         Some(a) => a,
-                        None => match get_lang() {
+                        None => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
@@ -853,8 +855,8 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -863,18 +865,18 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
-                        },
+                        }),
                     };
-                    stack.push(b.eşit_değildir(a));
+                    stack.push(match b.eşit_değildir(a) { Ok(a) => a, Err(e) => return Err(e) });
                     self.current += 1;
                 }
                 TokenType::Değildir => {
                     let a = match stack.pop() {
                         Some(a) => a,
-                        None => match get_lang() {
+                        None => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
@@ -882,8 +884,8 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -892,12 +894,12 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
-                        },
+                        }),
                     };
-                    stack.push(a.değildir());
+                    stack.push(match a.değildir() { Ok(a) => a, Err(e) => return Err(e) });
                     self.current += 1;
                 }
                 TokenType::Son { tp } => {
@@ -913,7 +915,7 @@ impl Run {
                 TokenType::Modulo => {
                     let a = match stack.pop() {
                         Some(a) => a,
-                        None => match get_lang() {
+                        None => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
@@ -921,8 +923,8 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -931,14 +933,14 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
-                        },
+                        }),
                     };
                     let b = match stack.pop() {
                         Some(a) => a,
-                        None => match get_lang() {
+                        None => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
@@ -946,8 +948,8 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -956,18 +958,18 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
-                        },
+                        }),
                     };
-                    stack.push(b.modulo(a));
+                    stack.push(match b.modulo(a) { Ok(a) => a, Err(e) => return Err(e) });
                     self.current += 1;
                 }
                 TokenType::Takas => {
                     let a = match stack.pop() {
                         Some(a) => a,
-                        None => match get_lang() {
+                        None => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
@@ -975,8 +977,8 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -985,14 +987,14 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
-                        },
+                        }),
                     };
                     let b = match stack.pop() {
                         Some(a) => a,
-                        None => match get_lang() {
+                        None => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
@@ -1000,8 +1002,8 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -1010,10 +1012,10 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
-                        },
+                        }),
                     };
                     stack.push(a);
                     stack.push(b);
@@ -1022,7 +1024,7 @@ impl Run {
                 TokenType::Döndür => {
                     let a = match stack.pop() {
                         Some(a) => a,
-                        None => match get_lang() {
+                        None => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
@@ -1030,8 +1032,8 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -1040,14 +1042,14 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
-                        },
+                        }),
                     };
                     let b = match stack.pop() {
                         Some(a) => a,
-                        None => match get_lang() {
+                        None => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
@@ -1055,8 +1057,8 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -1065,14 +1067,14 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
-                        },
+                        }),
                     };
                     let c = match stack.pop() {
                         Some(a) => a,
-                        None => match get_lang() {
+                        None => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
@@ -1080,8 +1082,8 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -1090,10 +1092,10 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
-                        },
+                        }),
                     };
                     stack.push(a);
                     stack.push(b);
@@ -1103,7 +1105,7 @@ impl Run {
                 TokenType::At => {
                     match stack.pop() {
                         Some(a) => a,
-                        None => match get_lang() {
+                        None => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
@@ -1111,8 +1113,8 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -1121,17 +1123,17 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
-                        },
+                        }),
                     };
                     self.current += 1;
                 }
                 TokenType::Üst => {
                     let a = match stack.pop() {
                         Some(a) => a,
-                        None => match get_lang() {
+                        None => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
@@ -1139,8 +1141,8 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -1149,14 +1151,14 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
-                        },
+                        }),
                     };
                     let b = match stack.pop() {
                         Some(a) => a,
-                        None => match get_lang() {
+                        None => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
@@ -1164,8 +1166,8 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -1174,10 +1176,10 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
-                        },
+                        }),
                     };
                     stack.push(b.clone());
                     stack.push(a);
@@ -1225,7 +1227,7 @@ impl Run {
                         }
                     },
                     None => {
-                        match get_lang() {
+                        return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "BilinmeyenTanımlayıcı",
@@ -1237,20 +1239,16 @@ impl Run {
                                     tokenc.col,
                                     tokenc.file,
                                     {
-                                        let hashc = hashs.clone().into_keys();
-                                        let id: String = id.clone();
-                                        Box::new(|| {
-                                            let mut hashc: Vec<String> = hashc;
-                                            let id = id;
-                                            hashc.sort();
-                                            let n = match hashc[..].binary_search(&id) {
-                                                Ok(n) => n,
-                                                Err(n) => n,
-                                            };
-                                            println!("    `{}` demek mi istediniz?", &hashc[n]);
-                                        })
-                                    },
-                                );
+                                        let mut hashk = hashs.clone().into_keys();
+                                        hashk.sort();
+                                        let n = hashk.binary_search(&id).unwrap_err();
+                                        if hashk.is_empty() {
+                                            None
+                                        } else {
+                                            Some(format!("{}", hashk[n]))
+                                        }
+                                    }
+                                )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -1260,28 +1258,24 @@ impl Run {
                                         tokenc.col,
                                         tokenc.file,
                                         {
-                                            let hashc = hashs.clone().into_keys();
-                                            let id: String = id.clone();
-                                            Box::new(||{
-                                                let mut hashc: Vec<String> = hashc;
-                                                let id = id;
-                                                hashc.sort();
-                                                let n = match hashc[..].binary_search(&id) {
-                                                    Ok(n) => n,
-                                                    Err(n) => n,
-                                                };
-                                                if !hashc.is_empty() { println!("    Maybe you meant `{}`?", &hashc[n]); }
-                                            })
+                                            let mut hashk = hashs.clone().into_keys();
+                                            hashk.sort();
+                                            let n = hashk.binary_search(&id).unwrap_err();
+                                            if hashk.is_empty() {
+                                                None
+                                            } else {
+                                                Some(format!("{}", hashk[n]))
+                                            }
                                         },
-                                    );
+                                    )
                             }
-                        };
+                        });
                     }
                 },
                 TokenType::Koy => {
                     let a = match stack.pop() {
                         Some(a) => a,
-                        None => match get_lang() {
+                        None => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
@@ -1289,8 +1283,8 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -1299,15 +1293,15 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
-                        },
+                        }),
                     };
                     let id = self.program.get(self.current + 1).unwrap();
                     hashs.insert(match id.typ.clone() {
                         TokenType::Identifier { id : i } => i,
-                        t => match get_lang() {
+                        t => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "BeklenmedikSimge",
@@ -1315,8 +1309,8 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             },
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -1325,17 +1319,17 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             },
-                        },
+                        }),
                     }, a);
                     self.current += 2;
                 }
                 TokenType::Ve => {
                     let a = match stack.pop() {
                         Some(a) => a,
-                        None => match get_lang() {
+                        None => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
@@ -1343,8 +1337,8 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -1353,14 +1347,14 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
-                        },
+                        }),
                     };
                     let b = match stack.pop() {
                         Some(a) => a,
-                        None => match get_lang() {
+                        None => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
@@ -1368,8 +1362,8 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -1378,18 +1372,18 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
-                        },
+                        }),
                     };
-                    stack.push(b.ve(a, tokenc.line, tokenc.col, tokenc.file.clone()));
+                    stack.push(match b.ve(a, tokenc.line, tokenc.col, tokenc.file.clone()) { Ok(a) => a, Err(e) => return Err(e) });
                     self.current += 1;
                 }
                 TokenType::Veya => {
                     let a = match stack.pop() {
                         Some(a) => a,
-                        None => match get_lang() {
+                        None => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
@@ -1397,8 +1391,8 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -1407,14 +1401,14 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
-                        },
+                        }),
                     };
                     let b = match stack.pop() {
                         Some(a) => a,
-                        None => match get_lang() {
+                        None => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
@@ -1422,8 +1416,8 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -1432,18 +1426,18 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
-                        },
+                        }),
                     };
-                    stack.push(b.veya(a, tokenc.line, tokenc.col, tokenc.file.clone()));
+                    stack.push(match b.veya(a, tokenc.line, tokenc.col, tokenc.file.clone()) { Ok(a) => a, Err(e) => return Err(e) });
                     self.current += 1;
                 }
                 TokenType::Tipinde => {
                     let a = match stack.pop() {
                         Some(a) => a,
-                        None => match get_lang() {
+                        None => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "KümedeYeterliDeğişkenYok",
@@ -1451,8 +1445,8 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -1461,18 +1455,18 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(||{}),
-                                );
+                                    None,
+                                )
                             }
-                        },
+                        }),
                     };
                     self.current += 1;
                     let b = self.program.get_mut(self.current).unwrap();
                     match &b.typ {
                         TokenType::Identifier { id } => {
-                            stack.push(a.dönüştür(id.clone(), b.line, b.col, b.file.clone()));
+                            stack.push(match a.dönüştür(id.clone(), b.line, b.col, b.file.clone()) { Ok(a) => a, Err(e) => return Err(e) });
                         }
-                        _ => match get_lang() {
+                        _ => return Err(match get_lang() {
                             SupportedLanguage::Turkish => {
                                 ErrorGenerator::error(
                                     "BeklenmedikSimge",
@@ -1483,8 +1477,8 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(|| {}),
-                                );
+                                    None,
+                                )
                             }
                             SupportedLanguage::English => {
                                 ErrorGenerator::error(
@@ -1493,10 +1487,10 @@ impl Run {
                                     tokenc.line,
                                     tokenc.col,
                                     tokenc.file,
-                                    Box::new(|| {}),
-                                );
+                                    None,
+                                )
                             }
-                        },
+                        }),
                     };
                     self.current += 1;
                 }
@@ -1567,5 +1561,6 @@ impl Run {
                 }
             }
         }
+        Ok(())
     }
 }

@@ -5,7 +5,7 @@ use std::fs::canonicalize;
 use std::io::Write;
 
 use std::path::PathBuf;
-pub use std::process::exit;
+use std::process::exit;
 
 pub mod lexer;
 use lexer::Lexer;
@@ -103,7 +103,7 @@ fn main() {
             }
 
             let mut run = runtime::Run::new(parser.parse());
-            run.run(args.file);
+            run.run(args.file).unwrap_or_else(|a| a.error());
         }
         argsparser::Subcommands::RunBytes => {
             let path = PathBuf::from(args.file.clone());
@@ -111,7 +111,7 @@ fn main() {
             let parsed = bytecode::from_bytecode(&con[..]);
 
             let mut run = runtime::Run::new(parsed);
-            run.run(args.file);
+            run.run(args.file).unwrap_or_else(|a| a.error());
         }
         argsparser::Subcommands::Command => {
             runtime::Run::new(
@@ -119,7 +119,7 @@ fn main() {
                     &mut Lexer::new(args.file),
                     "<args>".to_string()
                 ).parse()
-            ).run("<args>".to_string())
+            ).run("<args>".to_string()).unwrap_or_else(|a| a.error())
         }
     }
 }

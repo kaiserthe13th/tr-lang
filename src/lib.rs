@@ -15,5 +15,3 @@ pub(crate) mod util;
 
 pub mod runtime;
 pub use runtime::Run;
-
-pub(crate) use std::process::exit;
