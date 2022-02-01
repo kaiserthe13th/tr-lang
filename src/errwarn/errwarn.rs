@@ -13,11 +13,6 @@ pub struct Error {
 impl Error {
     pub fn error(&self) -> ! {
         self.eprint();
-        if let Some(note) = self.after_note.clone() {
-            for line in note.lines() {
-                println!("{line}");
-            }
-        }
         exit(1);
     }
     pub fn eprint(&self) {
@@ -29,6 +24,11 @@ impl Error {
             SupportedLanguage::Turkish => {
                 eprintln!("\n[HATA] {}, Satır {:?}, Sütun {:?}", self.position.2, self.position.0, self.position.1);
                 eprintln!("    {}: {}", self.name, self.explanation);
+            }
+        }
+        if let Some(note) = self.after_note.clone() {
+            for line in note.lines() {
+                println!("{line}");
             }
         }
     }
