@@ -3,7 +3,10 @@
 set GH_DEB_INST "tr-lang_0.3.1_amd64.deb"
 set GH_DEB_HREF "https://github.com/kaiserthe13th/tr-lang/releases/download/tr-lang-0.3.1/$GH_DEB_HREF"
 
-read -p "Do you wish to install tr-lang on your system[y/N]? " yn
+echo "This script is outdated!"
+echo "Please use install.py instead!"
+echo "If you still want to..."
+read -p "Do you still wish to install tr-lang on your system using this script[y/N]? " yn
 case $yn in
     [Yy]* ) ;;
     * ) echo "exiting..."; exit;;
