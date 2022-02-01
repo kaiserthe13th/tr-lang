@@ -23,11 +23,11 @@ impl Error {
     pub fn eprint(&self) {
         match get_lang() {
             SupportedLanguage::English => {
-                eprintln!("\n[ERROR] {}, Line {:?}, Column {:?}", self.position.0, self.position.1, self.position.2);
+                eprintln!("\n[ERROR] {}, Line {:?}, Column {:?}", self.position.2, self.position.0, self.position.1);
                 eprintln!("    {}: {}", self.name, self.explanation);
             }
             SupportedLanguage::Turkish => {
-                eprintln!("\n[HATA] {}, Satır {:?}, Sütun {:?}", self.position.0, self.position.1, self.position.2);
+                eprintln!("\n[HATA] {}, Satır {:?}, Sütun {:?}", self.position.2, self.position.0, self.position.1);
                 eprintln!("    {}: {}", self.name, self.explanation);
             }
         }
