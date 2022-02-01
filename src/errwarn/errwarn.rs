@@ -1,18 +1,9 @@
 use crate::util::{get_lang, SupportedLanguage};
 use std::process::exit;
+use std::error;
+use std::fmt;
 
-trait Callable {
-    fn call_once_safe(&mut self);
-}
-
-impl<F: FnOnce()> Callable for Option<F> {
-    fn call_once_safe(&mut self) {
-        if let Some(func) = self.take() {
-            func()
-        }
-    }
-}
-
+#[derive(Debug)]
 pub struct Error {
     name: String,
     explanation: String,
@@ -42,6 +33,12 @@ impl Error {
         }
     }
 }
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+impl error::Error for Error {}
 
 #[allow(non_snake_case)]
 pub mod ErrorGenerator {
