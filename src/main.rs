@@ -24,6 +24,8 @@ pub mod errwarn;
 pub mod runtime;
 
 mod argsparser;
+#[cfg(feature = "interactive")]
+mod interactive;
 
 fn main() {
     let args = argsparser::parse_args();
@@ -103,7 +105,7 @@ fn main() {
             }
 
             let mut run = runtime::Run::new(parser.parse());
-            run.run(args.file).unwrap_or_else(|a| a.error());
+            run.run(args.file, None, false).unwrap_or_else(|(_, _, a)| a.error());
         }
         argsparser::Subcommands::RunBytes => {
             let path = PathBuf::from(args.file.clone());
@@ -111,7 +113,7 @@ fn main() {
             let parsed = bytecode::from_bytecode(&con[..]);
 
             let mut run = runtime::Run::new(parsed);
-            run.run(args.file).unwrap_or_else(|a| a.error());
+            run.run(args.file, None, false).unwrap_or_else(|(_, _, a)| a.error());
         }
         argsparser::Subcommands::Command => {
             runtime::Run::new(
@@ -119,7 +121,11 @@ fn main() {
                     &mut Lexer::new(args.file),
                     "<args>".to_string()
                 ).parse()
-            ).run("<args>".to_string()).unwrap_or_else(|a| a.error())
+            ).run("<args>".to_string(), None, false).unwrap_or_else(|(_, _, a)| a.error());
+        }
+        #[cfg(feature = "interactive")]
+        argsparser::Subcommands::Interact => {
+            interactive::Interactive::new(args.quiet).start()
         }
     }
 }

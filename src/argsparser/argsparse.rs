@@ -2,6 +2,8 @@ use crate::store::globarg::*;
 use crate::util;
 use crate::utilbin;
 use std::env;
+#[cfg(feature = "interactive")]
+use crate::interactive::QuietLevel;
 
 #[derive(Debug)]
 pub enum Subcommands {
@@ -9,6 +11,8 @@ pub enum Subcommands {
     Byt,
     RunBytes,
     Command,
+    #[cfg(feature = "interactive")]
+    Interact,
 }
 
 #[derive(Debug)]
@@ -25,6 +29,8 @@ pub struct Options {
     pub prs_out: bool,
     pub argv: Vec<String>,
     pub license: bool,
+    #[cfg(feature = "interactive")]
+    pub quiet: QuietLevel,
 }
 
 pub fn parse_args() -> Options {
@@ -36,52 +42,63 @@ pub fn parse_args() -> Options {
     let mut argv_m = false;
     let mut argv: Vec<String> = vec![];
 
+    #[cfg(feature = "interactive")]
+    let mut quiet = QuietLevel::None;
+
     let (mut help, mut version) = (false, false);
 
     let (mut lex_out, mut prs_out) = (false, false);
     let (mut prd_out, mut outfile) = (false, None);
 
-    if args.len() < 2 {
-        if args.len() > 0 {
-            for arg in &args {
-                match arg.as_str() {
-                    "-V" | "-s" | "--sürüm" => {
-                        utilbin::print_version(name);
-                    }
-                    "-h" | "-y" | "--yardım" => utilbin::print_help(0, name),
-                    "-L" | "--license" | "--lisans" => utilbin::print_license(),
-                    _ => (),
+    if args.len() == 1 {
+            match args[0].as_str() {
+                "-V" | "-s" | "--sürüm" => {
+                    utilbin::print_version(name);
                 }
+                "-h" | "-y" | "--yardım" => utilbin::print_help(0, name),
+                "-L" | "--license" | "--lisans" => utilbin::print_license(),
+                "i" | "inter" => (),
+                _ => utilbin::print_help(1, name),
             }
-        }
-        utilbin::print_help(1, name)
+            if args.len() == 1 && args[0] != "inter" && args[0] != "i" {
+                utilbin::print_help(1, name);
+            }
     }
-
-    let sub_cmd = match args.get(0).unwrap().as_str() {
-        "y" | "yürüt" => Subcommands::Run,
-        "b" | "byt" => Subcommands::Byt,
-        "yb" | "yürbyt" => Subcommands::RunBytes,
-        "k" | "komut" => Subcommands::Command,
-        "-h" | "-y" | "--yardım" => {
-            utilbin::print_help(0, name);
-        }
-        "-V" | "-s" | "--sürüm" => {
-            utilbin::print_version(name);
-        }
-        "-L" | "--license" | "--lisans" => {
-            utilbin::print_license();
-        }
-        a => util::error_print("unknown subcommand", format!("{}", a)),
-    };
-    args.remove(0);
+        
+    let sub_cmd = if args.len() >= 1 {
+        let s = match args.get(0).unwrap().as_str() {
+            "y" | "yürüt" => Subcommands::Run,
+            "b" | "byt" => Subcommands::Byt,
+            "yb" | "yürbyt" => Subcommands::RunBytes,
+            "k" | "komut" => Subcommands::Command,
+            #[cfg(feature = "interactive")]
+            "i" | "inter" => Subcommands::Interact,
+            "-h" | "-y" | "--yardım" => {
+                utilbin::print_help(0, name);
+            }
+            "-V" | "-s" | "--sürüm" => {
+                utilbin::print_version(name);
+            }
+            "-L" | "--license" | "--lisans" => {
+                utilbin::print_license();
+            }
+            a => util::error_print("unknown subcommand", format!("{}", a)),
+        };
+        args.remove(0);
+        s
+    } else { Subcommands::Interact };
 
     let mut outs = false;
     let mut license = false;
 
-    let file = args.get(0)
-        .expect("couldn't get <FILE>")
-        .to_string();
-    args = args[1..].to_vec();
+    let file = if let Subcommands::Interact = sub_cmd {
+        "".to_string()
+    } else {
+        args = args[1..].to_vec();
+        args.get(0)
+            .expect("couldn't get <FILE>")
+            .to_string()
+    };
 
     for arg in args {
         match arg.as_str() {
@@ -102,6 +119,12 @@ pub fn parse_args() -> Options {
                 prd_out = true;
             }
             "-L" | "--license" | "--lisans" => license = true,
+            #[cfg(feature = "interactive")]
+            "-q" | "--sessiz" => quiet.inc(),
+            #[cfg(feature = "interactive")]
+            "-qq" => quiet.inc_by(2),
+            #[cfg(feature = "interactive")]
+            "-qqq" => quiet.inc_by(3),
             "--" => argv_m = true,
             a => util::error_print("unknown argument", format!("{}", a)),
         }
@@ -120,5 +143,7 @@ pub fn parse_args() -> Options {
         sub_cmd,
         license,
         help_exitc: 0,
+        #[cfg(feature = "interactive")]
+        quiet,
     }
 }

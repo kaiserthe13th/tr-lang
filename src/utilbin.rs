@@ -1,6 +1,6 @@
-pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 pub const LICENSE: &str = include_str!("../LICENSE");
 pub const RELEASE: &str = env!("RELEASE_DATE");
+pub use crate::store::VERSION;
 
 use crate::exit;
 use std::path::PathBuf;

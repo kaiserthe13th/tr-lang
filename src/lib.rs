@@ -15,3 +15,5 @@ pub(crate) mod util;
 
 pub mod runtime;
 pub use runtime::Run;
+#[cfg(feature = "interactive")]
+pub mod interactive;
