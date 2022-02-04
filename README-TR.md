@@ -2,6 +2,15 @@
 #### <center>Hızlı ve Kolay</center>
 <hr style="width: 50%;">
 
+[![GitHub lisansı](https://img.shields.io/github/license/kaiserthe13th/tr-lang?label=lisans)](https://github.com/kaiserthe13th/tr-lang/blob/master/LICENSE)
+[![GitHub issueları](https://img.shields.io/github/issues/kaiserthe13th/tr-lang?label=issuelar)](https://github.com/kaiserthe13th/tr-lang/issues)
+[![GitHub yıldızları](https://img.shields.io/github/stars/kaiserthe13th/tr-lang?label=yıldızlar)](https://github.com/kaiserthe13th/tr-lang/stargazers)
+![GitHub yayını (tarihe göre en son)](https://img.shields.io/github/v/release/kaiserthe13th/tr-lang?label=son%20github%20yayını)
+![GitHub yayını (önyaınlar dahil tarihe göre en son)](https://img.shields.io/github/v/release/kaiserthe13th/tr-lang?include_prereleases&label=son%20github%20önyayını)
+![Crates.io](https://img.shields.io/crates/v/tr-lang)
+![Visual Studio Marketplace Sürümü](https://img.shields.io/visual-studio-marketplace/v/kaiserthe13th.tr-lang)
+![PyPI](https://img.shields.io/pypi/v/tr-lang-py?label=tr-lang-py)
+
 ### ❤️ ile 🇹🇷 de yapılmıştır
 
 tr-lang programlama dili sözdizimini Türkçeye yaklaştırmayı amaçlayan bir programlama dilidir.
