@@ -23,10 +23,13 @@ if exists("b:current_syntax")
 endif
 
 " Keywords
-syn keyword trlKeyword at ver de ise son iken yoksa kpy tks üst veya ve dön girdi işlev yükle
+syn keyword trlKeyword at ver de ise son iken yoksa kpy tks üst veya ve dön girdi işlev yükle blok
 
 " Booleans
 syn keyword trlBoolean doğru yanlış
+
+" Null
+syn keyword trlNull hiç
 
 " Numbers
 syn match trlNumber '\v(\d+\.\d*|\d+)'
@@ -56,6 +59,7 @@ syn region trlString start=/\v'/ skip=/\v\\[tnr"'\\\n\t]/ end=/\v'/
 hi def link trlSingleCharOp Operator
 hi def link trlBoolean      Boolean
 hi def link trlKeyword      Keyword
+hi def link trlNull         Constant
 hi def link trlComment      Comment
 hi def link trlShebang      SpecialComment
 hi def link trlNumber       Number
