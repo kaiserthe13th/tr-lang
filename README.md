@@ -8,7 +8,7 @@
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/kaiserthe13th/tr-lang?label=latest%20github%20release)
 ![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/kaiserthe13th/tr-lang?include_prereleases&label=latest%20github%20prerelease)
 ![Crates.io](https://img.shields.io/crates/v/tr-lang)
-![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/kaiserthe13th.tr-lang)
+![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/kaiserthe13th.tr-lang?label=vscode%20extension%20version)
 ![PyPI](https://img.shields.io/pypi/v/tr-lang-py?label=tr-lang-py)
 
 ### Made with ❤️ in 🇹🇷
