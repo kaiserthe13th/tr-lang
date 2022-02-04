@@ -1,7 +1,7 @@
 #!/usr/bin/env -S tr-lang y
 -* tr-lang'da sterilize edilmemiş faktoriyel implementasyonu *-
 
-yükle "mat.trl"
+yükle "mat.trl"*
 
 -* 1 faktoriyel *-
 1 faktoriyel

@@ -1,0 +1,15 @@
+#!/usr/bin/env -S tr-lang y
+işlev sde -> a
+    a de '\n' de
+son
+
+blok benim-bloğum
+    3 -> a
+    4 -> b
+son
+
+benim-bloğum:a sde
+benim-bloğum:b sde
+benim-bloğum sde
+(benim-bloğum:a + benim-bloğum:b)sde
+

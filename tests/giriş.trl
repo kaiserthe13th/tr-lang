@@ -1,0 +1,15 @@
+#/usr/bin/env -S tr-lang y
+işlev faktoriyel
+    "--- faktoriyel ---\n" de 
+    yükle "./faktoriyel.trl"*
+son
+
+işlev multiples-of-3-and-5
+    "--- multiples_of_5_or_3 ---\n" de 
+    yükle "./multiples_of_5_or_3.trl"*
+son
+
+faktoriyel
+multiples-of-3-and-5
+
+

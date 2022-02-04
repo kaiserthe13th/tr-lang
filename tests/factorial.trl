@@ -1,7 +1,7 @@
 #!/usr/bin/env -S tr-lang y
 -* unsanitized factorial implementation in tr-lang *-
 
-yükle "math.trl"
+yükle "math.trl"*
 
 -* 1 factorial *-
 1 factorial
