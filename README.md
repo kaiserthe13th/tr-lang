@@ -11,6 +11,7 @@
 ![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/kaiserthe13th.tr-lang?label=vscode%20extension%20version)
 ![PyPI](https://img.shields.io/pypi/v/tr-lang-py?label=tr-lang-py)
 ![Platforms](https://img.shields.io/badge/platform-windows%20%7C%20macos%20%7C%20linux-blue)
+![GitHub branch checks state](https://img.shields.io/github/checks-status/kaiserthe13th/tr-lang/master)
 
 ### Made with ❤️ in 🇹🇷
 
