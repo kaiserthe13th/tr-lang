@@ -5,7 +5,8 @@
 ### ❤️ ile 🇹🇷 de yapılmıştır
 
 tr-lang programlama dili sözdizimini Türkçeye yaklaştırmayı amaçlayan bir programlama dilidir.
-tr-lang küme(stack) orantılı bir bellek yönetimine sahip.
+tr-lang yarı küme(stack), yarı bölgesel bir hafıza yönetim şekline sahip.
+tr-lang'ın matematiksel sözdizimi 0.4.0-rc1 sürümünden beri sondan eklemeliden ortaya eklemeli hale gelmiştir. (a b +) -> (a + b)
 
 [İngilizce](README.md) görüntüle
 
