@@ -1,10 +1,10 @@
+use crate::errwarn::Error;
 use crate::errwarn::ErrorGenerator;
-use crate::mem::{HashMemory, Object, StackMemory};
+use crate::mem::{HashMemory, Map, Object, StackMemory};
 use crate::store::globarg::SUPRESS_WARN;
 use crate::token::{tokentypes::ParserTokenType as TokenType, ParserToken as Token};
 use crate::util::{get_lang, SupportedLanguage};
 use std::io::{self, prelude::*};
-use crate::errwarn::Error;
 
 pub struct Run {
     program: Vec<Token>,
@@ -19,16 +19,248 @@ impl Run {
         }
     }
 
-    pub fn run(&mut self, file: String, mem: Option<(StackMemory, HashMemory)>, repl: bool) -> Result<(StackMemory, HashMemory), (StackMemory, HashMemory, Error)> {
+    pub fn run(
+        &mut self,
+        file: String,
+        mem: Option<(StackMemory, HashMemory)>,
+        repl: bool,
+    ) -> Result<(StackMemory, HashMemory), (StackMemory, HashMemory, Error)> {
         let (mut stack, mut hashs) = if let Some((s, h)) = mem {
-            (s, h)} else {(StackMemory::new(), HashMemory::new())};
+            (s, h)
+        } else {
+            (StackMemory::new(), HashMemory::new())
+        };
         // let mut warnings: Vec<Box<dyn FnOnce()>> = vec![]; // for later use
+        let mut current_namespace: Vec<String> = vec![];
 
         while self.program.len() > self.current {
             let tokenc = self.program.get(self.current).unwrap().clone();
             let token = self.program.get_mut(self.current).unwrap();
 
             match token.typ.clone() {
+                TokenType::İkiNokta => {
+                    let a = match stack.pop() {
+                        Some(a) => a,
+                        None => return Err((stack, hashs, match get_lang() {
+                            SupportedLanguage::Turkish => {
+                                ErrorGenerator::error(
+                            "KümedeYeterliDeğişkenYok",
+                            &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
+                            tokenc.line,
+                            tokenc.col,
+                            tokenc.file,
+                            None,
+                        )
+                            }
+                            SupportedLanguage::English => {
+                                ErrorGenerator::error(
+                            "NotEnoughVarsInStack",
+                            &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
+                            tokenc.line,
+                            tokenc.col,
+                            tokenc.file,
+                            None,
+                        )
+                            }
+                        })),
+                    };
+                    match a {
+                        Object::Harita(map) => {
+                            let id = self.program.get(self.current + 1).unwrap();
+                            match id.typ.clone() {
+                                TokenType::Identifier { id: ident } => {
+                                    let o = match map.map.get(&ident) {
+                                        Some(o) => o,
+                                        None => return Err((stack, hashs.clone(), match get_lang() {
+                                            SupportedLanguage::Turkish => ErrorGenerator::error(
+                                                "BilinmeyenTanımlayıcı",
+                                                &format!(
+                                                    "bilinmeyen değişken: `{}`, bu değişken bulunamamıştır",
+                                                    tokenc.repr()
+                                                ),
+                                                tokenc.line,
+                                                tokenc.col,
+                                                tokenc.file,
+                                                {
+                                                    let mut hashk = hashs.clone().into_keys();
+                                                    hashk.sort();
+                                                    let n = hashk.binary_search(&ident).unwrap_err();
+                                                    if hashk.is_empty() {
+                                                        None
+                                                    } else {
+                                                        Some(format!("`{}` demek mi istediniz?", hashk[n]))
+                                                    }
+                                                }
+                                            ),
+                                            SupportedLanguage::English => ErrorGenerator::error(
+                                                "UnknownIdentifier",
+                                                &format!("unknown identifier: `{}`, this identifier could not be found", tokenc.repr()),
+                                                tokenc.line,
+                                                tokenc.col,
+                                                tokenc.file,
+                                                {
+                                                    let mut hashk = hashs.clone().into_keys();
+                                                    hashk.sort();
+                                                    let n = hashk.binary_search(&ident).unwrap_err();
+                                                    if hashk.is_empty() {
+                                                        None
+                                                    } else {
+                                                        Some(format!("maybe you meant {}?", hashk[n]))
+                                                    }
+                                                },
+                                            ),
+                                        })),
+                                    };
+                                    match o {
+                                        Object::Hiç
+                                        | Object::Bool(_)
+                                        | Object::Sayı(_)
+                                        | Object::Yazı(_)
+                                        | Object::Liste(_)
+                                        | Object::Harita(_) => {
+                                            stack.push(o.clone());
+                                            self.current += 2;
+                                        }
+                                        Object::İşlev(tp) => {
+                                            let işlev = self.program.get(*tp).unwrap();
+                                            match işlev.typ {
+                                                TokenType::İşlev { sonloc: tpi } => {
+                                                    let loc = match tpi {
+                                                        Some(i) => i,
+                                                        None => unreachable!(),
+                                                    };
+                                                    let işlevson =
+                                                        self.program.get_mut(loc).unwrap();
+                                                    match &mut işlevson.typ {
+                                                        TokenType::İşlevSonlandır {
+                                                            tp: ref mut tps,
+                                                        } => {
+                                                            tps.push(self.current + 1);
+                                                        }
+                                                        _ => unreachable!(),
+                                                    }
+                                                    self.current = *tp + 2;
+                                                }
+                                                _ => unreachable!(),
+                                            }
+                                            stack.new_stack();
+                                            hashs.new_hash();
+                                        }
+                                    }
+                                }
+                                _ => {
+                                    return Err((
+                                        stack,
+                                        hashs,
+                                        match get_lang() {
+                                            SupportedLanguage::Turkish => ErrorGenerator::error(
+                                                "BeklenmedikSimge",
+                                                &format!(
+                                                    "tanımlayıcı beklenmişti ancak `{}` bulundu",
+                                                    id.repr()
+                                                ),
+                                                tokenc.line,
+                                                tokenc.col,
+                                                tokenc.file,
+                                                None,
+                                            ),
+                                            SupportedLanguage::English => ErrorGenerator::error(
+                                                "UnexpectedToken",
+                                                &format!(
+                                                    "expected identifier, but found `{}`",
+                                                    id.repr()
+                                                ),
+                                                tokenc.line,
+                                                tokenc.col,
+                                                tokenc.file,
+                                                None,
+                                            ),
+                                        },
+                                    ))
+                                }
+                            }
+                        }
+                        b => {
+                            return Err((
+                                stack,
+                                hashs,
+                                match get_lang() {
+                                    SupportedLanguage::Turkish => ErrorGenerator::error(
+                                        "BeklenmedikTip",
+                                        &format!("harita beklenmişti ancak `{:?}` bulundu", b),
+                                        tokenc.line,
+                                        tokenc.col,
+                                        tokenc.file,
+                                        None,
+                                    ),
+                                    SupportedLanguage::English => ErrorGenerator::error(
+                                        "UnexpectedType",
+                                        &format!("expected map but found `{:?}`", b),
+                                        tokenc.line,
+                                        tokenc.col,
+                                        tokenc.file,
+                                        None,
+                                    ),
+                                },
+                            ))
+                        }
+                    }
+                }
+                TokenType::BlokSonlandır => {
+                    let mut map = Map::new();
+                    if let Some(last_ele) = stack.pop() {
+                        stack.push_ret(last_ele);
+                    }
+                    stack.del_stack();
+                    let fhash = hashs.del_hash().unwrap();
+                    for (k, v) in fhash.into_iter() {
+                        map.map.insert(k, v);
+                    }
+                    hashs.insert(current_namespace.pop().unwrap(), Object::Harita(map));
+                    self.current += 1;
+                }
+                TokenType::Blok => {
+                    stack.new_stack();
+                    hashs.new_hash();
+                    let id = self.program.get(self.current + 1).unwrap();
+                    match id.typ.clone() {
+                        TokenType::Identifier { id: ident } => {
+                            current_namespace.push(ident);
+                        }
+                        _ => {
+                            return Err((
+                                stack,
+                                hashs,
+                                match get_lang() {
+                                    SupportedLanguage::Turkish => ErrorGenerator::error(
+                                        "BeklenmedikSimge",
+                                        &format!(
+                                            "tanımlayıcı beklenmişti ancak `{}` bulundu",
+                                            id.repr()
+                                        ),
+                                        tokenc.line,
+                                        tokenc.col,
+                                        tokenc.file,
+                                        None,
+                                    ),
+                                    SupportedLanguage::English => ErrorGenerator::error(
+                                        "UnexpectedToken",
+                                        &format!("expected identifier, but found `{}`", id.repr()),
+                                        tokenc.line,
+                                        tokenc.col,
+                                        tokenc.file,
+                                        None,
+                                    ),
+                                },
+                            ))
+                        }
+                    }
+                    self.current += 2;
+                }
+                TokenType::Hiç => {
+                    stack.push(Object::Hiç);
+                    self.current += 1;
+                }
                 TokenType::ParenL => unreachable!(),
                 TokenType::Ver { tp } => {
                     let a = match stack.pop() {
@@ -77,31 +309,33 @@ impl Run {
                         TokenType::Identifier { id: ident } => {
                             hashs.insert(ident, Object::İşlev(self.current));
                         }
-                        _ => return Err((stack, hashs, match get_lang() {
-                            SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
-                                    "BeklenmedikSimge",
-                                    &format!(
-                                        "tanımlayıcı beklenmişti ancak `{}` bulundu",
-                                        id.repr()
+                        _ => {
+                            return Err((
+                                stack,
+                                hashs,
+                                match get_lang() {
+                                    SupportedLanguage::Turkish => ErrorGenerator::error(
+                                        "BeklenmedikSimge",
+                                        &format!(
+                                            "tanımlayıcı beklenmişti ancak `{}` bulundu",
+                                            id.repr()
+                                        ),
+                                        tokenc.line,
+                                        tokenc.col,
+                                        tokenc.file,
+                                        None,
                                     ),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
-                                    None,
-                                )
-                            }
-                            SupportedLanguage::English => {
-                                ErrorGenerator::error(
-                                    "UnexpectedToken",
-                                    &format!("expected identifier, but found `{}`", id.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
-                                    None,
-                                )
-                            }
-                        })),
+                                    SupportedLanguage::English => ErrorGenerator::error(
+                                        "UnexpectedToken",
+                                        &format!("expected identifier, but found `{}`", id.repr()),
+                                        tokenc.line,
+                                        tokenc.col,
+                                        tokenc.file,
+                                        None,
+                                    ),
+                                },
+                            ))
+                        }
                     }
                     let loc = match sonloc {
                         Some(a) => a,
@@ -130,9 +364,13 @@ impl Run {
                         "{:?}",
                         match stack.pop() {
                             Some(a) => a,
-                            None => return Err((stack, hashs, match get_lang() {
-                                SupportedLanguage::Turkish => {
-                                    ErrorGenerator::error(
+                            None =>
+                                return Err((
+                                    stack,
+                                    hashs,
+                                    match get_lang() {
+                                        SupportedLanguage::Turkish => {
+                                            ErrorGenerator::error(
                                 "KümedeYeterliDeğişkenYok",
                                 &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
                                 tokenc.line,
@@ -140,9 +378,9 @@ impl Run {
                                 tokenc.file,
                                 None,
                             )
-                                }
-                                SupportedLanguage::English => {
-                                    ErrorGenerator::error(
+                                        }
+                                        SupportedLanguage::English => {
+                                            ErrorGenerator::error(
                                 "NotEnoughVarsInStack",
                                 &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                 tokenc.line,
@@ -150,8 +388,9 @@ impl Run {
                                 tokenc.file,
                                 None,
                             )
-                                }
-                            })),
+                                        }
+                                    }
+                                )),
                         }
                     );
                     io::stdout().flush().unwrap();
@@ -208,7 +447,10 @@ impl Run {
                             }
                         })),
                     };
-                    stack.push(match a.ekle(b) { Ok(a) => a, Err(e) => return Err((stack, hashs, e)) });
+                    stack.push(match a.ekle(b) {
+                        Ok(a) => a,
+                        Err(e) => return Err((stack, hashs, e)),
+                    });
                     self.current += 1;
                 }
                 TokenType::ArtıArtı => {
@@ -237,7 +479,10 @@ impl Run {
                             }
                         })),
                     };
-                    stack.push(match a.ekle(Object::Sayı(1.0)) { Ok(a) => a, Err(e) => return Err((stack, hashs, e)) });
+                    stack.push(match a.ekle(Object::Sayı(1.0)) {
+                        Ok(a) => a,
+                        Err(e) => return Err((stack, hashs, e)),
+                    });
                     self.current += 1;
                 }
                 TokenType::Eksi => {
@@ -291,7 +536,10 @@ impl Run {
                             }
                         })),
                     };
-                    stack.push(match b.çıkar(a) { Ok(a) => a, Err(e) => return Err((stack, hashs, e)) });
+                    stack.push(match b.çıkar(a) {
+                        Ok(a) => a,
+                        Err(e) => return Err((stack, hashs, e)),
+                    });
                     self.current += 1;
                 }
                 TokenType::EksiEksi => {
@@ -320,7 +568,10 @@ impl Run {
                             }
                         })),
                     };
-                    stack.push(match a.çıkar(Object::Sayı(1.0)) { Ok(a) => a, Err(e) => return Err((stack, hashs, e)) });
+                    stack.push(match a.çıkar(Object::Sayı(1.0)) {
+                        Ok(a) => a,
+                        Err(e) => return Err((stack, hashs, e)),
+                    });
                     self.current += 1;
                 }
                 TokenType::Çarpı => {
@@ -374,7 +625,10 @@ impl Run {
                             }
                         })),
                     };
-                    stack.push(match a.çarp(b) { Ok(a) => a, Err(e) => return Err((stack, hashs, e)) });
+                    stack.push(match a.çarp(b) {
+                        Ok(a) => a,
+                        Err(e) => return Err((stack, hashs, e)),
+                    });
                     self.current += 1;
                 }
                 TokenType::Bölü => {
@@ -428,7 +682,10 @@ impl Run {
                             }
                         })),
                     };
-                    stack.push(match b.böl(a) { Ok(a) => a, Err(e) => return Err((stack, hashs, e)) });
+                    stack.push(match b.böl(a) {
+                        Ok(a) => a,
+                        Err(e) => return Err((stack, hashs, e)),
+                    });
                     self.current += 1;
                 }
                 TokenType::Sayı { val } => {
@@ -600,7 +857,10 @@ impl Run {
                             }
                         })),
                     };
-                    stack.push(match b.büyüktür(a) { Ok(a) => a, Err(e) => return Err((stack, hashs, e)) });
+                    stack.push(match b.büyüktür(a) {
+                        Ok(a) => a,
+                        Err(e) => return Err((stack, hashs, e)),
+                    });
                     self.current += 1;
                 }
                 TokenType::BüyükEşittir => {
@@ -654,7 +914,10 @@ impl Run {
                             }
                         })),
                     };
-                    stack.push(match b.büyük_eşittir(a) { Ok(a) => a, Err(e) => return Err((stack, hashs, e)) });
+                    stack.push(match b.büyük_eşittir(a) {
+                        Ok(a) => a,
+                        Err(e) => return Err((stack, hashs, e)),
+                    });
                     self.current += 1;
                 }
                 TokenType::Küçüktür => {
@@ -708,7 +971,10 @@ impl Run {
                             }
                         })),
                     };
-                    stack.push(match b.küçüktür(a) { Ok(a) => a, Err(e) => return Err((stack, hashs, e)) });
+                    stack.push(match b.küçüktür(a) {
+                        Ok(a) => a,
+                        Err(e) => return Err((stack, hashs, e)),
+                    });
                     self.current += 1;
                 }
                 TokenType::KüçükEşittir => {
@@ -762,7 +1028,10 @@ impl Run {
                             }
                         })),
                     };
-                    stack.push(match b.küçük_eşittir(a) { Ok(a) => a, Err(e) => return Err((stack, hashs, e)) });
+                    stack.push(match b.küçük_eşittir(a) {
+                        Ok(a) => a,
+                        Err(e) => return Err((stack, hashs, e)),
+                    });
                     self.current += 1;
                 }
                 TokenType::Eşittir => {
@@ -816,7 +1085,10 @@ impl Run {
                             }
                         })),
                     };
-                    stack.push(match b.eşittir(a) { Ok(a) => a, Err(e) => return Err((stack, hashs, e)) });
+                    stack.push(match b.eşittir(a) {
+                        Ok(a) => a,
+                        Err(e) => return Err((stack, hashs, e)),
+                    });
                     self.current += 1;
                 }
                 TokenType::EşitDeğildir => {
@@ -870,7 +1142,10 @@ impl Run {
                             }
                         })),
                     };
-                    stack.push(match b.eşit_değildir(a) { Ok(a) => a, Err(e) => return Err((stack, hashs, e)) });
+                    stack.push(match b.eşit_değildir(a) {
+                        Ok(a) => a,
+                        Err(e) => return Err((stack, hashs, e)),
+                    });
                     self.current += 1;
                 }
                 TokenType::Değildir => {
@@ -899,7 +1174,10 @@ impl Run {
                             }
                         })),
                     };
-                    stack.push(match a.değildir() { Ok(a) => a, Err(e) => return Err((stack, hashs, e)) });
+                    stack.push(match a.değildir() {
+                        Ok(a) => a,
+                        Err(e) => return Err((stack, hashs, e)),
+                    });
                     self.current += 1;
                 }
                 TokenType::Son { tp } => {
@@ -963,7 +1241,10 @@ impl Run {
                             }
                         })),
                     };
-                    stack.push(match b.modulo(a) { Ok(a) => a, Err(e) => return Err((stack, hashs, e)) });
+                    stack.push(match b.modulo(a) {
+                        Ok(a) => a,
+                        Err(e) => return Err((stack, hashs, e)),
+                    });
                     self.current += 1;
                 }
                 TokenType::Takas => {
@@ -1195,7 +1476,8 @@ impl Run {
                 TokenType::İkiNoktaNokta | TokenType::EOF => self.current += 1,
                 TokenType::Identifier { id } => match hashs.clone().get_mut(&id) {
                     Some(val) => match val {
-                        Object::Bool(_)
+                        Object::Hiç
+                        | Object::Bool(_)
                         | Object::Sayı(_)
                         | Object::Yazı(_)
                         | Object::Liste(_)
@@ -1299,31 +1581,39 @@ impl Run {
                         })),
                     };
                     let id = self.program.get(self.current + 1).unwrap();
-                    hashs.insert(match id.typ.clone() {
-                        TokenType::Identifier { id : i } => i,
-                        t => return Err((stack, hashs, match get_lang() {
-                            SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
-                                    "BeklenmedikSimge",
-                                    &format!("Tanımlayıcı simgesi beklenmişti ancak {:?} bulundu", t),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
-                                    None,
-                                )
-                            },
-                            SupportedLanguage::English => {
-                                ErrorGenerator::error(
-                                    "UnexpectedToken",
-                                    &format!("expected Identifier but found {:?}", t),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
-                                    None,
-                                )
-                            },
-                        })),
-                    }, a);
+                    hashs.insert(
+                        match id.typ.clone() {
+                            TokenType::Identifier { id: i } => i,
+                            t => {
+                                return Err((
+                                    stack,
+                                    hashs,
+                                    match get_lang() {
+                                        SupportedLanguage::Turkish => ErrorGenerator::error(
+                                            "BeklenmedikSimge",
+                                            &format!(
+                                            "Tanımlayıcı simgesi beklenmişti ancak {:?} bulundu",
+                                            t
+                                        ),
+                                            tokenc.line,
+                                            tokenc.col,
+                                            tokenc.file,
+                                            None,
+                                        ),
+                                        SupportedLanguage::English => ErrorGenerator::error(
+                                            "UnexpectedToken",
+                                            &format!("expected Identifier but found {:?}", t),
+                                            tokenc.line,
+                                            tokenc.col,
+                                            tokenc.file,
+                                            None,
+                                        ),
+                                    },
+                                ))
+                            }
+                        },
+                        a,
+                    );
                     self.current += 2;
                 }
                 TokenType::Ve => {
@@ -1377,7 +1667,12 @@ impl Run {
                             }
                         })),
                     };
-                    stack.push(match b.ve(a, tokenc.line, tokenc.col, tokenc.file.clone()) { Ok(a) => a, Err(e) => return Err((stack, hashs, e)) });
+                    stack.push(
+                        match b.ve(a, tokenc.line, tokenc.col, tokenc.file.clone()) {
+                            Ok(a) => a,
+                            Err(e) => return Err((stack, hashs, e)),
+                        },
+                    );
                     self.current += 1;
                 }
                 TokenType::Veya => {
@@ -1431,7 +1726,12 @@ impl Run {
                             }
                         })),
                     };
-                    stack.push(match b.veya(a, tokenc.line, tokenc.col, tokenc.file.clone()) { Ok(a) => a, Err(e) => return Err((stack, hashs, e)) });
+                    stack.push(
+                        match b.veya(a, tokenc.line, tokenc.col, tokenc.file.clone()) {
+                            Ok(a) => a,
+                            Err(e) => return Err((stack, hashs, e)),
+                        },
+                    );
                     self.current += 1;
                 }
                 TokenType::Tipinde => {
@@ -1464,33 +1764,40 @@ impl Run {
                     let b = self.program.get_mut(self.current).unwrap();
                     match &b.typ {
                         TokenType::Identifier { id } => {
-                            stack.push(match a.dönüştür(id.clone(), b.line, b.col, b.file.clone()) { Ok(a) => a, Err(e) => return Err((stack, hashs, e)) });
+                            stack.push(
+                                match a.dönüştür(id.clone(), b.line, b.col, b.file.clone()) {
+                                    Ok(a) => a,
+                                    Err(e) => return Err((stack, hashs, e)),
+                                },
+                            );
                         }
-                        _ => return Err((stack, hashs, match get_lang() {
-                            SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
-                                    "BeklenmedikSimge",
-                                    &format!(
-                                        "tanımlayıcı beklenmişti ancak `{}` bulundu",
-                                        b.repr()
+                        _ => {
+                            return Err((
+                                stack,
+                                hashs,
+                                match get_lang() {
+                                    SupportedLanguage::Turkish => ErrorGenerator::error(
+                                        "BeklenmedikSimge",
+                                        &format!(
+                                            "tanımlayıcı beklenmişti ancak `{}` bulundu",
+                                            b.repr()
+                                        ),
+                                        tokenc.line,
+                                        tokenc.col,
+                                        tokenc.file,
+                                        None,
                                     ),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
-                                    None,
-                                )
-                            }
-                            SupportedLanguage::English => {
-                                ErrorGenerator::error(
-                                    "UnexpectedToken",
-                                    &format!("expected identifier, but found `{}`", b.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
-                                    None,
-                                )
-                            }
-                        })),
+                                    SupportedLanguage::English => ErrorGenerator::error(
+                                        "UnexpectedToken",
+                                        &format!("expected identifier, but found `{}`", b.repr()),
+                                        tokenc.line,
+                                        tokenc.col,
+                                        tokenc.file,
+                                        None,
+                                    ),
+                                },
+                            ))
+                        }
                     };
                     self.current += 1;
                 }
@@ -1511,7 +1818,8 @@ impl Run {
                     for (i, o) in stack.iter_vec().iter().rev().take(3).rev().enumerate() {
                         let o = match o {
                             Object::Yazı(s) => format!("{:?}", s),
-                            Object::Bool(_)
+                            Object::Hiç
+                            | Object::Bool(_)
                             | Object::Sayı(_)
                             | Object::Liste(_)
                             | Object::Harita(_) => format!("{:?}", o),
@@ -1541,7 +1849,8 @@ impl Run {
                     for (i, o) in stack.iter_vec().iter().rev().take(3).rev().enumerate() {
                         let o = match o {
                             Object::Yazı(s) => format!("{:?}", s),
-                            Object::Bool(_)
+                            Object::Hiç
+                            | Object::Bool(_)
                             | Object::Sayı(_)
                             | Object::Liste(_)
                             | Object::Harita(_) => format!("{:?}", o),

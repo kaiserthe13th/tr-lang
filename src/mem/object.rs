@@ -1,4 +1,4 @@
-use crate::errwarn::{ErrorGenerator, Error};
+use crate::errwarn::{Error, ErrorGenerator};
 use crate::util::{get_lang, SupportedLanguage};
 use std::collections::HashMap;
 use std::fmt;
@@ -19,6 +19,14 @@ pub struct Map {
     pub map: HashMap<String, Object>,
 }
 
+impl Map {
+    pub fn new() -> Self {
+        Self {
+            map: HashMap::new(),
+        }
+    }
+}
+
 impl fmt::Debug for Map {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         Ok(write!(f, "{:?}", self.map)?)
@@ -33,6 +41,7 @@ pub enum Object {
     İşlev(usize),
     Liste(List),
     Harita(Map),
+    Hiç,
 }
 
 impl fmt::Debug for Object {
@@ -53,6 +62,7 @@ impl fmt::Debug for Object {
             Self::İşlev(loc) => write!(f, "<işlev: {:?}>", loc)?,
             Self::Liste(ls) => write!(f, "{:?}", ls)?,
             Self::Harita(map) => write!(f, "{:?}", map)?,
+            Self::Hiç => write!(f, "hiç")?,
         }
         Ok(())
     }
@@ -107,6 +117,10 @@ impl Object {
                 )),
                 c => panic!("{:?} `=` {:?} operatörü desteklemiyor", m, c),
             },
+            Self::Hiç => match a {
+                Self::Hiç => Ok(Self::Bool(true)),
+                _ => Ok(Self::Bool(false)),
+            },
         }
     }
     pub fn eşit_değildir(&self, a: Self) -> ObjectResult {
@@ -153,6 +167,10 @@ impl Object {
                         }),
                 )),
                 c => panic!("{:?} `!=` {:?} operatörü desteklemiyor", m, c),
+            },
+            Self::Hiç => match a {
+                Self::Hiç => Ok(Self::Bool(false)),
+                _ => Ok(Self::Bool(true)),
             },
         }
     }
@@ -225,6 +243,7 @@ impl Object {
             Self::Bool(b) => panic!("{:?} `+` operatörünü desteklemiyor", b),
             Self::Harita(m) => panic!("{:?} `+` operatörünü desteklemiyor", m),
             Self::İşlev(_) => unreachable!(),
+            Self::Hiç => panic!("hiç `+` operatörünü desteklemiyor"),
         }
     }
     pub fn çıkar(&self, a: Self) -> ObjectResult {
@@ -298,49 +317,41 @@ impl Object {
             Self::Bool(f) => match a {
                 Self::Bool(a) => Ok(Self::Bool(*f && a)),
                 b => match get_lang() {
-                    SupportedLanguage::Turkish => {
-                        Err(ErrorGenerator::error(
-                            "Desteklenmeyenİşlem",
-                            &format!("`{:?}` `ve` `{:?}` işlemi desteklemiyor", self, b),
-                            line,
-                            col,
-                            file,
-                            None,
-                        ))
-                    }
-                    SupportedLanguage::English => {
-                        Err(ErrorGenerator::error(
-                            "UnsupportedOperation",
-                            &format!("`{:?}` `ve` `{:?}` operation is not supported", self, b),
-                            line,
-                            col,
-                            file,
-                            None,
-                        ))
-                    }
+                    SupportedLanguage::Turkish => Err(ErrorGenerator::error(
+                        "Desteklenmeyenİşlem",
+                        &format!("`{:?}` `ve` `{:?}` işlemi desteklemiyor", self, b),
+                        line,
+                        col,
+                        file,
+                        None,
+                    )),
+                    SupportedLanguage::English => Err(ErrorGenerator::error(
+                        "UnsupportedOperation",
+                        &format!("`{:?}` `ve` `{:?}` operation is not supported", self, b),
+                        line,
+                        col,
+                        file,
+                        None,
+                    )),
                 },
             },
             b => match get_lang() {
-                SupportedLanguage::Turkish => {
-                    Err(ErrorGenerator::error(
-                        "Desteklenmeyenİşlem",
-                        &format!("{:?} `veya` anahtar kelimesini desteklemiyor", b),
-                        line,
-                        col,
-                        file,
-                        None,
-                    ))
-                }
-                SupportedLanguage::English => {
-                    Err(ErrorGenerator::error(
-                        "UnsupportedOperation",
-                        &format!("{:?} does not support the keyword `veya`", b),
-                        line,
-                        col,
-                        file,
-                        None,
-                    ))
-                }
+                SupportedLanguage::Turkish => Err(ErrorGenerator::error(
+                    "Desteklenmeyenİşlem",
+                    &format!("{:?} `veya` anahtar kelimesini desteklemiyor", b),
+                    line,
+                    col,
+                    file,
+                    None,
+                )),
+                SupportedLanguage::English => Err(ErrorGenerator::error(
+                    "UnsupportedOperation",
+                    &format!("{:?} does not support the keyword `veya`", b),
+                    line,
+                    col,
+                    file,
+                    None,
+                )),
             },
         }
     }
@@ -349,49 +360,41 @@ impl Object {
             Self::Bool(f) => match a {
                 Self::Bool(a) => Ok(Self::Bool(*f || a)),
                 b => match get_lang() {
-                    SupportedLanguage::Turkish => {
-                        Err(ErrorGenerator::error(
-                            "Desteklenmeyenİşlem",
-                            &format!("`{:?}` `veya` `{:?}` işlemi desteklemiyor", self, b),
-                            line,
-                            col,
-                            file,
-                            None,
-                        ))
-                    }
-                    SupportedLanguage::English => {
-                        Err(ErrorGenerator::error(
-                            "UnsupportedOperation",
-                            &format!("`{:?}` `veya` `{:?}` operation is not supported", self, b),
-                            line,
-                            col,
-                            file,
-                            None,
-                        ))
-                    }
+                    SupportedLanguage::Turkish => Err(ErrorGenerator::error(
+                        "Desteklenmeyenİşlem",
+                        &format!("`{:?}` `veya` `{:?}` işlemi desteklemiyor", self, b),
+                        line,
+                        col,
+                        file,
+                        None,
+                    )),
+                    SupportedLanguage::English => Err(ErrorGenerator::error(
+                        "UnsupportedOperation",
+                        &format!("`{:?}` `veya` `{:?}` operation is not supported", self, b),
+                        line,
+                        col,
+                        file,
+                        None,
+                    )),
                 },
             },
             b => match get_lang() {
-                SupportedLanguage::Turkish => {
-                    Err(ErrorGenerator::error(
-                        "Desteklenmeyenİşlem",
-                        &format!("{:?} `veya` anahtar kelimesini desteklemiyor", b),
-                        line,
-                        col,
-                        file,
-                        None,
-                    ))
-                }
-                SupportedLanguage::English => {
-                    Err(ErrorGenerator::error(
-                        "UnsupportedOperation",
-                        &format!("{:?} does not support the keyword `veya`", b),
-                        line,
-                        col,
-                        file,
-                        None,
-                    ))
-                }
+                SupportedLanguage::Turkish => Err(ErrorGenerator::error(
+                    "Desteklenmeyenİşlem",
+                    &format!("{:?} `veya` anahtar kelimesini desteklemiyor", b),
+                    line,
+                    col,
+                    file,
+                    None,
+                )),
+                SupportedLanguage::English => Err(ErrorGenerator::error(
+                    "UnsupportedOperation",
+                    &format!("{:?} does not support the keyword `veya`", b),
+                    line,
+                    col,
+                    file,
+                    None,
+                )),
             },
         }
     }
@@ -408,40 +411,36 @@ impl Object {
                 Self::İşlev(_) => unreachable!(),
                 Self::Liste(l) => Ok(Self::Yazı(format!("{:?}", l))),
                 Self::Harita(m) => Ok(Self::Yazı(format!("{:?}", m))),
+                Self::Hiç => Ok(Self::Yazı("hiç".to_string())),
             },
             "bool" | "boolean" => match self {
                 Self::Bool(_) => Ok(self.clone()),
-                Self::Sayı(n) => {
-                    Ok(if n == &0. {
-                        Self::Bool(false)
-                    } else {
-                        Self::Bool(true)
-                    })
-                }
+                Self::Hiç => Ok(Self::Bool(false)),
+                Self::Sayı(n) => Ok(if n == &0. {
+                    Self::Bool(false)
+                } else {
+                    Self::Bool(true)
+                }),
                 Self::Yazı(s) => match s.as_str() {
                     "doğru" => Ok(Self::Bool(true)),
                     "yanlış" => Ok(Self::Bool(false)),
                     _ => Err(match get_lang() {
-                        SupportedLanguage::Turkish => {
-                            ErrorGenerator::error(
-                                "DeğerHatası",
-                                &format!("`{:?}` beklenen değerlerin arasında bulunmuyor", s),
-                                line,
-                                col,
-                                file,
-                                None,
-                            )
-                        }
-                        SupportedLanguage::English => {
-                            ErrorGenerator::error(
-                                "ValueError",
-                                &format!("`{:?}` is not one of the expected values", s),
-                                line,
-                                col,
-                                file,
-                                None,
-                            )
-                        }
+                        SupportedLanguage::Turkish => ErrorGenerator::error(
+                            "DeğerHatası",
+                            &format!("`{:?}` beklenen değerlerin arasında bulunmuyor", s),
+                            line,
+                            col,
+                            file,
+                            None,
+                        ),
+                        SupportedLanguage::English => ErrorGenerator::error(
+                            "ValueError",
+                            &format!("`{:?}` is not one of the expected values", s),
+                            line,
+                            col,
+                            file,
+                            None,
+                        ),
                     }),
                 },
                 Self::İşlev(_) => unreachable!(),
@@ -452,56 +451,49 @@ impl Object {
                     true => Self::Sayı(1.),
                     false => Self::Sayı(0.),
                 }),
+                Self::Hiç => Ok(Self::Sayı(0.)),
                 Self::Sayı(_) => Ok(self.clone()),
                 Self::Yazı(s) => match s.parse::<f64>() {
                     Ok(m) => Ok(Self::Sayı(m)),
                     Err(_) => Err(match get_lang() {
-                        SupportedLanguage::Turkish => {
-                            ErrorGenerator::error(
-                                "DeğerHatası",
-                                &format!("`{:?}` beklenen değerlerin arasında bulunmuyor", s),
-                                line,
-                                col,
-                                file,
-                                None,
-                            )
-                        }
-                        SupportedLanguage::English => {
-                            ErrorGenerator::error(
-                                "ValueError",
-                                &format!("`{:?}` is not one of the expected values", s),
-                                line,
-                                col,
-                                file,
-                                None,
-                            )
-                        }
+                        SupportedLanguage::Turkish => ErrorGenerator::error(
+                            "DeğerHatası",
+                            &format!("`{:?}` beklenen değerlerin arasında bulunmuyor", s),
+                            line,
+                            col,
+                            file,
+                            None,
+                        ),
+                        SupportedLanguage::English => ErrorGenerator::error(
+                            "ValueError",
+                            &format!("`{:?}` is not one of the expected values", s),
+                            line,
+                            col,
+                            file,
+                            None,
+                        ),
                     }),
                 },
                 Self::İşlev(_) => unreachable!(),
                 Self::Liste(_) | Self::Harita(_) => panic!("unsupported conversion"),
             },
             a => Err(match get_lang() {
-                SupportedLanguage::Turkish => {
-                    ErrorGenerator::error(
-                        "DeğerHatası",
-                        &format!("`{:?}` beklenen değerlerin arasında bulunmuyor", a),
-                        line,
-                        col,
-                        file,
-                        None,
-                    )
-                }
-                SupportedLanguage::English => {
-                    ErrorGenerator::error(
-                        "ValueError",
-                        &format!("`{:?}` is not one of the expected values", a),
-                        line,
-                        col,
-                        file,
-                        None,
-                    )
-                }
+                SupportedLanguage::Turkish => ErrorGenerator::error(
+                    "DeğerHatası",
+                    &format!("`{:?}` beklenen değerlerin arasında bulunmuyor", a),
+                    line,
+                    col,
+                    file,
+                    None,
+                ),
+                SupportedLanguage::English => ErrorGenerator::error(
+                    "ValueError",
+                    &format!("`{:?}` is not one of the expected values", a),
+                    line,
+                    col,
+                    file,
+                    None,
+                ),
             }),
         }
     }

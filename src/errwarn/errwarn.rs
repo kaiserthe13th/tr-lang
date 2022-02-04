@@ -1,7 +1,7 @@
 use crate::util::{get_lang, SupportedLanguage};
-use std::process::exit;
 use std::error;
 use std::fmt;
+use std::process::exit;
 
 #[derive(Debug)]
 pub struct Error {
@@ -18,11 +18,17 @@ impl Error {
     pub fn eprint(&self) {
         match get_lang() {
             SupportedLanguage::English => {
-                eprintln!("\n[ERROR] {}, Line {:?}, Column {:?}", self.position.2, self.position.0, self.position.1);
+                eprintln!(
+                    "\n[ERROR] {}, Line {:?}, Column {:?}",
+                    self.position.2, self.position.0, self.position.1
+                );
                 eprintln!("    {}: {}", self.name, self.explanation);
             }
             SupportedLanguage::Turkish => {
-                eprintln!("\n[HATA] {}, Satır {:?}, Sütun {:?}", self.position.2, self.position.0, self.position.1);
+                eprintln!(
+                    "\n[HATA] {}, Satır {:?}, Sütun {:?}",
+                    self.position.2, self.position.0, self.position.1
+                );
                 eprintln!("    {}: {}", self.name, self.explanation);
             }
         }

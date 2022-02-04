@@ -1,4 +1,3 @@
-use crate::store::PATH_SEP;
 use crate::token::tokentypes::LexerTokenType as TokenType;
 use crate::token::LexerToken as Token;
 use crate::token::Precedence;
@@ -33,49 +32,86 @@ impl Lexer {
 
             match c.typ {
                 TokenType::Yükle => {
-                    let next_tok = prog.get(current + 1).unwrap().clone();
-                    match next_tok.typ {
+                    let next_token = match prog.get(current + 1) {
+                        Some(e) => e.clone(),
+                        None => panic!("yükle den sonra <yazı> bekleniyordu ancak bulunamadı"),
+                    };
+                    match next_token.typ {
                         TokenType::Yazı => {
-                            let pathstr = next_tok.lexeme;
-                            let path = PathBuf::from(pathstr.clone());
-                            let canon_path: String = if path.has_root() {
-                                match canonicalize(&path) {
-                                    Ok(a) => a.as_path().display().to_string(),
-                                    Err(e) => panic!("`{}` adlı dosya yüklenemedi: `{}`", pathstr, e),
+                            let mut tmp_visited = visited.clone();
+                            let mut path = canonicalize(PathBuf::from(file.clone()))
+                                .expect("yol normalleştirilemedi");
+                            if !path.is_dir() {
+                                path.set_file_name(next_token.lexeme);
+                            } else {
+                                path.push(next_token.lexeme);
+                            }
+                            let source = match read_file(&path) {
+                                Ok(f) => {
+                                    tmp_visited.push(path.display().to_string());
+                                    f
+                                },
+                                Err(FSErr::IsADir) => {
+                                    path.push("giriş.trl");
+                                    match read_file(&path) {
+                                        Ok(f) => {
+                                            tmp_visited.push(path.display().to_string());
+                                            f
+                                        },
+                                        Err(e) => panic!("{:?}", e)
+                                    }
+                                },
+                            };
+                            if !in_vec(&path.display().to_string(), &visited.clone()) {
+                                let mut nl = Lexer::new(source);
+                                let mut res = nl.tokenize(visited, path.display().to_string());
+
+                                let next_token = match prog.get(current + 2) {
+                                    Some(e) => e.clone(),
+                                    None => panic!("yükle <yazı> dan sonra `*` veya `->` bekleniyordu ancak bulunamadı"),
+                                };
+                                match next_token.typ {
+                                    TokenType::Çarpı => {
+                                        tokens.append(&mut res);
+                                        current += 3;
+                                    }
+                                    TokenType::Koy => {
+                                        tokens.push(Token::new(
+                                            TokenType::Blok,
+                                            "blok".to_string(),
+                                            next_token.line,
+                                            next_token.col,
+                                            next_token.file.clone(),
+                                            Precedence::Reserved,
+                                        ));
+                                        let next_token = match prog.get(current + 3) {
+                                            Some(e) => e.clone(),
+                                            None => panic!("yükle <yazı> -> dan sonra tanımlayıcı bekleniyordu ancak bulunamadı"),
+                                        };
+                                        match next_token.typ {
+                                            TokenType::Identifier => tokens.push(next_token.clone()),
+                                            _ => panic!("yükle <yazı> -> dan sonra tanımlayıcı bekleniyordu ancak bulunamadı"),
+                                        }
+                                        tokens.append(&mut res);
+                                        tokens.push(Token::new(
+                                            TokenType::Son,
+                                            "son".to_string(),
+                                            next_token.line,
+                                            next_token.col,
+                                            next_token.file,
+                                            Precedence::Reserved,
+                                        ));
+                                        current += 4;
+                                    }
+                                    _ => panic!("yükle <yazı> dan sonra `*` veya `->` bekleniyordu ancak bulunamadı"), 
                                 }
                             } else {
-                                match canonicalize(match canonicalize(file.clone()) {
-                                    Ok(a) => {
-                                        let mut a = a;
-                                        a.pop();
-                                        a.as_path().display().to_string()
-                                    },
-                                    Err(e) => panic!("`{}` adlı dosya yüklenemedi: {}", pathstr, e),
-                                } + &PATH_SEP.to_string() + &pathstr) {
-                                    Ok(a) => a.as_path().display().to_string(),
-                                    Err(e) => panic!("`{}` adlı dosya yüklenemedi: {}", pathstr, e),
-                                }
-                            };
-
-                            let mut path = PathBuf::from(canon_path.clone());
-                            if !in_vec(&canon_path, &visited) {
-                                visited.push(canon_path.clone());
-
-                                let mut nl = Self::new(match read_file(&path) {
-                                    Ok(f) => f,
-                                    Err(FSErr::IsADir) => {
-                                        path.push("main.trl");
-                                        read_file(&path).unwrap()
-                                    },
-                                });
-                                tokens.append(&mut nl.tokenize(visited, canon_path));
+                                *visited = tmp_visited;
                             }
                         },
-                        TokenType::Identifier => unimplemented!(),
-                        _ => panic!("yükle anahtar kelimesinden sonra yazı veya tanımlayıcı bekleniyordu ancak bulunamadı"), // SyntaxError
+                        _ => panic!("yükle den sonra <yazı> bekleniyordu ancak bulunamadı"),
                     }
-                    current += 2;
-                }
+                },
                 _ => {
                     tokens.push(c);
                     current += 1;
@@ -517,7 +553,14 @@ impl Lexer {
                             self.col += 1;
                             self.current += 1;
                         } else {
-                            unimplemented!("':' operatorü implemente edilmiş değil");
+                            tokens.push(Token::new(
+                                TokenType::İkiNokta,
+                                ":".to_string(),
+                                self.line,
+                                self.col,
+                                file.clone(),
+                                Precedence::None,
+                            ));
                         }
                     }
                 }
@@ -700,6 +743,22 @@ impl Lexer {
                         "yükle" => tokens.push(Token::new(
                             TokenType::Yükle,
                             "yükle".to_string(),
+                            self.line,
+                            self.col,
+                            file.clone(),
+                            Precedence::Reserved,
+                        )),
+                        "hiç" => tokens.push(Token::new(
+                            TokenType::Hiç,
+                            "hiç".to_string(),
+                            self.line,
+                            self.col,
+                            file.clone(),
+                            Precedence::None,
+                        )),
+                        "blok" => tokens.push(Token::new(
+                            TokenType::Blok,
+                            "blok".to_string(),
                             self.line,
                             self.col,
                             file.clone(),

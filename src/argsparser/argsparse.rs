@@ -1,9 +1,9 @@
+#[cfg(feature = "interactive")]
+use crate::interactive::QuietLevel;
 use crate::store::globarg::*;
 use crate::util;
 use crate::utilbin;
 use std::env;
-#[cfg(feature = "interactive")]
-use crate::interactive::QuietLevel;
 
 #[derive(Debug)]
 pub enum Subcommands {
@@ -51,20 +51,20 @@ pub fn parse_args() -> Options {
     let (mut prd_out, mut outfile) = (false, None);
 
     if args.len() == 1 {
-            match args[0].as_str() {
-                "-V" | "-s" | "--sürüm" => {
-                    utilbin::print_version(name);
-                }
-                "-h" | "-y" | "--yardım" => utilbin::print_help(0, name),
-                "-L" | "--license" | "--lisans" => utilbin::print_license(),
-                "i" | "inter" => (),
-                _ => utilbin::print_help(1, name),
+        match args[0].as_str() {
+            "-V" | "-s" | "--sürüm" => {
+                utilbin::print_version(name);
             }
-            if args.len() == 1 && args[0] != "inter" && args[0] != "i" {
-                utilbin::print_help(1, name);
-            }
+            "-h" | "-y" | "--yardım" => utilbin::print_help(0, name),
+            "-L" | "--license" | "--lisans" => utilbin::print_license(),
+            "i" | "inter" => (),
+            _ => utilbin::print_help(1, name),
+        }
+        if args.len() == 1 && args[0] != "inter" && args[0] != "i" {
+            utilbin::print_help(1, name);
+        }
     }
-        
+
     let sub_cmd = if args.len() >= 1 {
         let s = match args.get(0).unwrap().as_str() {
             "y" | "yürüt" => Subcommands::Run,
@@ -86,7 +86,9 @@ pub fn parse_args() -> Options {
         };
         args.remove(0);
         s
-    } else { Subcommands::Interact };
+    } else {
+        Subcommands::Interact
+    };
 
     let mut outs = false;
     let mut license = false;
@@ -94,10 +96,9 @@ pub fn parse_args() -> Options {
     let file = if let Subcommands::Interact = sub_cmd {
         "".to_string()
     } else {
-        args = args[1..].to_vec();
-        args.get(0)
-            .expect("couldn't get <FILE>")
-            .to_string()
+        let file = args.get(0).expect("couldn't get <FILE>").to_string();
+        args.remove(0);
+        file
     };
 
     for arg in args {

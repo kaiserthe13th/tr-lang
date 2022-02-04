@@ -1,8 +1,8 @@
-use std::process::exit;
 use std::fs::File;
 use std::io::ErrorKind::IsADirectory;
 use std::io::Read;
 use std::path::PathBuf;
+use std::process::exit;
 
 use locale_config::Locale;
 
@@ -101,4 +101,3 @@ where
     }
     false
 }
-

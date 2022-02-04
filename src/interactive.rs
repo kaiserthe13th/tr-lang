@@ -1,7 +1,3 @@
-use rustyline::error::ReadlineError;
-use rustyline::Editor;
-use rustyline::completion::Pair;
-use rustyline::completion::Completer;
 use crate::errwarn::ErrorGenerator;
 use crate::lexer::Lexer;
 use crate::parser::Parser;
@@ -10,25 +6,42 @@ use crate::store::VERSION;
 use crate::util::{get_lang, SupportedLanguage};
 use lazy_static::lazy_static;
 use regex::Regex;
+use rustyline::completion::Completer;
+use rustyline::completion::Pair;
+use rustyline::error::ReadlineError;
+use rustyline::Editor;
 
 struct InteractiveCompleter;
 impl Completer for InteractiveCompleter {
     type Candidate = Pair;
-    fn complete(&self, line: &str, pos: usize, _ctx: &rustyline::Context<'_>) -> rustyline::Result<(usize, Vec<Pair>)> {
+    fn complete(
+        &self,
+        line: &str,
+        pos: usize,
+        _ctx: &rustyline::Context<'_>,
+    ) -> rustyline::Result<(usize, Vec<Pair>)> {
         lazy_static! {
-            static ref RE: Regex = Regex::new(r#"[^()\d,'"+\-*/><!=%?.@\s][^\s"':?=<>!/%*@,()]*"#).unwrap();
+            static ref RE: Regex =
+                Regex::new(r#"[^()\d,'"+\-*/><!=%?.@\s][^\s"':?=<>!/%*@,()]*"#).unwrap();
             static ref KNOWN_KEYWORDS: Vec<&'static str> = vec![
-                "at", "ver", "de", "ise", "son", "iken", "yoksa", "doğru", "yanlış",
-                "kpy", "tks", "üst", "veya", "ve", "dön", "girdi", "işlev", "yükle",
+                "at", "ver", "de", "ise", "son", "iken", "yoksa", "doğru", "yanlış", "kpy", "tks",
+                "üst", "veya", "ve", "dön", "girdi", "işlev", "yükle",
             ];
         }
         let matches = RE.find_iter(line);
         for m in matches.into_iter() {
             if m.end() == pos {
-                return Ok((m.start(), KNOWN_KEYWORDS.iter()
-                    .filter(|a| a.starts_with(m.as_str()))
-                    .map(|a| Pair { display: a.to_string(), replacement: a.to_string() })
-                    .collect())); 
+                return Ok((
+                    m.start(),
+                    KNOWN_KEYWORDS
+                        .iter()
+                        .filter(|a| a.starts_with(m.as_str()))
+                        .map(|a| Pair {
+                            display: a.to_string(),
+                            replacement: a.to_string(),
+                        })
+                        .collect(),
+                ));
             }
         }
         Ok((0, Vec::with_capacity(0)))
@@ -55,14 +68,14 @@ impl QuietLevel {
         for _ in 0..i {
             self.inc()
         }
-    } 
+    }
 }
 
 pub struct Interactive {
     line: usize,
     quiet: QuietLevel,
 }
-impl Default for  Interactive {
+impl Default for Interactive {
     fn default() -> Self {
         Self {
             line: 1,
@@ -72,7 +85,10 @@ impl Default for  Interactive {
 }
 impl Interactive {
     pub fn new(quiet: QuietLevel) -> Self {
-        Self { quiet, ..Default::default() }
+        Self {
+            quiet,
+            ..Default::default()
+        }
     }
     pub fn start(&mut self) {
         if self.quiet == QuietLevel::None {
@@ -109,23 +125,28 @@ impl Interactive {
                 Ok(buf) => match buf.as_str() {
                     "#çık" => break,
                     "#yürüt" => {
-                        let (mut memcs, _) = Run::new(Parser::from_lexer(&mut Lexer::new(fbuf), "<trli>".to_string()).parse())
-                            .run("<trli>".to_string(), None, true)
-                            .unwrap_or_else(|(s, h, e)| {e.eprint(); (s, h)});
+                        let (mut memcs, _) = Run::new(
+                            Parser::from_lexer(&mut Lexer::new(fbuf), ".".to_string()).parse(),
+                        )
+                        .run("<trli>".to_string(), None, true)
+                        .unwrap_or_else(|(s, h, e)| {
+                            e.eprint();
+                            (s, h)
+                        });
                         println!();
                         if memcs.len() > 0 {
                             println!("=> {:?}", memcs.iter_vec());
                         }
                         fbuf = String::new();
                         self.line = 1;
-                    },
+                    }
                     _ => {
                         editor.add_history_entry(&buf);
                         fbuf.push_str(&buf);
                         fbuf.push('\n');
                         self.line += 1;
-                    },
-                }
+                    }
+                },
                 Err(ReadlineError::Interrupted) => {
                     eprintln!("Ctrl+C");
                 }
@@ -134,21 +155,23 @@ impl Interactive {
                     SupportedLanguage::Turkish => ErrorGenerator::error(
                         "EditörHatası",
                         &format!("{}", e),
-                        self.line, 0,
+                        self.line,
+                        0,
                         "<trli>".to_string(),
-                        None
+                        None,
                     ),
                     SupportedLanguage::English => ErrorGenerator::error(
                         "EditorError",
                         &format!("{}", e),
-                        self.line, 0,
+                        self.line,
+                        0,
                         "<trli>".to_string(),
-                        None
-                    )
-                }.eprint()
+                        None,
+                    ),
+                }
+                .eprint(),
             }
         }
         editor.save_history(".trlhistory").unwrap();
     }
 }
-

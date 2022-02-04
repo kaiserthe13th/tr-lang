@@ -45,13 +45,13 @@ fn main() {
             let mut lexer = Lexer::new(match util::read_file(&path) {
                 Ok(f) => f,
                 Err(util::FSErr::IsADir) => {
-                    path.push("main.trl");
+                    path.push("giriş.trl");
                     util::read_file(&path).unwrap()
                 }
             });
             if args.lex_out {
-                let canon_path = match canonicalize(args.file.clone()) {
-                    Ok(a) => a.as_path().display().to_string(),
+                let canon_path = match canonicalize(path) {
+                    Ok(a) => a.display().to_string(),
                     Err(e) => panic!("`{}` adlı dosya yüklenemedi: {}", args.file.clone(), e),
                 };
                 let lexed = lexer
@@ -70,7 +70,11 @@ fn main() {
             {
                 let mut bytecode_src = fs::File::create(&match &args.outfile {
                     Some(f) => f.clone(),
-                    None => format!("{}.trbyt", args.file),
+                    None => {
+                        let mut pb = PathBuf::from(args.file);
+                        pb.set_extension(".trbyt");
+                        pb.display().to_string()
+                    }
                 })
                 .unwrap();
 
@@ -83,12 +87,12 @@ fn main() {
             let mut lexer = Lexer::new(match util::read_file(&path) {
                 Ok(f) => f,
                 Err(util::FSErr::IsADir) => {
-                    path.push("main.trl");
+                    path.push("giriş.trl");
                     util::read_file(&path).unwrap()
                 }
             });
             if args.lex_out {
-                let canon_path = match canonicalize(args.file.clone()) {
+                let canon_path = match canonicalize(path) {
                     Ok(a) => a.as_path().display().to_string(),
                     Err(e) => panic!("`{}` adlı dosya yüklenemedi: {}", args.file.clone(), e),
                 };
@@ -105,7 +109,8 @@ fn main() {
             }
 
             let mut run = runtime::Run::new(parser.parse());
-            run.run(args.file, None, false).unwrap_or_else(|(_, _, a)| a.error());
+            run.run(args.file, None, false)
+                .unwrap_or_else(|(_, _, a)| a.error());
         }
         argsparser::Subcommands::RunBytes => {
             let path = PathBuf::from(args.file.clone());
@@ -113,19 +118,17 @@ fn main() {
             let parsed = bytecode::from_bytecode(&con[..]);
 
             let mut run = runtime::Run::new(parsed);
-            run.run(args.file, None, false).unwrap_or_else(|(_, _, a)| a.error());
+            run.run(args.file, None, false)
+                .unwrap_or_else(|(_, _, a)| a.error());
         }
         argsparser::Subcommands::Command => {
             runtime::Run::new(
-                Parser::from_lexer(
-                    &mut Lexer::new(args.file),
-                    "<args>".to_string()
-                ).parse()
-            ).run("<args>".to_string(), None, false).unwrap_or_else(|(_, _, a)| a.error());
+                Parser::from_lexer(&mut Lexer::new(args.file), ".".to_string()).parse(),
+            )
+            .run(".".to_string(), None, false)
+            .unwrap_or_else(|(_, _, a)| a.error());
         }
         #[cfg(feature = "interactive")]
-        argsparser::Subcommands::Interact => {
-            interactive::Interactive::new(args.quiet).start()
-        }
+        argsparser::Subcommands::Interact => interactive::Interactive::new(args.quiet).start(),
     }
 }

@@ -3,10 +3,10 @@ pub const RELEASE: &str = env!("RELEASE_DATE");
 pub use crate::store::VERSION;
 
 use crate::exit;
-use std::path::PathBuf;
 use crate::util::*;
 use std::fs::File;
 use std::io::Read;
+use std::path::PathBuf;
 
 pub fn read_file_to_vec_u8(path: &PathBuf) -> Vec<u8> {
     let mut file = match File::open(path.clone()) {
@@ -109,4 +109,3 @@ pub fn print_license() -> ! {
     println!("{}", LICENSE);
     exit(0);
 }
-

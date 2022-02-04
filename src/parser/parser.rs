@@ -12,6 +12,7 @@ enum BlockToken {
     İken(usize),
     İkiNoktaNokta(usize),
     İşlev(usize),
+    Blok,
 }
 
 #[derive(Clone)]
@@ -112,6 +113,27 @@ impl Parser {
 
         for (ip, ptoken) in self.tokens.iter().enumerate() {
             match ptoken.typ {
+                LexTokenType::İkiNokta => parsed.push(Token::new(
+                    TokenType::İkiNokta,
+                    ptoken.line,
+                    ptoken.col,
+                    ptoken.file.clone(),
+                )),
+                LexTokenType::Blok => {
+                    parsed.push(Token::new(
+                        TokenType::Blok,
+                        ptoken.line,
+                        ptoken.col,
+                        ptoken.file.clone(),
+                    ));
+                    blocktokens.push(BlockToken::Blok);
+                }
+                LexTokenType::Hiç => parsed.push(Token::new(
+                    TokenType::Hiç,
+                    ptoken.line,
+                    ptoken.col,
+                    ptoken.file.clone(),
+                )),
                 LexTokenType::Ver => {
                     parsed.push(Token::new(
                         TokenType::Ver { tp: None },
@@ -298,6 +320,14 @@ impl Parser {
                                     _ => unreachable!(),
                                 }
                             }
+                        }
+                        BlockToken::Blok => {
+                            parsed.push(Token::new(
+                                TokenType::BlokSonlandır,
+                                ptoken.line,
+                                ptoken.col,
+                                ptoken.file.clone(),
+                            ));
                         }
                         _ => unimplemented!(),
                     };

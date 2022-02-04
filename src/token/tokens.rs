@@ -29,6 +29,7 @@ pub mod tokentypes {
         Veya,
         Girdi,
         İkiNoktaNokta,
+        İkiNokta,
         İken(Option<usize>),
         Sayı { val: f64 },
         Bool { val: bool },
@@ -43,6 +44,9 @@ pub mod tokentypes {
         At,
         Tipinde,
         ParenL,
+        Hiç,
+        Blok,
+        BlokSonlandır,
         EOF,
     }
 
@@ -73,6 +77,7 @@ pub mod tokentypes {
         Büyüktür,
         Küçüktür,
         İkiNoktaNokta,
+        İkiNokta,
         BüyükEşittir,
         KüçükEşittir,
         Eşittir,
@@ -96,6 +101,8 @@ pub mod tokentypes {
         Ver,
         Yükle,
         Tipinde,
+        Hiç,
+        Blok,
         EOF,
     }
 }
@@ -206,6 +213,10 @@ impl ParserToken {
             TokTyp::Üst => "üst".to_string(),
             TokTyp::Ver { .. } => "ver".to_string(),
             TokTyp::ParenL => "(".to_string(),
+            TokTyp::Hiç => "hiç".to_string(),
+            TokTyp::Blok => "blok".to_string(),
+            TokTyp::BlokSonlandır => "son".to_string(),
+            TokTyp::İkiNokta => ":".to_string(),
         }
     }
 }
