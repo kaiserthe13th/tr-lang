@@ -8,7 +8,7 @@
 ![GitHub yayını (tarihe göre en son)](https://img.shields.io/github/v/release/kaiserthe13th/tr-lang?label=son%20github%20yayını)
 ![GitHub yayını (önyaınlar dahil tarihe göre en son)](https://img.shields.io/github/v/release/kaiserthe13th/tr-lang?include_prereleases&label=son%20github%20önyayını)
 ![Crates.io](https://img.shields.io/crates/v/tr-lang)
-![Visual Studio Marketplace Sürümü](https://img.shields.io/visual-studio-marketplace/v/kaiserthe13th.tr-lang)
+![Visual Studio Marketplace Sürümü](https://img.shields.io/visual-studio-marketplace/v/kaiserthe13th.tr-lang?label=vscode%20eklentisinin%20sürümü)
 ![PyPI](https://img.shields.io/pypi/v/tr-lang-py?label=tr-lang-py)
 
 ### ❤️ ile 🇹🇷 de yapılmıştır
