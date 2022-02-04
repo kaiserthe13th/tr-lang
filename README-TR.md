@@ -16,6 +16,7 @@ tr-lang küme(stack) orantılı bir bellek yönetimine sahip.
 - [📖 Dokümantasyonu İncele](#-dok%C3%BCmantasyonu-i%CC%87ncele)
 - [🤝 Katkıda Bulunma](#-katkıda-bulunma)
 - [📜 Teşekkürler](#-teşekkürler)
+- [🔮 Gelecek için Planlar](#-gelecek-i%E7in-planlar)
 
 # 🏆 Dilin Hangi Parçaları Tamamlandı?
 
@@ -32,10 +33,12 @@ tr-lang küme(stack) orantılı bir bellek yönetimine sahip.
 
 ## 🪟 Windows
 
+<!-- // Bozuk! Çalışmıyor.
 ### 📇 tr-lang_Setup.exe
 Windows için programın bir indirici var.
 Sadece indirip çalıştırın.
 Sadece talimatları takip edin ve hazırsınız!
+-->
 
 ### 📇 Önden Derlenmiş Program
 Windows için programın önden derlenmiş hali var.
@@ -141,6 +144,12 @@ bug raporlamak, yeni özellik tavsiye etmek veya dokümantasyonu güncellemek i�
 özellikler için <span class="tag">`(enhancement | yükseltme)`</span> etiketini, buglar için <span class="tag">`(bug)`</span> etiketini ve dokümantasyon güncellemeleri için <span class="tag">`(documentation | dökümantasyon)`</span> etiketini kullanın
 
 👍 Bugfix PR'lerine açığız!
+
+# 🔮 Gelecek için Planlar
+- Rust benzeri struct'lar
+- Gerçek Listeler
+- Enterpolasyonlu Yazılar
+- Paket Yöneticisi (Trileche, Trill, Tren veya Trial adının verilmesi düşünülüyor)
 
 # 📜 Teşekkürler
 

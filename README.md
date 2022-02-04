@@ -5,7 +5,8 @@
 ### Made with ❤️ in 🇹🇷
 
 tr-lang is a language that aims to bring programming language syntax closer to Turkish.
-tr-lang is a stack based language and uses reverse-polish notation for maths.
+tr-lang has half-stack, half-regional based approach to memory management.
+tr-lang syntax has become infix from postfix starting with 0.4.0-rc1.
 
 View in [Turkish](README-TR.md)
 
@@ -16,6 +17,7 @@ View in [Turkish](README-TR.md)
 - [📖 See the Docs](#-see-the-docs)
 - [🤝 Contributing](#-contributing)
 - [📜 Thanks](#-thanks)
+- [🔮 Plans For Future](#-plans-for-future)
 
 # 🏆 What Has Been Implemented?
 
@@ -30,11 +32,12 @@ View in [Turkish](README-TR.md)
 # 🚀 Installation
 
 ## 🪟 Windows
-
+<!-- // Broken! Does not work!
 ### 📇 tr-lang_Setup.exe
 For windows there is a setup program.
 Just download it and run it.
 Follow the instructions and you are ready to go!
+-->
 
 ### 📇 Pre-Compiled Executable
 For windows there is a pre-compiled binary.
@@ -139,6 +142,12 @@ To report bugs, suggest new features or update documentation use the [issue trac
 for features use <span class="tag">`(enhancement | yükseltme)`</span> tag, for bugs use <span class="tag">`(bug)`</span> tag and for documentation updates use <span class="tag">`(documentation | dökümantasyon)`</span> tag
 
 👍 Bugfix PR's are welcome!
+
+# 🔮 Plans For Future
+- Rust-like implemented structs
+- Actual Lists
+- Interpolated Strings
+- Package Manager (planned to be named one of Trileche, Trill, Tren or Trial)
 
 # 📜 Thanks
 
