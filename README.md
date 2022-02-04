@@ -10,6 +10,7 @@
 ![Crates.io](https://img.shields.io/crates/v/tr-lang)
 ![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/kaiserthe13th.tr-lang?label=vscode%20extension%20version)
 ![PyPI](https://img.shields.io/pypi/v/tr-lang-py?label=tr-lang-py)
+![Platforms](https://img.shields.io/badge/platform-windows%20%7C%20macos%20%7C%20linux-blue)
 
 ### Made with ❤️ in 🇹🇷
 
