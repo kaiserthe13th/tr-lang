@@ -37,7 +37,7 @@
 		"keywords": {
 			"patterns": [{
 				"name": "keyword.control.tr-lang",
-				"match": "\\b(at|ver|de|ise|son|iken|yoksa|kpy|tks|üst|veya|ve|dön|girdi|işlev|yükle)\\b"
+				"match": "\\b(at|ver|de|ise|son|iken|yoksa|kpy|tks|üst|veya|ve|dön|girdi|işlev|yükle|blok)\\b"
 			}]
 		},
 		"strings": {
