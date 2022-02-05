@@ -113,6 +113,18 @@ impl Parser {
 
         for (ip, ptoken) in self.tokens.iter().enumerate() {
             match ptoken.typ {
+                LexTokenType::InScopeParentR => parsed.push(Token::new(
+                    TokenType::InScopeParentR,
+                    ptoken.line,
+                    ptoken.col,
+                    ptoken.file.clone(),
+                )),
+                LexTokenType::InScopeParentL => parsed.push(Token::new(
+                    TokenType::InScopeParentL,
+                    ptoken.line,
+                    ptoken.col,
+                    ptoken.file.clone(),
+                )),
                 LexTokenType::İkiNokta => parsed.push(Token::new(
                     TokenType::İkiNokta,
                     ptoken.line,
