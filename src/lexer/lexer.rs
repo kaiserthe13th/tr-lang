@@ -620,7 +620,7 @@ impl Lexer {
                         Precedence::None,
                     ));
                 }
-                ' ' => {
+                '\r' | ' ' => {
                     self.current += 1;
                     self.col += 1;
                 }
