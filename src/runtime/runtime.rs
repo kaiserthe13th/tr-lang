@@ -51,11 +51,11 @@ impl Run {
                                         "BilinmeyenTanımlayıcı",
                                         &format!(
                                             "bilinmeyen değişken: `{}`, bu değişken bulunamamıştır",
-                                            tokenc.repr()
+                                            tok.repr()
                                         ),
-                                        tokenc.line,
-                                        tokenc.col,
-                                        tokenc.file,
+                                        tok.line,
+                                        tok.col,
+                                        tok.file.clone(),
                                         {
                                             let mut hashk = hashs.clone().into_keys();
                                             hashk.sort();
@@ -69,10 +69,10 @@ impl Run {
                                     ),
                                     SupportedLanguage::English => ErrorGenerator::error(
                                         "UnknownIdentifier",
-                                        &format!("unknown identifier: `{}`, this identifier could not be found", tokenc.repr()),
-                                        tokenc.line,
-                                        tokenc.col,
-                                        tokenc.file,
+                                        &format!("unknown identifier: `{}`, this identifier could not be found", tok.repr()),
+                                        tok.line,
+                                        tok.col,
+                                        tok.file.clone(),
                                         {
                                             let mut hashk = hashs.clone().into_keys();
                                             hashk.sort();
@@ -159,13 +159,13 @@ impl Run {
                                                             "BilinmeyenTanımlayıcı",
                                                             &format!(
                                                                 "bilinmeyen değişken: `{}`, bu değişken bulunamamıştır",
-                                                                tokenc.repr()
+                                                                tok.repr()
                                                             ),
-                                                            tokenc.line,
-                                                            tokenc.col,
-                                                            tokenc.file,
+                                                            tok.line,
+                                                            tok.col,
+                                                            tok.file.clone(),
                                                             {
-                                                                let mut hashk = hashs.clone().into_keys();
+                                                                let mut hashk: Vec<_> = map.map.clone().into_keys().collect();
                                                                 hashk.sort();
                                                                 let n = hashk.binary_search(id).unwrap_err();
                                                                 if hashk.is_empty() {
@@ -179,13 +179,13 @@ impl Run {
                                                             "UnknownIdentifier",
                                                             &format!(
                                                                 "unknown identifier: `{}`, this identifier could not be found",
-                                                                tokenc.repr()
+                                                                tok.repr()
                                                             ),
-                                                            tokenc.line,
-                                                            tokenc.col,
-                                                            tokenc.file,
+                                                            tok.line,
+                                                            tok.col,
+                                                            tok.file.clone(),
                                                             {
-                                                                let mut hashk = hashs.clone().into_keys();
+                                                                let mut hashk: Vec<_> = map.map.clone().into_keys().collect();
                                                                 hashk.sort();
                                                                 let n = hashk.binary_search(id).unwrap_err();
                                                                 if hashk.is_empty() {
