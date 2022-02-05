@@ -1,28 +1,10 @@
 #!/usr/bin/env -S tr-lang y
--* tr-lang'da sterilize edilmemiş faktoriyel implementasyonu *-
-
 yükle "mat.trl"*
 
--* 1 faktoriyel *-
-1 faktoriyel
-"1! = " de de "\n" de
+"1! = " de 1 faktoriyel de "\n" de
+"2! = " de 2 faktoriyel de "\n" de
+"3! = " de 3 faktoriyel de "\n" de
+"4! = " de 4 faktoriyel de "\n" de
+"5! = " de 5 faktoriyel de "\n" de
+"100! = " de 100 faktoriyel de "\n" de
 
--* 2 faktoriyel *-
-2 faktoriyel
-"2! = " de de "\n" de
-
--* 3 faktoriyel *-
-3 faktoriyel
-"3! = " de de "\n" de
-
--* 4 faktoriyel *-
-4 faktoriyel
-"4! = " de de "\n" de
-
--* 5 faktoriyel *-
-5 faktoriyel
-"5! = " de de "\n" de
-
--* 100 faktoriyel *-
-100 faktoriyel
-"100! = " de de "\n" de

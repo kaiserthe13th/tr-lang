@@ -5,6 +5,7 @@ işlev fonksiyon -> parametre            # Bir işlev(def) bloğunun başı
         :. parametre > 0 iken           # Bir iken(while) bloğunun başı
             parametre de
             parametre - 1 -> parametre
+            blok ad son                 # Bir blok bloğunun başı ve sonu
         son                             # iken(while) bloğunun sonu
     son                                 # ise-yoksa(if-else) bloğunun sonu
 son                                     # işlev(def) bloğunun sonu

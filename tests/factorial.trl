@@ -1,28 +1,10 @@
 #!/usr/bin/env -S tr-lang y
--* unsanitized factorial implementation in tr-lang *-
-
 yükle "math.trl"*
 
--* 1 factorial *-
-1 factorial
-"1! = " de de "\n" de
+"1! = " de 1 factorial de "\n" de
+"2! = " de 2 factorial de "\n" de
+"3! = " de 3 factorial de "\n" de
+"4! = " de 4 factorial de "\n" de
+"5! = " de 5 factorial de "\n" de
+"100! = " de 100 factorial de "\n" de
 
--* 2 factorial *-
-2 factorial
-"2! = " de de "\n" de
-
--* 3 factorial *-
-3 factorial
-"3! = " de de "\n" de
-
--* 4 factorial *-
-4 factorial
-"4! = " de de "\n" de
-
--* 5 factorial *-
-5 factorial
-"5! = " de de "\n" de
-
--* 100 factorial *-
-100 factorial
-"100! = " de de "\n" de
