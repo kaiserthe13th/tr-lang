@@ -50,17 +50,17 @@ impl Lexer {
                                 Ok(f) => {
                                     tmp_visited.push(path.display().to_string());
                                     f
-                                },
+                                }
                                 Err(FSErr::IsADir) => {
                                     path.push("giriş.trl");
                                     match read_file(&path) {
                                         Ok(f) => {
                                             tmp_visited.push(path.display().to_string());
                                             f
-                                        },
-                                        Err(e) => panic!("{:?}", e)
+                                        }
+                                        Err(e) => panic!("{:?}", e),
                                     }
-                                },
+                                }
                             };
                             if !in_vec(&path.display().to_string(), &visited.clone()) {
                                 let mut nl = Lexer::new(source);
@@ -108,10 +108,42 @@ impl Lexer {
                             } else {
                                 *visited = tmp_visited;
                             }
-                        },
-                        _ => panic!("yükle den sonra <yazı> bekleniyordu ancak bulunamadı"),
+                        }
+                        TokenType::ParenL => {
+                            tokens.push(Token::new(
+                                TokenType::InScopeParentL,
+                                next_token.lexeme,
+                                next_token.line,
+                                next_token.col,
+                                next_token.file,
+                                Precedence::Reserved,
+                            ));
+                            current += 2;
+                            while current < prog.len() - 1 {
+                                let c = prog.get(current).unwrap().clone();
+                                current += 1;
+                                match c.typ {
+                                    TokenType::ParenR => {
+                                        tokens.push(Token::new(
+                                            TokenType::InScopeParentR,
+                                            c.lexeme,
+                                            c.line,
+                                            c.col,
+                                            c.file,
+                                            Precedence::Reserved,
+                                        ));
+                                        break;
+                                    }
+                                    TokenType::Identifier | TokenType::Çarpı | TokenType::İkiNokta => tokens.push(c),
+                                    _ => panic!("yükle ('dan sonra tanımlayıcı, `)` veya `*` bekleniyordu ancak bulunamadı. {:?}", c),
+                                }
+                            }
+                        }
+                        _ => {
+                            panic!("yükle den sonra <yazı> veya `(` bekleniyordu ancak bulunamadı")
+                        }
                     }
-                },
+                }
                 _ => {
                     tokens.push(c);
                     current += 1;

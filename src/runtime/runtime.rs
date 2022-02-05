@@ -38,6 +38,225 @@ impl Run {
             let token = self.program.get_mut(self.current).unwrap();
 
             match token.typ.clone() {
+                TokenType::InScopeParentL => {
+                    stack.new_stack();
+
+                    let tok = self.program.get(self.current + 1).unwrap();
+                    match tok.typ {
+                        TokenType::Identifier { ref id } => {
+                            match hashs.get(id) {
+                                Some(o) => stack.push(o.clone()),
+                                None => return Err((stack, hashs.clone(), match get_lang() {
+                                    SupportedLanguage::Turkish => ErrorGenerator::error(
+                                        "BilinmeyenTanımlayıcı",
+                                        &format!(
+                                            "bilinmeyen değişken: `{}`, bu değişken bulunamamıştır",
+                                            tokenc.repr()
+                                        ),
+                                        tokenc.line,
+                                        tokenc.col,
+                                        tokenc.file,
+                                        {
+                                            let mut hashk = hashs.clone().into_keys();
+                                            hashk.sort();
+                                            let n = hashk.binary_search(id).unwrap_err();
+                                            if hashk.is_empty() {
+                                                None
+                                            } else {
+                                                Some(format!("`{}` demek mi istediniz?", hashk[n]))
+                                            }
+                                        }
+                                    ),
+                                    SupportedLanguage::English => ErrorGenerator::error(
+                                        "UnknownIdentifier",
+                                        &format!("unknown identifier: `{}`, this identifier could not be found", tokenc.repr()),
+                                        tokenc.line,
+                                        tokenc.col,
+                                        tokenc.file,
+                                        {
+                                            let mut hashk = hashs.clone().into_keys();
+                                            hashk.sort();
+                                            let n = hashk.binary_search(id).unwrap_err();
+                                            if hashk.is_empty() {
+                                                None
+                                            } else {
+                                                Some(format!("maybe you meant {}?", hashk[n]))
+                                            }
+                                        },
+                                    ),
+                                })),
+                            }
+                        }
+                        _ => return Err((stack, hashs, match get_lang() {
+                                SupportedLanguage::Turkish => ErrorGenerator::error(
+                                    "BeklenmedikSimge",
+                                    &format!(
+                                        "tanımlayıcı beklenmişti ancak `{}` bulundu",
+                                        tok.repr()
+                                    ),
+                                    tokenc.line,
+                                    tokenc.col,
+                                    tokenc.file,
+                                    None,
+                                ),
+                                SupportedLanguage::English => ErrorGenerator::error(
+                                    "UnexpectedToken",
+                                    &format!(
+                                        "expected identifier, but found `{}`",
+                                        tok.repr()
+                                    ),
+                                    tokenc.line,
+                                    tokenc.col,
+                                    tokenc.file,
+                                    None,
+                                ),
+                            },
+                        )),
+                    }
+
+                    self.current += 2;
+
+                    let mut latest_id = None;
+                    while self.program.len() > self.current {
+                        let c = self.program.get(self.current).unwrap().clone();
+
+                        match c.typ {
+                            TokenType::İkiNokta => {
+                                let a = match stack.pop() {
+                                    Some(a) => a,
+                                    None => return Err((stack, hashs, match get_lang() {
+                                        SupportedLanguage::Turkish => {
+                                            ErrorGenerator::error(
+                                                "KümedeYeterliDeğişkenYok",
+                                                &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
+                                                tokenc.line,
+                                                tokenc.col,
+                                                tokenc.file,
+                                                None,
+                                            )
+                                        }
+                                        SupportedLanguage::English => {
+                                            ErrorGenerator::error(
+                                                "NotEnoughVarsInStack",
+                                                &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
+                                                tokenc.line,
+                                                tokenc.col,
+                                                tokenc.file,
+                                                None,
+                                            )
+                                        }
+                                    })),
+                                };
+                                match a {
+                                    Object::Harita(map) => {
+                                        let tok = self.program.get(self.current + 1).unwrap();
+                                        match tok.typ {
+                                            TokenType::Identifier { ref id } => {
+                                                let o = match map.map.get(id) {
+                                                    Some(o) => o.clone(),
+                                                    None => return Err((stack, hashs.clone(), match get_lang() {
+                                                        SupportedLanguage::Turkish => ErrorGenerator::error(
+                                                            "BilinmeyenTanımlayıcı",
+                                                            &format!(
+                                                                "bilinmeyen değişken: `{}`, bu değişken bulunamamıştır",
+                                                                tokenc.repr()
+                                                            ),
+                                                            tokenc.line,
+                                                            tokenc.col,
+                                                            tokenc.file,
+                                                            {
+                                                                let mut hashk = hashs.clone().into_keys();
+                                                                hashk.sort();
+                                                                let n = hashk.binary_search(id).unwrap_err();
+                                                                if hashk.is_empty() {
+                                                                    None
+                                                                } else {
+                                                                    Some(format!("`{}` demek mi istediniz?", hashk[n]))
+                                                                }
+                                                            }
+                                                        ),
+                                                        SupportedLanguage::English => ErrorGenerator::error(
+                                                            "UnknownIdentifier",
+                                                            &format!(
+                                                                "unknown identifier: `{}`, this identifier could not be found",
+                                                                tokenc.repr()
+                                                            ),
+                                                            tokenc.line,
+                                                            tokenc.col,
+                                                            tokenc.file,
+                                                            {
+                                                                let mut hashk = hashs.clone().into_keys();
+                                                                hashk.sort();
+                                                                let n = hashk.binary_search(id).unwrap_err();
+                                                                if hashk.is_empty() {
+                                                                    None
+                                                                } else {
+                                                                    Some(format!("maybe you meant {}?", hashk[n]))
+                                                                }
+                                                            },
+                                                        ),
+                                                    })),
+                                                };
+                                                latest_id = Some(id);
+                                                stack.push(o);
+                                                self.current += 2;
+                                            },
+                                            TokenType::Çarpı => {
+                                                for (k, v) in map.map.iter() {
+                                                    hashs.insert(k.clone(), v.clone());
+                                                }
+                                                let next = match self.program.get(self.current + 2) {
+                                                    Some(t) => t,
+                                                    None => todo!(), // Error
+                                                };
+                                                match next.typ {
+                                                    TokenType::InScopeParentR => {
+                                                        self.current += 3;
+                                                        break;
+                                                    },
+                                                    _ => todo!(), // Error
+                                                }
+                                            },
+                                            _ => todo!(), // Error
+                                        };
+                                    }
+                                    b => return Err((
+                                        stack,
+                                        hashs,
+                                        match get_lang() {
+                                            SupportedLanguage::Turkish => ErrorGenerator::error(
+                                                "BeklenmedikTip",
+                                                &format!("harita beklenmişti ancak `{:?}` bulundu", b),
+                                                tokenc.line,
+                                                tokenc.col,
+                                                tokenc.file,
+                                                None,
+                                            ),
+                                            SupportedLanguage::English => ErrorGenerator::error(
+                                                "UnexpectedType",
+                                                &format!("expected map but found `{:?}`", b),
+                                                tokenc.line,
+                                                tokenc.col,
+                                                tokenc.file,
+                                                None,
+                                            ),
+                                        },
+                                    )),
+                                }
+                            }
+                            TokenType::InScopeParentR => {
+                                self.current += 1;
+                                if let Some(id) = latest_id {
+                                    hashs.insert(id.clone(), stack.pop().unwrap());
+                                } else { unreachable!() }
+                                break;
+                            }
+                            _ => todo!(),
+                        }
+                    }
+                    stack.del_stack();
+                }
+                TokenType::InScopeParentR => {},
                 TokenType::İkiNokta => {
                     let a = match stack.pop() {
                         Some(a) => a,

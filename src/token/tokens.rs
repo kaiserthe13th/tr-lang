@@ -47,6 +47,8 @@ pub mod tokentypes {
         Hiç,
         Blok,
         BlokSonlandır,
+        InScopeParentL,
+        InScopeParentR,
         EOF,
     }
 
@@ -103,6 +105,8 @@ pub mod tokentypes {
         Tipinde,
         Hiç,
         Blok,
+        InScopeParentL,
+        InScopeParentR,
         EOF,
     }
 }
@@ -217,6 +221,8 @@ impl ParserToken {
             TokTyp::Blok => "blok".to_string(),
             TokTyp::BlokSonlandır => "son".to_string(),
             TokTyp::İkiNokta => ":".to_string(),
+            TokTyp::InScopeParentL => "(".to_string(),
+            TokTyp::InScopeParentR => ")".to_string(),
         }
     }
 }
