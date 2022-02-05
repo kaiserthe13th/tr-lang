@@ -207,18 +207,97 @@ impl Run {
                                                 }
                                                 let next = match self.program.get(self.current + 2) {
                                                     Some(t) => t,
-                                                    None => todo!(), // Error
+                                                    None => return Err((
+                                                        stack,
+                                                        hashs,
+                                                        match get_lang() {
+                                                            SupportedLanguage::Turkish => ErrorGenerator::error(
+                                                                "BeklenmedikSimge",
+                                                                &format!(
+                                                                    "`)` beklenmişti ancak birşey bulunamadı",
+                                                                ),
+                                                                tokenc.line,
+                                                                tokenc.col,
+                                                                tokenc.file,
+                                                                None,
+                                                            ),
+                                                            SupportedLanguage::English => ErrorGenerator::error(
+                                                                "UnexpectedToken",
+                                                                &format!(
+                                                                    "expected `)`, but found nothing",
+                                                                ),
+                                                                tokenc.line,
+                                                                tokenc.col,
+                                                                tokenc.file,
+                                                                None,
+                                                            ),
+                                                        },
+                                                    )),
                                                 };
                                                 match next.typ {
                                                     TokenType::InScopeParentR => {
                                                         self.current += 3;
                                                         break;
                                                     },
-                                                    _ => todo!(), // Error
+                                                    _ => return Err((
+                                                        stack,
+                                                        hashs,
+                                                        match get_lang() {
+                                                            SupportedLanguage::Turkish => ErrorGenerator::error(
+                                                                "BeklenmedikSimge",
+                                                                &format!(
+                                                                    "`)` beklenmişti ancak `{}` bulundu",
+                                                                    next.repr()
+                                                                ),
+                                                                tokenc.line,
+                                                                tokenc.col,
+                                                                tokenc.file,
+                                                                None,
+                                                            ),
+                                                            SupportedLanguage::English => ErrorGenerator::error(
+                                                                "UnexpectedToken",
+                                                                &format!(
+                                                                    "expected `)`, but found `{}`",
+                                                                    next.repr()
+                                                                ),
+                                                                tokenc.line,
+                                                                tokenc.col,
+                                                                tokenc.file,
+                                                                None,
+                                                            ),
+                                                        },
+                                                    )),
                                                 }
                                             },
-                                            _ => todo!(), // Error
-                                        };
+                                            _ => return Err((
+                                                stack,
+                                                hashs,
+                                                match get_lang() {
+                                                    SupportedLanguage::Turkish => ErrorGenerator::error(
+                                                        "BeklenmedikSimge",
+                                                        &format!(
+                                                            "`)` beklenmişti ancak `{}` bulundu",
+                                                            tok.repr()
+                                                        ),
+                                                        tokenc.line,
+                                                        tokenc.col,
+                                                        tokenc.file,
+                                                        None,
+                                                    ),
+                                                    SupportedLanguage::English => ErrorGenerator::error(
+                                                        "UnexpectedToken",
+                                                        &format!(
+                                                            "expected `)`, but found `{}`",
+                                                            tok.repr()
+                                                        ),
+                                                        tokenc.line,
+                                                        tokenc.col,
+                                                        tokenc.file,
+                                                        None,
+                                                    ),
+                                                },
+                                            )),
+                                        }
                                     }
                                     b => return Err((
                                         stack,
