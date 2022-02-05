@@ -72,7 +72,7 @@ fn main() {
                     Some(f) => f.clone(),
                     None => {
                         let mut pb = PathBuf::from(args.file);
-                        pb.set_extension(".trbyt");
+                        pb.set_extension("trbyt");
                         pb.display().to_string()
                     }
                 })
