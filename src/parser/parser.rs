@@ -1,3 +1,4 @@
+use crate::errwarn::{Error, ErrorGenerator};
 use crate::lexer;
 
 use crate::token::tokentypes::LexerTokenType as LexTokenType;
@@ -5,14 +6,37 @@ use crate::token::LexerToken as LexToken;
 
 use crate::token::tokentypes::ParserTokenType as TokenType;
 use crate::token::ParserToken as Token;
+use crate::util::{get_lang, SupportedLanguage};
+use std::fmt;
 
-#[derive(Debug)]
+#[derive(Clone)]
 enum BlockToken {
     İse(usize),
     İken(usize),
     İkiNoktaNokta(usize),
     İşlev(usize),
-    Blok,
+    Blok(usize),
+}
+
+impl fmt::Debug for BlockToken {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::İse(_) => write!(f, "ise"),
+            Self::İken(_) => write!(f, "iken"),
+            Self::İkiNoktaNokta(_) => write!(f, ":."),
+            Self::İşlev(_) => write!(f, "işlev"),
+            Self::Blok(_) => write!(f, "blok"),
+        }
+    }
+}
+
+impl BlockToken {
+    fn unwrap_inner(&self) -> usize {
+        match self {
+            Self::İse(u) | Self::İken(u) | Self::İkiNoktaNokta(u)
+                | Self::İşlev(u) | Self::Blok(u) => *u,
+        }
+    }
 }
 
 #[derive(Clone)]
@@ -27,10 +51,10 @@ impl Parser {
         }
     }
 
-    pub fn from_lexer(lexer: &mut lexer::Lexer, file: String) -> Self {
-        Self {
-            tokens: Self::preproc(lexer.tokenize(&mut vec![], file)),
-        }
+    pub fn from_lexer(lexer: &mut lexer::Lexer, file: String) -> Result<Self, Error> {
+        Ok(Self {
+            tokens: Self::preproc(lexer.tokenize(&mut vec![], file)?),
+        })
     }
 
     fn preproc(prog: Vec<LexToken>) -> Vec<LexToken> {
@@ -106,7 +130,10 @@ impl Parser {
         tokens
     }
 
-    pub fn parse(&mut self) -> Vec<Token> {
+    /// Parser for tr-lang. It runs `Parser::preproc` beforehand to reorder operations in a way the
+    /// language can understand. After that it will try to parse the tokens and run them. On
+    /// failure it will return `Err(tr_lang::errwarn::Error)`
+    pub fn parse(&mut self) -> Result<Vec<Token>, Error> {
         let mut parsed: Vec<Token> = vec![];
         let mut blocktokens: Vec<BlockToken> = vec![];
         let mut rets: Vec<Vec<usize>> = vec![vec![]];
@@ -138,7 +165,7 @@ impl Parser {
                         ptoken.col,
                         ptoken.file.clone(),
                     ));
-                    blocktokens.push(BlockToken::Blok);
+                    blocktokens.push(BlockToken::Blok(ip));
                 }
                 LexTokenType::Hiç => parsed.push(Token::new(
                     TokenType::Hiç,
@@ -155,11 +182,24 @@ impl Parser {
                     ));
                     if let Some(last) = rets.last_mut() {
                         last.push(ip);
-                    } // error
+                    } else { unreachable!() }
                 }
                 LexTokenType::Yükle | LexTokenType::Comma => unreachable!(),
                 LexTokenType::ParenR | LexTokenType::ParenL => {
-                    unimplemented!("error: unclosed parenthesis")
+                    return Err(match get_lang() {
+                        SupportedLanguage::Turkish => ErrorGenerator::error(
+                            "SözdizimHatası",
+                            "kapatılmamış parantez",
+                            ptoken.line, ptoken.col, ptoken.file.clone(),
+                            None
+                        ),
+                        SupportedLanguage::English => ErrorGenerator::error(
+                            "SyntaxError",
+                            "unclosed parenthesis",
+                            ptoken.line, ptoken.col, ptoken.file.clone(),
+                            None
+                        ),
+                    });
                 }
                 LexTokenType::İşlev => {
                     blocktokens.push(BlockToken::İşlev(ip));
@@ -218,7 +258,29 @@ impl Parser {
                     let last_blocktoken = blocktokens.last().unwrap();
                     match last_blocktoken {
                         BlockToken::İkiNoktaNokta(_) => (),
-                        _ => unimplemented!(), // SyntaxError
+                        a => {
+                            let o = parsed.get(a.unwrap_inner()).unwrap().clone();
+                            return Err(match get_lang() {
+                                SupportedLanguage::Turkish => ErrorGenerator::error(
+                                    "SözdizimHatası",
+                                    &format!(
+                                        "kapatılmamış blok {:?}",
+                                        a
+                                    ),
+                                    o.line, o.col, o.file,
+                                    None,
+                                ),
+                                SupportedLanguage::English => ErrorGenerator::error(
+                                    "SyntaxError",
+                                    &format!(
+                                        "unclosed block {:?}",
+                                        a
+                                    ),
+                                    o.line, o.col, o.file,
+                                    None,
+                                ),
+                            });
+                        },
                     };
                     blocktokens.push(BlockToken::İken(ip));
                     parsed.push(Token::new(
@@ -293,13 +355,57 @@ impl Parser {
                                             let iknk = parsed.get_mut(iknkip).unwrap();
                                             match iknk.typ {
                                                 TokenType::İkiNoktaNokta => iknkip,
-                                                _ => unimplemented!(), // SyntaxError
+                                                _ => {
+                                                    let o = iknk.clone();
+                                                    return Err(match get_lang() {
+                                                    SupportedLanguage::Turkish => ErrorGenerator::error(
+                                                        "SözdizimHatası",
+                                                            &format!(
+                                                                "kapatılmamış blok {:?}",
+                                                                o.repr()
+                                                            ),
+                                                            o.line, o.col, o.file,
+                                                            None,
+                                                        ),
+                                                        SupportedLanguage::English => ErrorGenerator::error(
+                                                            "SyntaxError",
+                                                            &format!(
+                                                                "unclosed block {:?}",
+                                                                o.repr()
+                                                            ),
+                                                            o.line, o.col, o.file,
+                                                            None,
+                                                        ),
+                                                    });
+                                                },
                                             }
                                         }
-                                        _ => unreachable!(), // SyntaxError
+                                        a => {
+                                            let o = parsed.get(a.unwrap_inner()).unwrap().clone();
+                                            return Err(match get_lang() {
+                                                SupportedLanguage::Turkish => ErrorGenerator::error(
+                                                    "SözdizimHatası",
+                                                    &format!(
+                                                        "kapatılmamış blok {:?}",
+                                                        a
+                                                    ),
+                                                    o.line, o.col, o.file,
+                                                    None,
+                                                ),
+                                                SupportedLanguage::English => ErrorGenerator::error(
+                                                    "SyntaxError",
+                                                    &format!(
+                                                        "unclosed block {:?}",
+                                                        a
+                                                    ),
+                                                    o.line, o.col, o.file,
+                                                    None,
+                                                ),
+                                            });
+                                        },
                                     }
                                 }
-                                _ => unimplemented!(), // SyntaxError
+                                _ => unreachable!(),
                             };
                             parsed.push(Token::new(
                                 TokenType::Son { tp },
@@ -333,7 +439,7 @@ impl Parser {
                                 }
                             }
                         }
-                        BlockToken::Blok => {
+                        BlockToken::Blok(_) => {
                             parsed.push(Token::new(
                                 TokenType::BlokSonlandır,
                                 ptoken.line,
@@ -508,6 +614,6 @@ impl Parser {
                 )),
             }
         }
-        parsed
+        Ok(parsed)
     }
 }

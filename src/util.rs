@@ -1,5 +1,5 @@
 use std::fs::File;
-use std::io::ErrorKind::IsADirectory;
+use std::io::ErrorKind::{IsADirectory, self};
 use std::io::Read;
 use std::path::PathBuf;
 use std::process::exit;
@@ -24,6 +24,7 @@ macro_rules! hashmap {
 #[derive(Debug)]
 pub enum FSErr {
     IsADir,
+    Other(ErrorKind),
 }
 
 pub enum SupportedLanguage {
@@ -52,18 +53,16 @@ pub fn read_file(path: &PathBuf) -> Result<String, FSErr> {
     match file.read_to_string(&mut buf) {
         Ok(_) => (),
         Err(err) => match err.kind() {
-            IsADirectory => {
-                return Err(FSErr::IsADir);
-            }
-            _ => panic!(),
+            IsADirectory => return Err(FSErr::IsADir),
+            e => return Err(FSErr::Other(e)),
         },
     };
     Ok(buf)
 }
 
+/// Returns a SupportedLanguage by checking systems default locale
+/// if an unrecognized language is found it will return English
 pub fn get_lang() -> SupportedLanguage {
-    //! Returns a SupportedLanguage by checking systems default locale
-    //! if an unrecognized language is found it will return English
     let l = format!("{}", Locale::user_default());
     // As Unix provides more info about locale(number format, date format, time format...)
     // separated by ',' we split once at the first ',' if it is successfull we take the first
@@ -87,13 +86,13 @@ pub fn char_in_str(a: char, b: &str) -> bool {
     false
 }
 
+/// Checks if &T is in a &Vec<T>
+/// It is shortcircuiting function meaning if it finds any match it will immideatly return true
+/// if no matches are found it will return false
 pub fn in_vec<T>(a: &T, v: &Vec<T>) -> bool
 where
-    T: Eq,
+    T: PartialEq,
 {
-    //! Checks if &T is in a &Vec<T>
-    //! It is shortcircuiting function meaning if it finds any match it will immideatly return true
-    //! if no matches are found it will return false
     for item in v.iter() {
         if item == a {
             return true;
@@ -101,3 +100,4 @@ where
     }
     false
 }
+

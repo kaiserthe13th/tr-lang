@@ -1,11 +1,16 @@
 use crate::token::tokentypes::LexerTokenType as TokenType;
 use crate::token::LexerToken as Token;
 use crate::token::Precedence;
+use crate::util::SupportedLanguage;
+use crate::util::get_lang;
 use crate::util::{char_in_str, in_vec, read_file, FSErr};
+use crate::errwarn::{ErrorGenerator, Error};
 
 use std::fs::canonicalize;
 use std::path::PathBuf;
 
+/// Lexer of tr-lang, made primarily for tokenization
+/// but it also manages imports and includes at post_proc
 #[derive(Clone)]
 pub struct Lexer {
     source: Vec<char>,
@@ -15,6 +20,7 @@ pub struct Lexer {
 }
 
 impl Lexer {
+    /// Creates a new lexer from content(source code)
     pub fn new(content: String) -> Self {
         Self {
             source: content.chars().collect(),
@@ -23,7 +29,8 @@ impl Lexer {
             col: 1,
         }
     }
-    fn post_proc(&self, prog: Vec<Token>, visited: &mut Vec<String>, file: String) -> Vec<Token> {
+    /// Lexer post processor
+    fn post_proc(&self, prog: Vec<Token>, visited: &mut Vec<String>, file: String) -> Result<Vec<Token>, Error> {
         let mut tokens: Vec<Token> = vec![];
         let mut current: usize = 0;
 
@@ -34,17 +41,33 @@ impl Lexer {
                 TokenType::Yükle => {
                     let next_token = match prog.get(current + 1) {
                         Some(e) => e.clone(),
-                        None => panic!("yükle den sonra <yazı> bekleniyordu ancak bulunamadı"),
+                        None => return Err(match get_lang() {
+                            SupportedLanguage::Turkish => ErrorGenerator::error(
+                                "BeklenmedikSimge",
+                                "yükle den sonra <yazı> ya da '(' bekleniyordu ancak bulunamadı",
+                                0, 0, file,
+                                None
+                            ),
+                            SupportedLanguage::English => ErrorGenerator::error(
+                                "UnexpectedToken",
+                                "expected <string> or `(` after `yükle` but couldn't find it",
+                                0, 0, file,
+                                None
+                            ),
+                        })
                     };
                     match next_token.typ {
                         TokenType::Yazı => {
                             let mut tmp_visited = visited.clone();
                             let mut path = canonicalize(PathBuf::from(file.clone()))
-                                .expect("yol normalleştirilemedi");
-                            if !path.is_dir() {
-                                path.set_file_name(next_token.lexeme);
-                            } else {
+                                .expect(match get_lang() {
+                                    SupportedLanguage::Turkish => "yol normalleştirilemedi",
+                                    SupportedLanguage::English => "couldn't canonicalize path",
+                                });
+                            if path.is_dir() {
                                 path.push(next_token.lexeme);
+                            } else {
+                                path.set_file_name(next_token.lexeme);
                             }
                             let source = match read_file(&path) {
                                 Ok(f) => {
@@ -58,21 +81,61 @@ impl Lexer {
                                             tmp_visited.push(path.display().to_string());
                                             f
                                         }
-                                        Err(e) => panic!("{:?}", e),
+                                        Err(e) => return Err(match get_lang() {    
+                                            SupportedLanguage::Turkish => ErrorGenerator::error(
+                                                "DosyaHatası",
+                                                &format!("{:?}", e),
+                                                0, 0, path.display().to_string(),
+                                                None
+                                            ),
+                                            SupportedLanguage::English => ErrorGenerator::error(
+                                                "FSError",
+                                                &format!("{:?}", e),
+                                                0, 0, path.display().to_string(),
+                                                None,
+                                            ),
+                                        }),
                                     }
-                                }
+                                },
+                                Err(e) => return Err(match get_lang() {    
+                                    SupportedLanguage::Turkish => ErrorGenerator::error(
+                                        "DosyaHatası",
+                                        &format!("{:?}", e),
+                                        0, 0, path.display().to_string(),
+                                        None
+                                    ),
+                                    SupportedLanguage::English => ErrorGenerator::error(
+                                        "FSError",
+                                        &format!("{:?}", e),
+                                        0, 0, path.display().to_string(),
+                                        None,
+                                    ),
+                                }),
                             };
                             if !in_vec(&path.display().to_string(), &visited.clone()) {
                                 let mut nl = Lexer::new(source);
-                                let mut res = nl.tokenize(visited, path.display().to_string());
+                                let res = nl.tokenize(visited, path.display().to_string());
 
                                 let next_token = match prog.get(current + 2) {
                                     Some(e) => e.clone(),
-                                    None => panic!("yükle <yazı> dan sonra `*` veya `->` bekleniyordu ancak bulunamadı"),
+                                    None => return Err(match get_lang() {
+                                        SupportedLanguage::Turkish => ErrorGenerator::error(
+                                            "BeklenmedikSimge",
+                                            "yükle <yazı> dan sonra `*` veya `->` bekleniyordu ancak bulunamadı",
+                                            0, 0, file,
+                                            None,
+                                        ),
+                                        SupportedLanguage::English => ErrorGenerator::error(
+                                            "UnexpectedToken",
+                                            "expected `*` or `->` after `yükle <string>` but couldn't find any",
+                                            0, 0, file,
+                                            None,
+                                        ),
+                                    }),
                                 };
                                 match next_token.typ {
                                     TokenType::Çarpı => {
-                                        tokens.append(&mut res);
+                                        tokens.append(&mut res?);
                                         current += 3;
                                     }
                                     TokenType::Koy => {
@@ -86,13 +149,39 @@ impl Lexer {
                                         ));
                                         let next_token = match prog.get(current + 3) {
                                             Some(e) => e.clone(),
-                                            None => panic!("yükle <yazı> -> dan sonra tanımlayıcı bekleniyordu ancak bulunamadı"),
+                                            None => return Err(match get_lang() {
+                                                SupportedLanguage::Turkish => ErrorGenerator::error(
+                                                    "BeklenmedikSimge",
+                                                    "`yükle <yazı> ->` dan sonra tanımlayıcı bekleniyordu ancak bulunamadı",
+                                                    0, 0, file,
+                                                    None,
+                                                ),
+                                                SupportedLanguage::English => ErrorGenerator::error(
+                                                    "UnexpectedToken",
+                                                    "expected identifier after `yükle <string> ->` but couldn't find it",
+                                                    0, 0, file,
+                                                    None,
+                                                ),
+                                            }),
                                         };
                                         match next_token.typ {
                                             TokenType::Identifier => tokens.push(next_token.clone()),
-                                            _ => panic!("yükle <yazı> -> dan sonra tanımlayıcı bekleniyordu ancak bulunamadı"),
+                                            _ => return Err(match get_lang() {
+                                                SupportedLanguage::Turkish => ErrorGenerator::error(
+                                                    "BeklenmedikSimge",
+                                                    "`yükle <yazı> ->` dan sonra tanımlayıcı bekleniyordu ancak bulunamadı",
+                                                    0, 0, file,
+                                                    None,
+                                                ),
+                                                SupportedLanguage::English => ErrorGenerator::error(
+                                                    "UnexpectedToken",
+                                                    "expected identifier after `yükle <string> ->` but couldn't find it",
+                                                    0, 0, file,
+                                                    None,
+                                                ),
+                                            }),
                                         }
-                                        tokens.append(&mut res);
+                                        tokens.append(&mut res?);
                                         tokens.push(Token::new(
                                             TokenType::Son,
                                             "son".to_string(),
@@ -103,7 +192,18 @@ impl Lexer {
                                         ));
                                         current += 4;
                                     }
-                                    _ => panic!("yükle <yazı> dan sonra `*` veya `->` bekleniyordu ancak bulunamadı"), 
+                                    _ => return Err(match get_lang() {
+                                        SupportedLanguage::Turkish => ErrorGenerator::error(
+                                            "BeklenmedikSimge",
+                                            "`yükle <yazı>` dan sonra `*` veya `->` bekleniyordu ancak bulunamadı",
+                                            next_token.line, next_token.col, next_token.file, None
+                                        ),
+                                        SupportedLanguage::English => ErrorGenerator::error(
+                                            "UnexpectedToken",
+                                            "expected `*` or `->` after `yükle <string>` but couldn't find any",
+                                            next_token.line, next_token.col, next_token.file, None
+                                        ),
+                                    }),
                                 }
                             } else {
                                 *visited = tmp_visited;
@@ -135,13 +235,39 @@ impl Lexer {
                                         break;
                                     }
                                     TokenType::Identifier | TokenType::Çarpı | TokenType::İkiNokta => tokens.push(c),
-                                    _ => panic!("yükle ('dan sonra tanımlayıcı, `)` veya `*` bekleniyordu ancak bulunamadı. {:?}", c),
+                                    _ => return Err(match get_lang() {
+                                        SupportedLanguage::Turkish => ErrorGenerator::error(
+                                            "BeklenmedikSimge",
+                                            &format!(
+                                                "yükle ('dan sonra tanımlayıcı, `)` veya `*` bekleniyordu ancak bulunamadı. {:?}",
+                                                c
+                                            ),
+                                            c.line, c.col, c.file, None
+                                        ),
+                                        SupportedLanguage::English => ErrorGenerator::error(
+                                            "UnexpectedToken",
+                                            &format!(
+                                                "expected identifier, `)` or `*` after `yükle (` but found {:?}",
+                                                c
+                                            ),
+                                            c.line, c.col, c.file, None
+                                        ),
+                                    })
                                 }
                             }
                         }
-                        _ => {
-                            panic!("yükle den sonra <yazı> veya `(` bekleniyordu ancak bulunamadı")
-                        }
+                        _ => return Err(match get_lang() {
+                            SupportedLanguage::Turkish => ErrorGenerator::error(
+                                "BeklenmedikSimge",
+                                "`yükle` den sonra `<yazı>` veya `(` bekleniyordu ancak bulunamadı",
+                                0, 0, file, None
+                            ),
+                            SupportedLanguage::English => ErrorGenerator::error(
+                                "UnexpectedToken",
+                                "expected `<string>` or `(` after `yükle` but couldn't find any",
+                                0, 0, file, None
+                            ),
+                        }),
                     }
                 }
                 _ => {
@@ -150,9 +276,12 @@ impl Lexer {
                 }
             }
         }
-        tokens
+        Ok(tokens)
     }
-    pub fn tokenize(&mut self, visited: &mut Vec<String>, file: String) -> Vec<Token> {
+    /// The tokenizer; it will try to tokenize the source code,
+    ///
+    /// If it encounters errors it will send `Err(tr_lang::errwarn::Error)` back
+    pub fn tokenize(&mut self, visited: &mut Vec<String>, file: String) -> Result<Vec<Token>, Error> {
         let mut tokens: Vec<Token> = vec![];
 
         while self.current < self.source.len() {
@@ -257,7 +386,18 @@ impl Lexer {
                             buf.push(self.currentc());
                         } else {
                             if dot_used {
-                                panic!("Sayılarda birden fazla nokta olamaz");
+                                return Err(match get_lang() {
+                                    SupportedLanguage::Turkish => ErrorGenerator::error(
+                                        "SözdizimHatası",
+                                        "Sayılarda birden fazla nokta olamaz",
+                                        self.line, self.col, file, None,
+                                    ),
+                                    SupportedLanguage::English => ErrorGenerator::error(
+                                        "SyntaxError",
+                                        "Numbers can't have more than one dot int them",
+                                        self.line, self.col, file, None,
+                                    ),
+                                });
                             } else {
                                 buf.push('.');
                                 dot_used = true;
@@ -327,7 +467,18 @@ impl Lexer {
                                 self.current += 1;
                                 self.col += 1;
                                 if self.current > self.source.len() {
-                                    panic!("unterminated comment");
+                                    return Err(match get_lang() {
+                                        SupportedLanguage::English => ErrorGenerator::error(
+                                            "SyntaxError",
+                                            "unterminated comment",
+                                            self.line, self.col, file, None,
+                                        ),
+                                        SupportedLanguage::Turkish => ErrorGenerator::error(
+                                            "SözdizimHatası",
+                                            "bitirilmemiş yorum",
+                                            self.line, self.col, file, None,
+                                        ),
+                                    });
                                 }
                                 if self.currentc() == '\n' {
                                     self.line += 1;
@@ -342,7 +493,18 @@ impl Lexer {
                                             break;
                                         }
                                     } else {
-                                        panic!("unterminated comment");
+                                        return Err(match get_lang() {
+                                            SupportedLanguage::English => ErrorGenerator::error(
+                                                "SyntaxError",
+                                                "unterminated comment",
+                                                self.line, self.col, file, None,
+                                            ),
+                                            SupportedLanguage::Turkish => ErrorGenerator::error(
+                                                "SözdizimHatası",
+                                                "bitirilmemiş yorum",
+                                                self.line, self.col, file, None,
+                                            ),
+                                        });
                                     }
                                 }
                             }

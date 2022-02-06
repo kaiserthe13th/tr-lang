@@ -11,6 +11,8 @@ use rustyline::completion::Pair;
 use rustyline::error::ReadlineError;
 use rustyline::Editor;
 
+// TODO: Finish completer
+/// Completer in progress
 struct InteractiveCompleter;
 impl Completer for InteractiveCompleter {
     type Candidate = Pair;
@@ -126,7 +128,16 @@ impl Interactive {
                     "#çık" => break,
                     "#yürüt" => {
                         let (mut memcs, _) = Run::new(
-                            Parser::from_lexer(&mut Lexer::new(fbuf), ".".to_string()).parse(),
+                            match match Parser::from_lexer(&mut Lexer::new(fbuf.clone()), ".".to_string()) {
+                                Ok(parser) => parser,
+                                Err(e) => {
+                                    e.eprint();
+                                    continue;
+                                }
+                            }.parse() {
+                                Ok(ptk) => ptk,
+                                Err(e) => { e.eprint(); continue; }
+                            },
                         )
                         .run("<trli>".to_string(), None, true)
                         .unwrap_or_else(|(s, h, e)| {

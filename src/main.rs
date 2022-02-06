@@ -18,9 +18,11 @@ pub mod mem;
 pub mod store;
 pub mod token;
 mod util;
+use util::{get_lang, SupportedLanguage};
 mod utilbin;
 
 pub mod errwarn;
+use errwarn::ErrorGenerator;
 pub mod runtime;
 
 mod argsparser;
@@ -46,8 +48,38 @@ fn main() {
                 Ok(f) => f,
                 Err(util::FSErr::IsADir) => {
                     path.push("giriş.trl");
-                    util::read_file(&path).unwrap()
+                    match util::read_file(&path) {
+                        Ok(f) => f,
+                        Err(e) => match get_lang() {    
+                            SupportedLanguage::Turkish => ErrorGenerator::error(
+                                "DosyaHatası",
+                                &format!("{:?}", e),
+                                0, 0, path.display().to_string(),
+                                None
+                            ),
+                            SupportedLanguage::English => ErrorGenerator::error(
+                                "FSError",
+                                &format!("{:?}", e),
+                                0, 0, path.display().to_string(),
+                                None,
+                            ),
+                        }.error(),
+                    }
                 }
+                Err(e) => match get_lang() {    
+                    SupportedLanguage::Turkish => ErrorGenerator::error(
+                        "DosyaHatası",
+                        &format!("{:?}", e),
+                        0, 0, path.display().to_string(),
+                        None
+                    ),
+                    SupportedLanguage::English => ErrorGenerator::error(
+                        "FSError",
+                        &format!("{:?}", e),
+                        0, 0, path.display().to_string(),
+                        None,
+                    ),
+                }.error(),
             });
             if args.lex_out {
                 let canon_path = match canonicalize(path) {
@@ -56,12 +88,16 @@ fn main() {
                 };
                 let lexed = lexer
                     .clone()
-                    .tokenize(&mut vec![canon_path.clone()], canon_path);
+                    .tokenize(&mut vec![canon_path.clone()], canon_path)
+                    .unwrap_or_else(|e| e.error());
                 println!("{:#?}", &lexed);
             }
 
-            let mut parser = Parser::from_lexer(&mut lexer, args.file.clone());
-            let parsed = parser.parse();
+            let mut parser = match Parser::from_lexer(&mut lexer, args.file.clone()) {
+                Ok(p) => p,
+                Err(e) => e.error(),
+            };
+            let parsed = parser.parse().unwrap_or_else(|e| e.error());
             if args.prs_out {
                 println!("{:#?}", parsed.clone());
             }
@@ -88,8 +124,38 @@ fn main() {
                 Ok(f) => f,
                 Err(util::FSErr::IsADir) => {
                     path.push("giriş.trl");
-                    util::read_file(&path).unwrap()
+                    match util::read_file(&path) {
+                        Ok(f) => f,
+                        Err(e) => match get_lang() {    
+                            SupportedLanguage::Turkish => ErrorGenerator::error(
+                                "DosyaHatası",
+                                &format!("{:?}", e),
+                                0, 0, path.display().to_string(),
+                                None
+                            ),
+                            SupportedLanguage::English => ErrorGenerator::error(
+                                "FSError",
+                                &format!("{:?}", e),
+                                0, 0, path.display().to_string(),
+                                None,
+                            ),
+                        }.error(),
+                    }
                 }
+                Err(e) => match get_lang() {    
+                    SupportedLanguage::Turkish => ErrorGenerator::error(
+                        "DosyaHatası",
+                        &format!("{:?}", e),
+                        0, 0, path.display().to_string(),
+                        None
+                    ),
+                    SupportedLanguage::English => ErrorGenerator::error(
+                        "FSError",
+                        &format!("{:?}", e),
+                        0, 0, path.display().to_string(),
+                        None,
+                    ),
+                }.error(),
             });
             if args.lex_out {
                 let canon_path = match canonicalize(path) {
@@ -98,17 +164,21 @@ fn main() {
                 };
                 let lexed = lexer
                     .clone()
-                    .tokenize(&mut vec![canon_path.clone()], canon_path);
+                    .tokenize(&mut vec![canon_path.clone()], canon_path)
+                    .unwrap_or_else(|e| e.error());
                 println!("{:#?}", lexed);
             }
 
-            let mut parser = Parser::from_lexer(&mut lexer, args.file.clone());
+            let mut parser = match Parser::from_lexer(&mut lexer, args.file.clone()) {
+                Ok(p) => p,
+                Err(e) => e.error(),
+            };
             if args.prs_out {
-                let parsed = parser.clone().parse();
+                let parsed = parser.clone().parse().unwrap_or_else(|e| e.error());
                 println!("{:#?}", parsed);
             }
 
-            let mut run = runtime::Run::new(parser.parse());
+            let mut run = runtime::Run::new(parser.parse().unwrap_or_else(|e| e.error()));
             run.run(args.file, None, false)
                 .unwrap_or_else(|(_, _, a)| a.error());
         }
@@ -123,7 +193,10 @@ fn main() {
         }
         argsparser::Subcommands::Command => {
             runtime::Run::new(
-                Parser::from_lexer(&mut Lexer::new(args.file), ".".to_string()).parse(),
+                match Parser::from_lexer(&mut Lexer::new(args.file), ".".to_string()) {
+                    Ok(p) => p,
+                    Err(e) => e.error(),
+                }.parse().unwrap_or_else(|e| e.error()),
             )
             .run(".".to_string(), None, false)
             .unwrap_or_else(|(_, _, a)| a.error());
