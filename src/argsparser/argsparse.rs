@@ -1,5 +1,7 @@
 #[cfg(feature = "interactive")]
 use crate::interactive::QuietLevel;
+#[cfg(feature = "fmt")]
+use crate::fmt::{LineEnding, IndentOptions};
 use crate::store::globarg::*;
 use crate::util;
 use crate::utilbin;
@@ -13,6 +15,8 @@ pub enum Subcommands {
     Command,
     #[cfg(feature = "interactive")]
     Interact,
+    #[cfg(feature = "fmt")]
+    Format,
 }
 
 #[derive(Debug)]
@@ -31,6 +35,10 @@ pub struct Options {
     pub license: bool,
     #[cfg(feature = "interactive")]
     pub quiet: QuietLevel,
+    #[cfg(feature = "fmt")]
+    pub line_ending: LineEnding,
+    #[cfg(feature = "fmt")]
+    pub indent: IndentOptions,
 }
 
 pub fn parse_args() -> Options {
@@ -44,6 +52,11 @@ pub fn parse_args() -> Options {
 
     #[cfg(feature = "interactive")]
     let mut quiet = QuietLevel::None;
+    #[cfg(all(feature = "fmt", not(windows)))]
+    let mut line_ending = LineEnding::LF;
+    #[cfg(all(feature = "fmt", windows))]
+    let mut line_ending = LineEnding::CRLF;
+    let mut indent = IndentOptions::Spaces(4);
 
     let (mut help, mut version) = (false, false);
 
@@ -60,7 +73,7 @@ pub fn parse_args() -> Options {
             "i" | "inter" => (),
             _ => utilbin::print_help(1, name),
         }
-        if args.len() == 1 && args[0] != "inter" && args[0] != "i" {
+        if args.len() == 1 && args[0] != "inter" && args[0] != "i" && args[0] != "fmt" && args[0] != "f" {
             utilbin::print_help(1, name);
         }
     }
@@ -73,6 +86,8 @@ pub fn parse_args() -> Options {
             "k" | "komut" => Subcommands::Command,
             #[cfg(feature = "interactive")]
             "i" | "inter" => Subcommands::Interact,
+            #[cfg(feature = "fmt")]
+            "f" | "fmt" => Subcommands::Format,
             "-h" | "-y" | "--yardım" => {
                 utilbin::print_help(0, name);
             }
@@ -101,12 +116,32 @@ pub fn parse_args() -> Options {
         file
     };
 
+    let mut change_line_ending = false;
+    let mut change_indent = false;
     for arg in args {
         match arg.as_str() {
             a if argv_m => argv.push(a.to_string()),
             a if outs => {
                 outs = false;
                 outfile.replace(a.to_string());
+            }
+            a if change_line_ending => {
+                match a {
+                    "lf" => line_ending = LineEnding::LF,
+                    "crlf" => line_ending = LineEnding::CRLF,
+                    _ => utilbin::print_help(1, name),
+                }
+            }
+            a if change_indent => {
+                indent = if a.chars().all(|a| a.is_ascii_digit()) {
+                    let spc = a.parse().unwrap();
+                    IndentOptions::Spaces(spc)
+                } else {
+                    match a {
+                        "t" | "tabs" => IndentOptions::Tabs,
+                        _ => utilbin::print_help(1, name),
+                    }
+                }
             }
             "-h" | "-y" | "--yardım" => help = true,
             "-V" | "-s" | "--sürüm" => version = true,
@@ -127,6 +162,12 @@ pub fn parse_args() -> Options {
             #[cfg(feature = "interactive")]
             "-qqq" => quiet.inc_by(3),
             "--" => argv_m = true,
+            "--line-ending" => {
+                change_line_ending = true;
+            },
+            "-i" | "--indent" => {
+                change_indent = true;
+            }
             a => util::error_print("unknown argument", format!("{}", a)),
         }
     }
@@ -146,5 +187,9 @@ pub fn parse_args() -> Options {
         help_exitc: 0,
         #[cfg(feature = "interactive")]
         quiet,
+        #[cfg(feature = "fmt")]
+        line_ending,
+        #[cfg(feature = "fmt")]
+        indent,
     }
 }

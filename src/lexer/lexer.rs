@@ -4,7 +4,7 @@ use crate::token::Precedence;
 use crate::util::SupportedLanguage;
 use crate::util::get_lang;
 use crate::util::{char_in_str, in_vec, read_file, FSErr};
-use crate::errwarn::{ErrorGenerator, Error};
+use crate::error::Error;
 
 use std::fs::canonicalize;
 use std::path::PathBuf;
@@ -17,6 +17,7 @@ pub struct Lexer {
     current: usize,
     line: usize,
     col: usize,
+    do_post_proc: bool,
 }
 
 impl Lexer {
@@ -27,6 +28,14 @@ impl Lexer {
             current: 0,
             line: 1,
             col: 1,
+            do_post_proc: true,
+        }
+    }
+    pub fn do_post_proc(&mut self, do_post_proc: bool) -> Self {
+        self.do_post_proc = do_post_proc;
+        Self {
+            do_post_proc,
+            ..self.clone()
         }
     }
     /// Lexer post processor
@@ -42,16 +51,16 @@ impl Lexer {
                     let next_token = match prog.get(current + 1) {
                         Some(e) => e.clone(),
                         None => return Err(match get_lang() {
-                            SupportedLanguage::Turkish => ErrorGenerator::error(
+                            SupportedLanguage::Turkish => Error::new(
                                 "BeklenmedikSimge",
                                 "yükle den sonra <yazı> ya da '(' bekleniyordu ancak bulunamadı",
-                                0, 0, file,
+                                vec![(0, 0, file, None)],
                                 None
                             ),
-                            SupportedLanguage::English => ErrorGenerator::error(
+                            SupportedLanguage::English => Error::new(
                                 "UnexpectedToken",
                                 "expected <string> or `(` after `yükle` but couldn't find it",
-                                0, 0, file,
+                                vec![(0, 0, file, None)],
                                 None
                             ),
                         })
@@ -82,32 +91,32 @@ impl Lexer {
                                             f
                                         }
                                         Err(e) => return Err(match get_lang() {    
-                                            SupportedLanguage::Turkish => ErrorGenerator::error(
+                                            SupportedLanguage::Turkish => Error::new(
                                                 "DosyaHatası",
                                                 &format!("{:?}", e),
-                                                0, 0, path.display().to_string(),
+                                                vec![(0, 0, path.display().to_string(), None)],
                                                 None
                                             ),
-                                            SupportedLanguage::English => ErrorGenerator::error(
+                                            SupportedLanguage::English => Error::new(
                                                 "FSError",
                                                 &format!("{:?}", e),
-                                                0, 0, path.display().to_string(),
+                                                vec![(0, 0, path.display().to_string(), None)],
                                                 None,
                                             ),
                                         }),
                                     }
                                 },
                                 Err(e) => return Err(match get_lang() {    
-                                    SupportedLanguage::Turkish => ErrorGenerator::error(
+                                    SupportedLanguage::Turkish => Error::new(
                                         "DosyaHatası",
                                         &format!("{:?}", e),
-                                        0, 0, path.display().to_string(),
+                                        vec![(0, 0, path.display().to_string(), None)],
                                         None
                                     ),
-                                    SupportedLanguage::English => ErrorGenerator::error(
+                                    SupportedLanguage::English => Error::new(
                                         "FSError",
                                         &format!("{:?}", e),
-                                        0, 0, path.display().to_string(),
+                                        vec![(0, 0, path.display().to_string(), None)],
                                         None,
                                     ),
                                 }),
@@ -119,16 +128,16 @@ impl Lexer {
                                 let next_token = match prog.get(current + 2) {
                                     Some(e) => e.clone(),
                                     None => return Err(match get_lang() {
-                                        SupportedLanguage::Turkish => ErrorGenerator::error(
+                                        SupportedLanguage::Turkish => Error::new(
                                             "BeklenmedikSimge",
                                             "yükle <yazı> dan sonra `*` veya `->` bekleniyordu ancak bulunamadı",
-                                            0, 0, file,
+                                            vec![(0, 0, file, None)],
                                             None,
                                         ),
-                                        SupportedLanguage::English => ErrorGenerator::error(
+                                        SupportedLanguage::English => Error::new(
                                             "UnexpectedToken",
                                             "expected `*` or `->` after `yükle <string>` but couldn't find any",
-                                            0, 0, file,
+                                            vec![(0, 0, file, None)],
                                             None,
                                         ),
                                     }),
@@ -150,16 +159,16 @@ impl Lexer {
                                         let next_token = match prog.get(current + 3) {
                                             Some(e) => e.clone(),
                                             None => return Err(match get_lang() {
-                                                SupportedLanguage::Turkish => ErrorGenerator::error(
+                                                SupportedLanguage::Turkish => Error::new(
                                                     "BeklenmedikSimge",
                                                     "`yükle <yazı> ->` dan sonra tanımlayıcı bekleniyordu ancak bulunamadı",
-                                                    0, 0, file,
+                                                    vec![(0, 0, file, None)],
                                                     None,
                                                 ),
-                                                SupportedLanguage::English => ErrorGenerator::error(
+                                                SupportedLanguage::English => Error::new(
                                                     "UnexpectedToken",
                                                     "expected identifier after `yükle <string> ->` but couldn't find it",
-                                                    0, 0, file,
+                                                    vec![(0, 0, file, None)],
                                                     None,
                                                 ),
                                             }),
@@ -167,16 +176,16 @@ impl Lexer {
                                         match next_token.typ {
                                             TokenType::Identifier => tokens.push(next_token.clone()),
                                             _ => return Err(match get_lang() {
-                                                SupportedLanguage::Turkish => ErrorGenerator::error(
+                                                SupportedLanguage::Turkish => Error::new(
                                                     "BeklenmedikSimge",
                                                     "`yükle <yazı> ->` dan sonra tanımlayıcı bekleniyordu ancak bulunamadı",
-                                                    0, 0, file,
+                                                    vec![(0, 0, file, None)],
                                                     None,
                                                 ),
-                                                SupportedLanguage::English => ErrorGenerator::error(
+                                                SupportedLanguage::English => Error::new(
                                                     "UnexpectedToken",
                                                     "expected identifier after `yükle <string> ->` but couldn't find it",
-                                                    0, 0, file,
+                                                    vec![(0, 0, file, None)],
                                                     None,
                                                 ),
                                             }),
@@ -193,15 +202,17 @@ impl Lexer {
                                         current += 4;
                                     }
                                     _ => return Err(match get_lang() {
-                                        SupportedLanguage::Turkish => ErrorGenerator::error(
+                                        SupportedLanguage::Turkish => Error::new(
                                             "BeklenmedikSimge",
                                             "`yükle <yazı>` dan sonra `*` veya `->` bekleniyordu ancak bulunamadı",
-                                            next_token.line, next_token.col, next_token.file, None
+                                            vec![(next_token.line, next_token.col, next_token.file, None)],
+                                            None,
                                         ),
-                                        SupportedLanguage::English => ErrorGenerator::error(
+                                        SupportedLanguage::English => Error::new(
                                             "UnexpectedToken",
                                             "expected `*` or `->` after `yükle <string>` but couldn't find any",
-                                            next_token.line, next_token.col, next_token.file, None
+                                            vec![(next_token.line, next_token.col, next_token.file, None)],
+                                            None,
                                         ),
                                     }),
                                 }
@@ -236,36 +247,38 @@ impl Lexer {
                                     }
                                     TokenType::Identifier | TokenType::Çarpı | TokenType::İkiNokta => tokens.push(c),
                                     _ => return Err(match get_lang() {
-                                        SupportedLanguage::Turkish => ErrorGenerator::error(
+                                        SupportedLanguage::Turkish => Error::new(
                                             "BeklenmedikSimge",
                                             &format!(
                                                 "yükle ('dan sonra tanımlayıcı, `)` veya `*` bekleniyordu ancak bulunamadı. {:?}",
                                                 c
                                             ),
-                                            c.line, c.col, c.file, None
+                                            vec![(c.line, c.col, c.file, None)],
+                                            None
                                         ),
-                                        SupportedLanguage::English => ErrorGenerator::error(
+                                        SupportedLanguage::English => Error::new(
                                             "UnexpectedToken",
                                             &format!(
                                                 "expected identifier, `)` or `*` after `yükle (` but found {:?}",
                                                 c
                                             ),
-                                            c.line, c.col, c.file, None
+                                            vec![(c.line, c.col, c.file, None)],
+                                            None
                                         ),
                                     })
                                 }
                             }
                         }
                         _ => return Err(match get_lang() {
-                            SupportedLanguage::Turkish => ErrorGenerator::error(
+                            SupportedLanguage::Turkish => Error::new(
                                 "BeklenmedikSimge",
                                 "`yükle` den sonra `<yazı>` veya `(` bekleniyordu ancak bulunamadı",
-                                0, 0, file, None
+                                vec![(0, 0, file, None)], None
                             ),
-                            SupportedLanguage::English => ErrorGenerator::error(
+                            SupportedLanguage::English => Error::new(
                                 "UnexpectedToken",
                                 "expected `<string>` or `(` after `yükle` but couldn't find any",
-                                0, 0, file, None
+                                vec![(0, 0, file, None)], None
                             ),
                         }),
                     }
@@ -301,9 +314,7 @@ impl Lexer {
                     tokens.push(Token::new(
                         TokenType::ParenL,
                         "(".to_string(),
-                        self.line,
-                        self.col,
-                        file.clone(),
+                        self.line, self.col, file.clone(),
                         Precedence::ParenL,
                     ))
                 }
@@ -313,9 +324,7 @@ impl Lexer {
                     tokens.push(Token::new(
                         TokenType::ParenR,
                         ")".to_string(),
-                        self.line,
-                        self.col,
-                        file.clone(),
+                        self.line, self.col, file.clone(),
                         Precedence::ParenR,
                     ))
                 }
@@ -325,9 +334,7 @@ impl Lexer {
                     tokens.push(Token::new(
                         TokenType::Comma,
                         ",".to_string(),
-                        self.line,
-                        self.col,
-                        file.clone(),
+                        self.line, self.col, file.clone(),
                         Precedence::Comma,
                     ))
                 }
@@ -369,9 +376,7 @@ impl Lexer {
                     tokens.push(Token::new(
                         TokenType::Yazı,
                         buf,
-                        self.line,
-                        self.col,
-                        file.clone(),
+                        self.line, self.col, file.clone(),
                         Precedence::None,
                     ))
                 }
@@ -387,15 +392,15 @@ impl Lexer {
                         } else {
                             if dot_used {
                                 return Err(match get_lang() {
-                                    SupportedLanguage::Turkish => ErrorGenerator::error(
+                                    SupportedLanguage::Turkish => Error::new(
                                         "SözdizimHatası",
                                         "Sayılarda birden fazla nokta olamaz",
-                                        self.line, self.col, file, None,
+                                        vec![(self.line, self.col, file, None)], None,
                                     ),
-                                    SupportedLanguage::English => ErrorGenerator::error(
+                                    SupportedLanguage::English => Error::new(
                                         "SyntaxError",
                                         "Numbers can't have more than one dot int them",
-                                        self.line, self.col, file, None,
+                                        vec![(self.line, self.col, file, None)], None,
                                     ),
                                 });
                             } else {
@@ -409,9 +414,7 @@ impl Lexer {
                     tokens.push(Token::new(
                         TokenType::Sayı,
                         buf,
-                        self.line,
-                        self.col,
-                        file.clone(),
+                        self.line, self.col, file.clone(),
                         Precedence::None,
                     ));
                 }
@@ -430,18 +433,14 @@ impl Lexer {
                             tokens.push(Token::new(
                                 TokenType::ArtıArtı,
                                 "++".to_string(),
-                                self.line,
-                                self.col,
-                                file.clone(),
+                                self.line, self.col, file.clone(),
                                 Precedence::None,
                             ))
                         } else {
                             tokens.push(Token::new(
                                 TokenType::Artı,
                                 "+".to_string(),
-                                self.line,
-                                self.col,
-                                file.clone(),
+                                self.line, self.col, file.clone(),
                                 Precedence::Precedence(2),
                             ))
                         }
@@ -457,9 +456,7 @@ impl Lexer {
                             tokens.push(Token::new(
                                 TokenType::EksiEksi,
                                 "--".to_string(),
-                                self.line,
-                                self.col,
-                                file.clone(),
+                                self.line, self.col, file.clone(),
                                 Precedence::None,
                             ))
                         } else if self.currentc() == '*' {
@@ -468,15 +465,15 @@ impl Lexer {
                                 self.col += 1;
                                 if self.current > self.source.len() {
                                     return Err(match get_lang() {
-                                        SupportedLanguage::English => ErrorGenerator::error(
+                                        SupportedLanguage::English => Error::new(
                                             "SyntaxError",
                                             "unterminated comment",
-                                            self.line, self.col, file, None,
+                                            vec![(self.line, self.col, file, None)], None,
                                         ),
-                                        SupportedLanguage::Turkish => ErrorGenerator::error(
+                                        SupportedLanguage::Turkish => Error::new(
                                             "SözdizimHatası",
                                             "bitirilmemiş yorum",
-                                            self.line, self.col, file, None,
+                                            vec![(self.line, self.col, file, None)], None,
                                         ),
                                     });
                                 }
@@ -494,15 +491,15 @@ impl Lexer {
                                         }
                                     } else {
                                         return Err(match get_lang() {
-                                            SupportedLanguage::English => ErrorGenerator::error(
+                                            SupportedLanguage::English => Error::new(
                                                 "SyntaxError",
                                                 "unterminated comment",
-                                                self.line, self.col, file, None,
+                                                vec![(self.line, self.col, file, None)], None,
                                             ),
-                                            SupportedLanguage::Turkish => ErrorGenerator::error(
+                                            SupportedLanguage::Turkish => Error::new(
                                                 "SözdizimHatası",
                                                 "bitirilmemiş yorum",
-                                                self.line, self.col, file, None,
+                                                vec![(self.line, self.col, file, None)], None,
                                             ),
                                         });
                                     }
@@ -514,18 +511,14 @@ impl Lexer {
                             tokens.push(Token::new(
                                 TokenType::Koy,
                                 "->".to_string(),
-                                self.line,
-                                self.col,
-                                file.clone(),
+                                self.line, self.col, file.clone(),
                                 Precedence::Reserved,
                             ));
                         } else {
                             tokens.push(Token::new(
                                 TokenType::Eksi,
                                 "-".to_string(),
-                                self.line,
-                                self.col,
-                                file.clone(),
+                                self.line, self.col, file.clone(),
                                 Precedence::Precedence(2),
                             ))
                         }
@@ -533,9 +526,7 @@ impl Lexer {
                         tokens.push(Token::new(
                             TokenType::Eksi,
                             "-".to_string(),
-                            self.line,
-                            self.col,
-                            file.clone(),
+                            self.line, self.col, file.clone(),
                             Precedence::Precedence(2),
                         ))
                     }
@@ -546,9 +537,7 @@ impl Lexer {
                     tokens.push(Token::new(
                         TokenType::Çarpı,
                         "*".to_string(),
-                        self.line,
-                        self.col,
-                        file.clone(),
+                        self.line, self.col, file.clone(),
                         Precedence::Precedence(3),
                     ))
                 }
@@ -558,9 +547,7 @@ impl Lexer {
                     tokens.push(Token::new(
                         TokenType::Bölü,
                         "/".to_string(),
-                        self.line,
-                        self.col,
-                        file.clone(),
+                        self.line, self.col, file.clone(),
                         Precedence::Precedence(3),
                     ))
                 }
@@ -570,9 +557,7 @@ impl Lexer {
                     tokens.push(Token::new(
                         TokenType::Modulo,
                         "%".to_string(),
-                        self.line,
-                        self.col,
-                        file.clone(),
+                        self.line, self.col, file.clone(),
                         Precedence::Precedence(3),
                     ))
                 }
@@ -584,9 +569,7 @@ impl Lexer {
                             tokens.push(Token::new(
                                 TokenType::BüyükEşittir,
                                 ">=".to_string(),
-                                self.line,
-                                self.col,
-                                file.clone(),
+                                self.line, self.col, file.clone(),
                                 Precedence::Precedence(1),
                             ));
                             self.col += 1;
@@ -595,9 +578,7 @@ impl Lexer {
                             tokens.push(Token::new(
                                 TokenType::Büyüktür,
                                 ">".to_string(),
-                                self.line,
-                                self.col,
-                                file.clone(),
+                                self.line, self.col, file.clone(),
                                 Precedence::Precedence(1),
                             ));
                         }
@@ -605,9 +586,7 @@ impl Lexer {
                         tokens.push(Token::new(
                             TokenType::Büyüktür,
                             ">".to_string(),
-                            self.line,
-                            self.col,
-                            file.clone(),
+                            self.line, self.col, file.clone(),
                             Precedence::Precedence(1),
                         ));
                     }
@@ -620,9 +599,7 @@ impl Lexer {
                             tokens.push(Token::new(
                                 TokenType::KüçükEşittir,
                                 "<=".to_string(),
-                                self.line,
-                                self.col,
-                                file.clone(),
+                                self.line, self.col, file.clone(),
                                 Precedence::Precedence(1),
                             ));
                             self.col += 1;
@@ -631,9 +608,7 @@ impl Lexer {
                             tokens.push(Token::new(
                                 TokenType::Küçüktür,
                                 "<".to_string(),
-                                self.line,
-                                self.col,
-                                file.clone(),
+                                self.line, self.col, file.clone(),
                                 Precedence::Precedence(1),
                             ));
                         }
@@ -641,9 +616,7 @@ impl Lexer {
                         tokens.push(Token::new(
                             TokenType::Küçüktür,
                             "<".to_string(),
-                            self.line,
-                            self.col,
-                            file.clone(),
+                            self.line, self.col, file.clone(),
                             Precedence::Precedence(1),
                         ));
                     }
@@ -656,9 +629,7 @@ impl Lexer {
                             tokens.push(Token::new(
                                 TokenType::EşitDeğildir,
                                 "!=".to_string(),
-                                self.line,
-                                self.col,
-                                file.clone(),
+                                self.line, self.col, file.clone(),
                                 Precedence::Precedence(1),
                             ));
                             self.col += 1;
@@ -667,9 +638,7 @@ impl Lexer {
                             tokens.push(Token::new(
                                 TokenType::Değildir,
                                 "!".to_string(),
-                                self.line,
-                                self.col,
-                                file.clone(),
+                                self.line, self.col, file.clone(),
                                 Precedence::Precedence(0),
                             ));
                         }
@@ -677,9 +646,7 @@ impl Lexer {
                         tokens.push(Token::new(
                             TokenType::Değildir,
                             "!".to_string(),
-                            self.line,
-                            self.col,
-                            file.clone(),
+                            self.line, self.col, file.clone(),
                             Precedence::Precedence(0),
                         ));
                     }
@@ -692,9 +659,7 @@ impl Lexer {
                             tokens.push(Token::new(
                                 TokenType::Son,
                                 "=?".to_string(),
-                                self.line,
-                                self.col,
-                                file.clone(),
+                                self.line, self.col, file.clone(),
                                 Precedence::Reserved,
                             ));
                             self.col += 1;
@@ -703,9 +668,7 @@ impl Lexer {
                             tokens.push(Token::new(
                                 TokenType::Eşittir,
                                 "=".to_string(),
-                                self.line,
-                                self.col,
-                                file.clone(),
+                                self.line, self.col, file.clone(),
                                 Precedence::Precedence(1),
                             ));
                         }
@@ -713,9 +676,7 @@ impl Lexer {
                         tokens.push(Token::new(
                             TokenType::Eşittir,
                             "=".to_string(),
-                            self.line,
-                            self.col,
-                            file.clone(),
+                            self.line, self.col, file.clone(),
                             Precedence::Precedence(1),
                         ));
                     }
@@ -728,9 +689,7 @@ impl Lexer {
                             tokens.push(Token::new(
                                 TokenType::İkiNoktaNokta,
                                 ":.".to_string(),
-                                self.line,
-                                self.col,
-                                file.clone(),
+                                self.line, self.col, file.clone(),
                                 Precedence::Reserved,
                             ));
                             self.col += 1;
@@ -739,9 +698,7 @@ impl Lexer {
                             tokens.push(Token::new(
                                 TokenType::Yoksa,
                                 ":?".to_string(),
-                                self.line,
-                                self.col,
-                                file.clone(),
+                                self.line, self.col, file.clone(),
                                 Precedence::Reserved,
                             ));
                             self.col += 1;
@@ -750,9 +707,7 @@ impl Lexer {
                             tokens.push(Token::new(
                                 TokenType::İkiNokta,
                                 ":".to_string(),
-                                self.line,
-                                self.col,
-                                file.clone(),
+                                self.line, self.col, file.clone(),
                                 Precedence::None,
                             ));
                         }
@@ -764,9 +719,7 @@ impl Lexer {
                     tokens.push(Token::new(
                         TokenType::İse,
                         "?".to_string(),
-                        self.line,
-                        self.col,
-                        file.clone(),
+                        self.line, self.col, file.clone(),
                         Precedence::Reserved,
                     ));
                 }
@@ -776,9 +729,7 @@ impl Lexer {
                     tokens.push(Token::new(
                         TokenType::Tipinde,
                         "@".to_string(),
-                        self.line,
-                        self.col,
-                        file.clone(),
+                        self.line, self.col, file.clone(),
                         Precedence::None,
                     ));
                 }
@@ -801,169 +752,127 @@ impl Lexer {
                         "at" => tokens.push(Token::new(
                             TokenType::At,
                             "at".to_string(),
-                            self.line,
-                            self.col,
-                            file.clone(),
+                            self.line, self.col, file.clone(),
                             Precedence::Reserved,
                         )),
                         "ver" => tokens.push(Token::new(
                             TokenType::Ver,
                             "ver".to_string(),
-                            self.line,
-                            self.col,
-                            file.clone(),
+                            self.line, self.col, file.clone(),
                             Precedence::Reserved,
                         )),
                         "de" => tokens.push(Token::new(
                             TokenType::De,
                             "de".to_string(),
-                            self.line,
-                            self.col,
-                            file.clone(),
+                            self.line, self.col, file.clone(),
                             Precedence::Reserved,
                         )),
                         "ise" => tokens.push(Token::new(
                             TokenType::İse,
                             "ise".to_string(),
-                            self.line,
-                            self.col,
-                            file.clone(),
+                            self.line, self.col, file.clone(),
                             Precedence::Reserved,
                         )),
                         "son" => tokens.push(Token::new(
                             TokenType::Son,
                             "son".to_string(),
-                            self.line,
-                            self.col,
-                            file.clone(),
+                            self.line, self.col, file.clone(),
                             Precedence::Reserved,
                         )),
                         "iken" => tokens.push(Token::new(
                             TokenType::İken,
                             "iken".to_string(),
-                            self.line,
-                            self.col,
-                            file.clone(),
+                            self.line, self.col, file.clone(),
                             Precedence::Reserved,
                         )),
                         "yoksa" => tokens.push(Token::new(
                             TokenType::Yoksa,
                             "yoksa".to_string(),
-                            self.line,
-                            self.col,
-                            file.clone(),
+                            self.line, self.col, file.clone(),
                             Precedence::Reserved,
                         )),
                         "doğru" => tokens.push(Token::new(
                             TokenType::Doğru,
                             "doğru".to_string(),
-                            self.line,
-                            self.col,
-                            file.clone(),
+                            self.line, self.col, file.clone(),
                             Precedence::None,
                         )),
                         "yanlış" => tokens.push(Token::new(
                             TokenType::Yanlış,
                             "yanlış".to_string(),
-                            self.line,
-                            self.col,
-                            file.clone(),
+                            self.line, self.col, file.clone(),
                             Precedence::None,
                         )),
                         "kpy" => tokens.push(Token::new(
                             TokenType::Kopya,
                             "kpy".to_string(),
-                            self.line,
-                            self.col,
-                            file.clone(),
+                            self.line, self.col, file.clone(),
                             Precedence::None,
                         )),
                         "tks" => tokens.push(Token::new(
                             TokenType::Takas,
                             "tks".to_string(),
-                            self.line,
-                            self.col,
-                            file.clone(),
+                            self.line, self.col, file.clone(),
                             Precedence::None,
                         )),
                         "üst" => tokens.push(Token::new(
                             TokenType::Üst,
                             "üst".to_string(),
-                            self.line,
-                            self.col,
-                            file.clone(),
+                            self.line, self.col, file.clone(),
                             Precedence::None,
                         )),
                         "veya" => tokens.push(Token::new(
                             TokenType::Veya,
                             "veya".to_string(),
-                            self.line,
-                            self.col,
-                            file.clone(),
+                            self.line, self.col, file.clone(),
                             Precedence::Precedence(0),
                         )),
                         "ve" => tokens.push(Token::new(
                             TokenType::Ve,
                             "ve".to_string(),
-                            self.line,
-                            self.col,
-                            file.clone(),
+                            self.line, self.col, file.clone(),
                             Precedence::Precedence(0),
                         )),
                         "dön" => tokens.push(Token::new(
                             TokenType::Döndür,
                             "dön".to_string(),
-                            self.line,
-                            self.col,
-                            file.clone(),
+                            self.line, self.col, file.clone(),
                             Precedence::None,
                         )),
                         "girdi" => tokens.push(Token::new(
                             TokenType::Girdi,
                             "girdi".to_string(),
-                            self.line,
-                            self.col,
-                            file.clone(),
+                            self.line, self.col, file.clone(),
                             Precedence::None,
                         )),
                         "işlev" => tokens.push(Token::new(
                             TokenType::İşlev,
                             "işlev".to_string(),
-                            self.line,
-                            self.col,
-                            file.clone(),
+                            self.line, self.col, file.clone(),
                             Precedence::Reserved,
                         )),
                         "yükle" => tokens.push(Token::new(
                             TokenType::Yükle,
                             "yükle".to_string(),
-                            self.line,
-                            self.col,
-                            file.clone(),
+                            self.line, self.col, file.clone(),
                             Precedence::Reserved,
                         )),
                         "hiç" => tokens.push(Token::new(
                             TokenType::Hiç,
                             "hiç".to_string(),
-                            self.line,
-                            self.col,
-                            file.clone(),
+                            self.line, self.col, file.clone(),
                             Precedence::None,
                         )),
                         "blok" => tokens.push(Token::new(
                             TokenType::Blok,
                             "blok".to_string(),
-                            self.line,
-                            self.col,
-                            file.clone(),
+                            self.line, self.col, file.clone(),
                             Precedence::Reserved,
                         )),
                         a => tokens.push(Token::new(
                             TokenType::Identifier,
                             a.to_string(),
-                            self.line,
-                            self.col,
-                            file.clone(),
+                            self.line, self.col, file.clone(),
                             Precedence::None,
                         )),
                     }
@@ -973,12 +882,14 @@ impl Lexer {
         tokens.push(Token::new(
             TokenType::EOF,
             "".to_string(),
-            self.line,
-            self.col,
-            file.clone(),
+            self.line, self.col, file.clone(),
             Precedence::Reserved,
         ));
-        self.post_proc(tokens, visited, file)
+        if self.do_post_proc {
+            self.post_proc(tokens, visited, file)
+        } else {
+            Ok(tokens)
+        }
     }
     fn currentc(&self) -> char {
         *self.source.get(self.current).unwrap()

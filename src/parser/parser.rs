@@ -1,4 +1,4 @@
-use crate::errwarn::{Error, ErrorGenerator};
+use crate::error::Error;
 use crate::lexer;
 
 use crate::token::tokentypes::LexerTokenType as LexTokenType;
@@ -187,16 +187,16 @@ impl Parser {
                 LexTokenType::Yükle | LexTokenType::Comma => unreachable!(),
                 LexTokenType::ParenR | LexTokenType::ParenL => {
                     return Err(match get_lang() {
-                        SupportedLanguage::Turkish => ErrorGenerator::error(
+                        SupportedLanguage::Turkish => Error::new(
                             "SözdizimHatası",
                             "kapatılmamış parantez",
-                            ptoken.line, ptoken.col, ptoken.file.clone(),
+                            vec![(ptoken.line, ptoken.col, ptoken.file.clone(), None)],
                             None
                         ),
-                        SupportedLanguage::English => ErrorGenerator::error(
+                        SupportedLanguage::English => Error::new(
                             "SyntaxError",
                             "unclosed parenthesis",
-                            ptoken.line, ptoken.col, ptoken.file.clone(),
+                            vec![(ptoken.line, ptoken.col, ptoken.file.clone(), None)],
                             None
                         ),
                     });
@@ -261,22 +261,22 @@ impl Parser {
                         a => {
                             let o = parsed.get(a.unwrap_inner()).unwrap().clone();
                             return Err(match get_lang() {
-                                SupportedLanguage::Turkish => ErrorGenerator::error(
+                                SupportedLanguage::Turkish => Error::new(
                                     "SözdizimHatası",
                                     &format!(
                                         "kapatılmamış blok {:?}",
                                         a
                                     ),
-                                    o.line, o.col, o.file,
+                                    vec![(o.line, o.col, o.file, None)],
                                     None,
                                 ),
-                                SupportedLanguage::English => ErrorGenerator::error(
+                                SupportedLanguage::English => Error::new(
                                     "SyntaxError",
                                     &format!(
                                         "unclosed block {:?}",
                                         a
                                     ),
-                                    o.line, o.col, o.file,
+                                    vec![(o.line, o.col, o.file, None)],
                                     None,
                                 ),
                             });
@@ -358,22 +358,22 @@ impl Parser {
                                                 _ => {
                                                     let o = iknk.clone();
                                                     return Err(match get_lang() {
-                                                    SupportedLanguage::Turkish => ErrorGenerator::error(
+                                                    SupportedLanguage::Turkish => Error::new(
                                                         "SözdizimHatası",
                                                             &format!(
                                                                 "kapatılmamış blok {:?}",
                                                                 o.repr()
                                                             ),
-                                                            o.line, o.col, o.file,
+                                                            vec![(o.line, o.col, o.file, None)],
                                                             None,
                                                         ),
-                                                        SupportedLanguage::English => ErrorGenerator::error(
+                                                        SupportedLanguage::English => Error::new(
                                                             "SyntaxError",
                                                             &format!(
                                                                 "unclosed block {:?}",
                                                                 o.repr()
                                                             ),
-                                                            o.line, o.col, o.file,
+                                                            vec![(o.line, o.col, o.file, None)],
                                                             None,
                                                         ),
                                                     });
@@ -383,22 +383,22 @@ impl Parser {
                                         a => {
                                             let o = parsed.get(a.unwrap_inner()).unwrap().clone();
                                             return Err(match get_lang() {
-                                                SupportedLanguage::Turkish => ErrorGenerator::error(
+                                                SupportedLanguage::Turkish => Error::new(
                                                     "SözdizimHatası",
                                                     &format!(
                                                         "kapatılmamış blok {:?}",
                                                         a
                                                     ),
-                                                    o.line, o.col, o.file,
+                                                    vec![(o.line, o.col, o.file, None)],
                                                     None,
                                                 ),
-                                                SupportedLanguage::English => ErrorGenerator::error(
+                                                SupportedLanguage::English => Error::new(
                                                     "SyntaxError",
                                                     &format!(
                                                         "unclosed block {:?}",
                                                         a
                                                     ),
-                                                    o.line, o.col, o.file,
+                                                    vec![(o.line, o.col, o.file, None)],
                                                     None,
                                                 ),
                                             });

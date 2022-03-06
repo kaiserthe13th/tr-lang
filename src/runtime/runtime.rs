@@ -1,5 +1,4 @@
-use crate::errwarn::Error;
-use crate::errwarn::ErrorGenerator;
+use crate::error::Error;
 use crate::mem::{HashMemory, Map, Object, StackMemory};
 use crate::store::globarg::SUPRESS_WARN;
 use crate::token::{tokentypes::ParserTokenType as TokenType, ParserToken as Token};
@@ -32,6 +31,7 @@ impl Run {
         };
         // let mut warnings: Vec<Box<dyn FnOnce()>> = vec![]; // for later use
         let mut current_namespace: Vec<String> = vec![];
+        let mut traceback: Vec<(usize, usize, String, Option<String>)> = vec![];
 
         while self.program.len() > self.current {
             let tokenc = self.program.get(self.current).unwrap().clone();
@@ -47,15 +47,13 @@ impl Run {
                             match hashs.get(id) {
                                 Some(o) => stack.push(o.clone()),
                                 None => return Err((stack, hashs.clone(), match get_lang() {
-                                    SupportedLanguage::Turkish => ErrorGenerator::error(
+                                    SupportedLanguage::Turkish => Error::new(
                                         "BilinmeyenTanımlayıcı",
                                         &format!(
                                             "bilinmeyen değişken: `{}`, bu değişken bulunamamıştır",
                                             tok.repr()
                                         ),
-                                        tok.line,
-                                        tok.col,
-                                        tok.file.clone(),
+                                        { traceback.push((tok.line, tok.col, tok.file.clone(), None)); traceback },
                                         {
                                             let mut hashk = hashs.clone().into_keys();
                                             hashk.sort();
@@ -67,12 +65,10 @@ impl Run {
                                             }
                                         }
                                     ),
-                                    SupportedLanguage::English => ErrorGenerator::error(
+                                    SupportedLanguage::English => Error::new(
                                         "UnknownIdentifier",
                                         &format!("unknown identifier: `{}`, this identifier could not be found", tok.repr()),
-                                        tok.line,
-                                        tok.col,
-                                        tok.file.clone(),
+                                        { traceback.push((tok.line, tok.col, tok.file.clone(), None)); traceback },
                                         {
                                             let mut hashk = hashs.clone().into_keys();
                                             hashk.sort();
@@ -88,26 +84,22 @@ impl Run {
                             }
                         }
                         _ => return Err((stack, hashs, match get_lang() {
-                                SupportedLanguage::Turkish => ErrorGenerator::error(
+                                SupportedLanguage::Turkish => Error::new(
                                     "BeklenmedikSimge",
                                     &format!(
                                         "tanımlayıcı beklenmişti ancak `{}` bulundu",
                                         tok.repr()
                                     ),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 ),
-                                SupportedLanguage::English => ErrorGenerator::error(
+                                SupportedLanguage::English => Error::new(
                                     "UnexpectedToken",
                                     &format!(
                                         "expected identifier, but found `{}`",
                                         tok.repr()
                                     ),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 ),
                             },
@@ -126,22 +118,18 @@ impl Run {
                                     Some(a) => a,
                                     None => return Err((stack, hashs, match get_lang() {
                                         SupportedLanguage::Turkish => {
-                                            ErrorGenerator::error(
+                                            Error::new(
                                                 "KümedeYeterliDeğişkenYok",
                                                 &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
-                                                tokenc.line,
-                                                tokenc.col,
-                                                tokenc.file,
+                                                { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                                 None,
                                             )
                                         }
                                         SupportedLanguage::English => {
-                                            ErrorGenerator::error(
+                                            Error::new(
                                                 "NotEnoughVarsInStack",
                                                 &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
-                                                tokenc.line,
-                                                tokenc.col,
-                                                tokenc.file,
+                                                { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                                 None,
                                             )
                                         }
@@ -155,15 +143,13 @@ impl Run {
                                                 let o = match map.map.get(id) {
                                                     Some(o) => o.clone(),
                                                     None => return Err((stack, hashs.clone(), match get_lang() {
-                                                        SupportedLanguage::Turkish => ErrorGenerator::error(
+                                                        SupportedLanguage::Turkish => Error::new(
                                                             "BilinmeyenTanımlayıcı",
                                                             &format!(
                                                                 "bilinmeyen değişken: `{}`, bu değişken bulunamamıştır",
                                                                 tok.repr()
                                                             ),
-                                                            tok.line,
-                                                            tok.col,
-                                                            tok.file.clone(),
+                                                            { traceback.push((tok.line, tok.col, tok.file.clone(), None)); traceback },
                                                             {
                                                                 let mut hashk: Vec<_> = map.map.clone().into_keys().collect();
                                                                 hashk.sort();
@@ -175,15 +161,13 @@ impl Run {
                                                                 }
                                                             }
                                                         ),
-                                                        SupportedLanguage::English => ErrorGenerator::error(
+                                                        SupportedLanguage::English => Error::new(
                                                             "UnknownIdentifier",
                                                             &format!(
                                                                 "unknown identifier: `{}`, this identifier could not be found",
                                                                 tok.repr()
                                                             ),
-                                                            tok.line,
-                                                            tok.col,
-                                                            tok.file.clone(),
+                                                            { traceback.push((tok.line, tok.col, tok.file.clone(), None)); traceback },
                                                             {
                                                                 let mut hashk: Vec<_> = map.map.clone().into_keys().collect();
                                                                 hashk.sort();
@@ -211,24 +195,20 @@ impl Run {
                                                         stack,
                                                         hashs,
                                                         match get_lang() {
-                                                            SupportedLanguage::Turkish => ErrorGenerator::error(
+                                                            SupportedLanguage::Turkish => Error::new(
                                                                 "BeklenmedikSimge",
                                                                 &format!(
                                                                     "`)` beklenmişti ancak birşey bulunamadı",
                                                                 ),
-                                                                tokenc.line,
-                                                                tokenc.col,
-                                                                tokenc.file,
+                                                                { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                                                 None,
                                                             ),
-                                                            SupportedLanguage::English => ErrorGenerator::error(
+                                                            SupportedLanguage::English => Error::new(
                                                                 "UnexpectedToken",
                                                                 &format!(
                                                                     "expected `)`, but found nothing",
                                                                 ),
-                                                                tokenc.line,
-                                                                tokenc.col,
-                                                                tokenc.file,
+                                                                { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                                                 None,
                                                             ),
                                                         },
@@ -243,26 +223,22 @@ impl Run {
                                                         stack,
                                                         hashs,
                                                         match get_lang() {
-                                                            SupportedLanguage::Turkish => ErrorGenerator::error(
+                                                            SupportedLanguage::Turkish => Error::new(
                                                                 "BeklenmedikSimge",
                                                                 &format!(
                                                                     "`)` beklenmişti ancak `{}` bulundu",
                                                                     next.repr()
                                                                 ),
-                                                                tokenc.line,
-                                                                tokenc.col,
-                                                                tokenc.file,
+                                                                { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                                                 None,
                                                             ),
-                                                            SupportedLanguage::English => ErrorGenerator::error(
+                                                            SupportedLanguage::English => Error::new(
                                                                 "UnexpectedToken",
                                                                 &format!(
                                                                     "expected `)`, but found `{}`",
                                                                     next.repr()
                                                                 ),
-                                                                tokenc.line,
-                                                                tokenc.col,
-                                                                tokenc.file,
+                                                                { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                                                 None,
                                                             ),
                                                         },
@@ -273,26 +249,22 @@ impl Run {
                                                 stack,
                                                 hashs,
                                                 match get_lang() {
-                                                    SupportedLanguage::Turkish => ErrorGenerator::error(
+                                                    SupportedLanguage::Turkish => Error::new(
                                                         "BeklenmedikSimge",
                                                         &format!(
                                                             "`)` beklenmişti ancak `{}` bulundu",
                                                             tok.repr()
                                                         ),
-                                                        tokenc.line,
-                                                        tokenc.col,
-                                                        tokenc.file,
+                                                        { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                                         None,
                                                     ),
-                                                    SupportedLanguage::English => ErrorGenerator::error(
+                                                    SupportedLanguage::English => Error::new(
                                                         "UnexpectedToken",
                                                         &format!(
                                                             "expected `)`, but found `{}`",
                                                             tok.repr()
                                                         ),
-                                                        tokenc.line,
-                                                        tokenc.col,
-                                                        tokenc.file,
+                                                        { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                                         None,
                                                     ),
                                                 },
@@ -303,20 +275,16 @@ impl Run {
                                         stack,
                                         hashs,
                                         match get_lang() {
-                                            SupportedLanguage::Turkish => ErrorGenerator::error(
+                                            SupportedLanguage::Turkish => Error::new(
                                                 "BeklenmedikTip",
                                                 &format!("harita beklenmişti ancak `{:?}` bulundu", b),
-                                                tokenc.line,
-                                                tokenc.col,
-                                                tokenc.file,
+                                                { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                                 None,
                                             ),
-                                            SupportedLanguage::English => ErrorGenerator::error(
+                                            SupportedLanguage::English => Error::new(
                                                 "UnexpectedType",
                                                 &format!("expected map but found `{:?}`", b),
-                                                tokenc.line,
-                                                tokenc.col,
-                                                tokenc.file,
+                                                { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                                 None,
                                             ),
                                         },
@@ -341,22 +309,18 @@ impl Run {
                         Some(a) => a,
                         None => return Err((stack, hashs, match get_lang() {
                             SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                                Error::new(
                             "KümedeYeterliDeğişkenYok",
                             &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
-                            tokenc.line,
-                            tokenc.col,
-                            tokenc.file,
+                            { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                             None,
                         )
                             }
                             SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                Error::new(
                             "NotEnoughVarsInStack",
                             &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
-                            tokenc.line,
-                            tokenc.col,
-                            tokenc.file,
+                            { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                             None,
                         )
                             }
@@ -370,15 +334,13 @@ impl Run {
                                     let o = match map.map.get(&ident) {
                                         Some(o) => o,
                                         None => return Err((stack, hashs.clone(), match get_lang() {
-                                            SupportedLanguage::Turkish => ErrorGenerator::error(
+                                            SupportedLanguage::Turkish => Error::new(
                                                 "BilinmeyenTanımlayıcı",
                                                 &format!(
                                                     "bilinmeyen değişken: `{}`, bu değişken bulunamamıştır",
                                                     tokenc.repr()
                                                 ),
-                                                tokenc.line,
-                                                tokenc.col,
-                                                tokenc.file,
+                                                { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                                 {
                                                     let mut hashk = hashs.clone().into_keys();
                                                     hashk.sort();
@@ -390,12 +352,10 @@ impl Run {
                                                     }
                                                 }
                                             ),
-                                            SupportedLanguage::English => ErrorGenerator::error(
+                                            SupportedLanguage::English => Error::new(
                                                 "UnknownIdentifier",
                                                 &format!("unknown identifier: `{}`, this identifier could not be found", tokenc.repr()),
-                                                tokenc.line,
-                                                tokenc.col,
-                                                tokenc.file,
+                                                { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                                 {
                                                     let mut hashk = hashs.clone().into_keys();
                                                     hashk.sort();
@@ -441,6 +401,10 @@ impl Run {
                                                 }
                                                 _ => unreachable!(),
                                             }
+                                            if let TokenType::Identifier { id : fname } =
+                                                &self.program.get(*tp + 1).unwrap().typ {
+                                                traceback.push((tokenc.line, tokenc.col, tokenc.file, Some(fname.clone())));
+                                            }
                                             stack.new_stack();
                                             hashs.new_hash();
                                         }
@@ -451,26 +415,22 @@ impl Run {
                                         stack,
                                         hashs,
                                         match get_lang() {
-                                            SupportedLanguage::Turkish => ErrorGenerator::error(
+                                            SupportedLanguage::Turkish => Error::new(
                                                 "BeklenmedikSimge",
                                                 &format!(
                                                     "tanımlayıcı beklenmişti ancak `{}` bulundu",
                                                     id.repr()
                                                 ),
-                                                tokenc.line,
-                                                tokenc.col,
-                                                tokenc.file,
+                                                { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                                 None,
                                             ),
-                                            SupportedLanguage::English => ErrorGenerator::error(
+                                            SupportedLanguage::English => Error::new(
                                                 "UnexpectedToken",
                                                 &format!(
                                                     "expected identifier, but found `{}`",
                                                     id.repr()
                                                 ),
-                                                tokenc.line,
-                                                tokenc.col,
-                                                tokenc.file,
+                                                { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                                 None,
                                             ),
                                         },
@@ -483,20 +443,16 @@ impl Run {
                                 stack,
                                 hashs,
                                 match get_lang() {
-                                    SupportedLanguage::Turkish => ErrorGenerator::error(
+                                    SupportedLanguage::Turkish => Error::new(
                                         "BeklenmedikTip",
                                         &format!("harita beklenmişti ancak `{:?}` bulundu", b),
-                                        tokenc.line,
-                                        tokenc.col,
-                                        tokenc.file,
+                                        { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                         None,
                                     ),
-                                    SupportedLanguage::English => ErrorGenerator::error(
+                                    SupportedLanguage::English => Error::new(
                                         "UnexpectedType",
                                         &format!("expected map but found `{:?}`", b),
-                                        tokenc.line,
-                                        tokenc.col,
-                                        tokenc.file,
+                                        { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                         None,
                                     ),
                                 },
@@ -530,23 +486,19 @@ impl Run {
                                 stack,
                                 hashs,
                                 match get_lang() {
-                                    SupportedLanguage::Turkish => ErrorGenerator::error(
+                                    SupportedLanguage::Turkish => Error::new(
                                         "BeklenmedikSimge",
                                         &format!(
                                             "tanımlayıcı beklenmişti ancak `{}` bulundu",
                                             id.repr()
                                         ),
-                                        tokenc.line,
-                                        tokenc.col,
-                                        tokenc.file,
+                                        { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                         None,
                                     ),
-                                    SupportedLanguage::English => ErrorGenerator::error(
+                                    SupportedLanguage::English => Error::new(
                                         "UnexpectedToken",
                                         &format!("expected identifier, but found `{}`", id.repr()),
-                                        tokenc.line,
-                                        tokenc.col,
-                                        tokenc.file,
+                                        { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                         None,
                                     ),
                                 },
@@ -565,22 +517,18 @@ impl Run {
                         Some(a) => a,
                         None => return Err((stack, hashs, match get_lang() {
                             SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                                Error::new(
                             "KümedeYeterliDeğişkenYok",
                             &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
-                            tokenc.line,
-                            tokenc.col,
-                            tokenc.file,
+                            { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                             None,
                         )
                             }
                             SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                Error::new(
                             "NotEnoughVarsInStack",
                             &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
-                            tokenc.line,
-                            tokenc.col,
-                            tokenc.file,
+                            { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                             None,
                         )
                             }
@@ -597,6 +545,7 @@ impl Run {
                             _ => unreachable!(),
                         };
                         self.current += 1;
+                        traceback.pop();
                         stack.del_stack();
                         hashs.del_hash();
                     } // error
@@ -612,23 +561,19 @@ impl Run {
                                 stack,
                                 hashs,
                                 match get_lang() {
-                                    SupportedLanguage::Turkish => ErrorGenerator::error(
+                                    SupportedLanguage::Turkish => Error::new(
                                         "BeklenmedikSimge",
                                         &format!(
                                             "tanımlayıcı beklenmişti ancak `{}` bulundu",
                                             id.repr()
                                         ),
-                                        tokenc.line,
-                                        tokenc.col,
-                                        tokenc.file,
+                                        { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                         None,
                                     ),
-                                    SupportedLanguage::English => ErrorGenerator::error(
+                                    SupportedLanguage::English => Error::new(
                                         "UnexpectedToken",
                                         &format!("expected identifier, but found `{}`", id.repr()),
-                                        tokenc.line,
-                                        tokenc.col,
-                                        tokenc.file,
+                                        { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                         None,
                                     ),
                                 },
@@ -654,6 +599,7 @@ impl Run {
                     };
                     self.current = loc;
                     self.current += 1;
+                    traceback.pop();
                     stack.del_stack();
                     hashs.del_hash();
                 }
@@ -668,22 +614,18 @@ impl Run {
                                     hashs,
                                     match get_lang() {
                                         SupportedLanguage::Turkish => {
-                                            ErrorGenerator::error(
+                                            Error::new(
                                 "KümedeYeterliDeğişkenYok",
                                 &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
-                                tokenc.line,
-                                tokenc.col,
-                                tokenc.file,
+                                { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                 None,
                             )
                                         }
                                         SupportedLanguage::English => {
-                                            ErrorGenerator::error(
+                                            Error::new(
                                 "NotEnoughVarsInStack",
                                 &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
-                                tokenc.line,
-                                tokenc.col,
-                                tokenc.file,
+                                { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                 None,
                             )
                                         }
@@ -699,22 +641,18 @@ impl Run {
                         Some(a) => a,
                         None => return Err((stack, hashs, match get_lang() {
                             SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                                Error::new(
                                 "KümedeYeterliDeğişkenYok",
                                 &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
-                                tokenc.line,
-                                tokenc.col,
-                                tokenc.file,
+                                { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                 None,
                             )
                             }
                             SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                Error::new(
                                 "NotEnoughVarsInStack",
                                 &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
-                                tokenc.line,
-                                tokenc.col,
-                                tokenc.file,
+                                { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                 None,
                             )
                             }
@@ -724,22 +662,18 @@ impl Run {
                         Some(a) => a,
                         None => return Err((stack, hashs, match get_lang() {
                             SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                                Error::new(
                                 "KümedeYeterliDeğişkenYok",
                                 &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
-                                tokenc.line,
-                                tokenc.col,
-                                tokenc.file,
+                                { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                 None,
                             )
                             }
                             SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                Error::new(
                                 "NotEnoughVarsInStack",
                                 &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
-                                tokenc.line,
-                                tokenc.col,
-                                tokenc.file,
+                                { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                 None,
                             )
                             }
@@ -756,22 +690,18 @@ impl Run {
                         Some(a) => a,
                         None => return Err((stack, hashs, match get_lang() {
                             SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "KümedeYeterliDeğişkenYok",
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
                             SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "NotEnoughVarsInStack",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
@@ -788,22 +718,18 @@ impl Run {
                         Some(a) => a,
                         None => return Err((stack, hashs, match get_lang() {
                             SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "KümedeYeterliDeğişkenYok",
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
                             SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "NotEnoughVarsInStack",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
@@ -813,22 +739,18 @@ impl Run {
                         Some(a) => a,
                         None => return Err((stack, hashs, match get_lang() {
                             SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "KümedeYeterliDeğişkenYok",
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
                             SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "NotEnoughVarsInStack",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
@@ -845,22 +767,18 @@ impl Run {
                         Some(a) => a,
                         None => return Err((stack, hashs, match get_lang() {
                             SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "KümedeYeterliDeğişkenYok",
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
                             SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "NotEnoughVarsInStack",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
@@ -877,22 +795,18 @@ impl Run {
                         Some(a) => a,
                         None => return Err((stack, hashs, match get_lang() {
                             SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "KümedeYeterliDeğişkenYok",
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
                             SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "NotEnoughVarsInStack",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
@@ -902,22 +816,18 @@ impl Run {
                         Some(a) => a,
                         None => return Err((stack, hashs, match get_lang() {
                             SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "KümedeYeterliDeğişkenYok",
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
                             SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "NotEnoughVarsInStack",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
@@ -934,22 +844,18 @@ impl Run {
                         Some(a) => a,
                         None => return Err((stack, hashs, match get_lang() {
                             SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "KümedeYeterliDeğişkenYok",
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
                             SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "NotEnoughVarsInStack",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
@@ -959,22 +865,18 @@ impl Run {
                         Some(a) => a,
                         None => return Err((stack, hashs, match get_lang() {
                             SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "KümedeYeterliDeğişkenYok",
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
                             SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "NotEnoughVarsInStack",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
@@ -1007,22 +909,18 @@ impl Run {
                             Some(a) => a,
                             None => return Err((stack, hashs, match get_lang() {
                                 SupportedLanguage::Turkish => {
-                                    ErrorGenerator::error(
+                                    Error::new(
                                             "KümedeYeterliDeğişkenYok",
                                             &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
-                                            tokenc.line,
-                                            tokenc.col,
-                                            tokenc.file,
+                                            { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                             None,
                                         )
                                 }
                                 SupportedLanguage::English => {
-                                    ErrorGenerator::error(
+                                    Error::new(
                                             "NotEnoughVarsInStack",
                                             &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
-                                            tokenc.line,
-                                            tokenc.col,
-                                            tokenc.file,
+                                            { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                             None,
                                         )
                                 }
@@ -1041,22 +939,18 @@ impl Run {
                                     Some(a) => a,
                                     None => return Err((stack, hashs, match get_lang() {
                                         SupportedLanguage::Turkish => {
-                                            ErrorGenerator::error(
+                                            Error::new(
                                                     "KümedeYeterliDeğişkenYok",
                                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` anahtar kelimesi uygulanamamıştır", tokenc.repr()),
-                                                    tokenc.line,
-                                                    tokenc.col,
-                                                    tokenc.file,
+                                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                                     None,
                                                 )
                                         }
                                         SupportedLanguage::English => {
-                                            ErrorGenerator::error(
+                                            Error::new(
                                                     "NotEnoughVarsInStack",
                                                     &format!("because there weren't enough variables in the stack, the keyword `{}` couldn't be used", tokenc.repr()),
-                                                    tokenc.line,
-                                                    tokenc.col,
-                                                    tokenc.file,
+                                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                                     None,
                                                 )
                                         }
@@ -1079,22 +973,18 @@ impl Run {
                         Some(a) => a,
                         None => return Err((stack, hashs, match get_lang() {
                             SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "KümedeYeterliDeğişkenYok",
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
                             SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "NotEnoughVarsInStack",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
@@ -1109,22 +999,18 @@ impl Run {
                         Some(a) => a,
                         None => return Err((stack, hashs, match get_lang() {
                             SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "KümedeYeterliDeğişkenYok",
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
                             SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "NotEnoughVarsInStack",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
@@ -1134,22 +1020,18 @@ impl Run {
                         Some(a) => a,
                         None => return Err((stack, hashs, match get_lang() {
                             SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "KümedeYeterliDeğişkenYok",
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
                             SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "NotEnoughVarsInStack",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
@@ -1166,22 +1048,18 @@ impl Run {
                         Some(a) => a,
                         None => return Err((stack, hashs, match get_lang() {
                             SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "KümedeYeterliDeğişkenYok",
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
                             SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "NotEnoughVarsInStack",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
@@ -1191,22 +1069,18 @@ impl Run {
                         Some(a) => a,
                         None => return Err((stack, hashs, match get_lang() {
                             SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "KümedeYeterliDeğişkenYok",
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
                             SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "NotEnoughVarsInStack",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
@@ -1223,22 +1097,18 @@ impl Run {
                         Some(a) => a,
                         None => return Err((stack, hashs, match get_lang() {
                             SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "KümedeYeterliDeğişkenYok",
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
                             SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "NotEnoughVarsInStack",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
@@ -1248,22 +1118,18 @@ impl Run {
                         Some(a) => a,
                         None => return Err((stack, hashs, match get_lang() {
                             SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "KümedeYeterliDeğişkenYok",
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
                             SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "NotEnoughVarsInStack",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
@@ -1280,22 +1146,18 @@ impl Run {
                         Some(a) => a,
                         None => return Err((stack, hashs, match get_lang() {
                             SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "KümedeYeterliDeğişkenYok",
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
                             SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "NotEnoughVarsInStack",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
@@ -1305,22 +1167,18 @@ impl Run {
                         Some(a) => a,
                         None => return Err((stack, hashs, match get_lang() {
                             SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "KümedeYeterliDeğişkenYok",
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
                             SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "NotEnoughVarsInStack",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
@@ -1337,22 +1195,18 @@ impl Run {
                         Some(a) => a,
                         None => return Err((stack, hashs, match get_lang() {
                             SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "KümedeYeterliDeğişkenYok",
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
                             SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "NotEnoughVarsInStack",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
@@ -1362,22 +1216,18 @@ impl Run {
                         Some(a) => a,
                         None => return Err((stack, hashs, match get_lang() {
                             SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "KümedeYeterliDeğişkenYok",
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
                             SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "NotEnoughVarsInStack",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
@@ -1394,22 +1244,18 @@ impl Run {
                         Some(a) => a,
                         None => return Err((stack, hashs, match get_lang() {
                             SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "KümedeYeterliDeğişkenYok",
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
                             SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "NotEnoughVarsInStack",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
@@ -1419,22 +1265,18 @@ impl Run {
                         Some(a) => a,
                         None => return Err((stack, hashs, match get_lang() {
                             SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "KümedeYeterliDeğişkenYok",
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
                             SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "NotEnoughVarsInStack",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
@@ -1451,22 +1293,18 @@ impl Run {
                         Some(a) => a,
                         None => return Err((stack, hashs, match get_lang() {
                             SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "KümedeYeterliDeğişkenYok",
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
                             SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "NotEnoughVarsInStack",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
@@ -1493,22 +1331,18 @@ impl Run {
                         Some(a) => a,
                         None => return Err((stack, hashs, match get_lang() {
                             SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "KümedeYeterliDeğişkenYok",
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
                             SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "NotEnoughVarsInStack",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
@@ -1518,22 +1352,18 @@ impl Run {
                         Some(a) => a,
                         None => return Err((stack, hashs, match get_lang() {
                             SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "KümedeYeterliDeğişkenYok",
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
                             SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "NotEnoughVarsInStack",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
@@ -1550,22 +1380,18 @@ impl Run {
                         Some(a) => a,
                         None => return Err((stack, hashs, match get_lang() {
                             SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "KümedeYeterliDeğişkenYok",
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` anahtar kelimesi uygulanamamıştır", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
                             SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "NotEnoughVarsInStack",
                                     &format!("because there weren't enough variables in the stack, the keyword `{}` couldn't be used", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
@@ -1575,22 +1401,18 @@ impl Run {
                         Some(a) => a,
                         None => return Err((stack, hashs, match get_lang() {
                             SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "KümedeYeterliDeğişkenYok",
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` anahtar kelimesi uygulanamamıştır", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
                             SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "NotEnoughVarsInStack",
                                     &format!("because there weren't enough variables in the stack, the keyword `{}` couldn't be used", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
@@ -1605,22 +1427,18 @@ impl Run {
                         Some(a) => a,
                         None => return Err((stack, hashs, match get_lang() {
                             SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "KümedeYeterliDeğişkenYok",
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` anahtar kelimesi uygulanamamıştır", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
                             SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "NotEnoughVarsInStack",
                                     &format!("because there weren't enough variables in the stack, the keyword `{}` couldn't be used", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
@@ -1630,22 +1448,18 @@ impl Run {
                         Some(a) => a,
                         None => return Err((stack, hashs, match get_lang() {
                             SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "KümedeYeterliDeğişkenYok",
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` anahtar kelimesi uygulanamamıştır", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
                             SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "NotEnoughVarsInStack",
                                     &format!("because there weren't enough variables in the stack, the keyword `{}` couldn't be used", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
@@ -1655,22 +1469,18 @@ impl Run {
                         Some(a) => a,
                         None => return Err((stack, hashs, match get_lang() {
                             SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "KümedeYeterliDeğişkenYok",
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` anahtar kelimesi uygulanamamıştır", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
                             SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "NotEnoughVarsInStack",
                                     &format!("because there weren't enough variables in the stack, the keyword `{}` couldn't be used", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
@@ -1686,22 +1496,18 @@ impl Run {
                         Some(a) => a,
                         None => return Err((stack, hashs, match get_lang() {
                             SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "KümedeYeterliDeğişkenYok",
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` anahtar kelimesi uygulanamamıştır", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
                             SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "NotEnoughVarsInStack",
                                     &format!("because there weren't enough variables in the stack, the keyword `{}` couldn't be used", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
@@ -1714,22 +1520,18 @@ impl Run {
                         Some(a) => a,
                         None => return Err((stack, hashs, match get_lang() {
                             SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "KümedeYeterliDeğişkenYok",
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` anahtar kelimesi uygulanamamıştır", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
                             SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "NotEnoughVarsInStack",
                                     &format!("because there weren't enough variables in the stack, the keyword `{}` couldn't be used", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
@@ -1739,22 +1541,18 @@ impl Run {
                         Some(a) => a,
                         None => return Err((stack, hashs, match get_lang() {
                             SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "KümedeYeterliDeğişkenYok",
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` anahtar kelimesi uygulanamamıştır", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
                             SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "NotEnoughVarsInStack",
                                     &format!("because there weren't enough variables in the stack, the keyword `{}` couldn't be used", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
@@ -1802,6 +1600,11 @@ impl Run {
                                 }
                                 _ => unreachable!(),
                             }
+                            
+                            if let TokenType::Identifier { id : fname } =
+                                &self.program.get(*tp + 1).unwrap().typ {
+                                traceback.push((tokenc.line, tokenc.col, tokenc.file, Some(fname.clone())));
+                            }
                             stack.new_stack();
                             hashs.new_hash();
                         }
@@ -1809,15 +1612,13 @@ impl Run {
                     None => {
                         return Err((stack, hashs.clone(), match get_lang() {
                             SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "BilinmeyenTanımlayıcı",
                                     &format!(
                                         "bilinmeyen değişken: `{}`, bu değişken bulunamamıştır",
                                         tokenc.repr()
                                     ),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     {
                                         let mut hashk = hashs.clone().into_keys();
                                         hashk.sort();
@@ -1831,12 +1632,10 @@ impl Run {
                                 )
                             }
                             SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                Error::new(
                                         "UnknownIdentifier",
                                         &format!("unknown identifier: `{}`, this identifier could not be found", tokenc.repr()),
-                                        tokenc.line,
-                                        tokenc.col,
-                                        tokenc.file,
+                                        { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                         {
                                             let mut hashk = hashs.clone().into_keys();
                                             hashk.sort();
@@ -1857,22 +1656,18 @@ impl Run {
                         Some(a) => a,
                         None => return Err((stack, hashs, match get_lang() {
                             SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "KümedeYeterliDeğişkenYok",
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
                             SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "NotEnoughVarsInStack",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
@@ -1887,23 +1682,19 @@ impl Run {
                                     stack,
                                     hashs,
                                     match get_lang() {
-                                        SupportedLanguage::Turkish => ErrorGenerator::error(
+                                        SupportedLanguage::Turkish => Error::new(
                                             "BeklenmedikSimge",
                                             &format!(
                                             "Tanımlayıcı simgesi beklenmişti ancak {:?} bulundu",
                                             t
                                         ),
-                                            tokenc.line,
-                                            tokenc.col,
-                                            tokenc.file,
+                                            { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                             None,
                                         ),
-                                        SupportedLanguage::English => ErrorGenerator::error(
+                                        SupportedLanguage::English => Error::new(
                                             "UnexpectedToken",
                                             &format!("expected Identifier but found {:?}", t),
-                                            tokenc.line,
-                                            tokenc.col,
-                                            tokenc.file,
+                                            { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                             None,
                                         ),
                                     },
@@ -1919,22 +1710,18 @@ impl Run {
                         Some(a) => a,
                         None => return Err((stack, hashs, match get_lang() {
                             SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "KümedeYeterliDeğişkenYok",
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
                             SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "NotEnoughVarsInStack",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
@@ -1944,22 +1731,18 @@ impl Run {
                         Some(a) => a,
                         None => return Err((stack, hashs, match get_lang() {
                             SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "KümedeYeterliDeğişkenYok",
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
                             SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "NotEnoughVarsInStack",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
@@ -1978,22 +1761,18 @@ impl Run {
                         Some(a) => a,
                         None => return Err((stack, hashs, match get_lang() {
                             SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "KümedeYeterliDeğişkenYok",
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
                             SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "NotEnoughVarsInStack",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
@@ -2003,22 +1782,18 @@ impl Run {
                         Some(a) => a,
                         None => return Err((stack, hashs, match get_lang() {
                             SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "KümedeYeterliDeğişkenYok",
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
                             SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "NotEnoughVarsInStack",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
@@ -2037,22 +1812,18 @@ impl Run {
                         Some(a) => a,
                         None => return Err((stack, hashs, match get_lang() {
                             SupportedLanguage::Turkish => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "KümedeYeterliDeğişkenYok",
                                     &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
                             SupportedLanguage::English => {
-                                ErrorGenerator::error(
+                                Error::new(
                                     "NotEnoughVarsInStack",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
-                                    tokenc.line,
-                                    tokenc.col,
-                                    tokenc.file,
+                                    { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
                                 )
                             }
@@ -2074,23 +1845,19 @@ impl Run {
                                 stack,
                                 hashs,
                                 match get_lang() {
-                                    SupportedLanguage::Turkish => ErrorGenerator::error(
+                                    SupportedLanguage::Turkish => Error::new(
                                         "BeklenmedikSimge",
                                         &format!(
                                             "tanımlayıcı beklenmişti ancak `{}` bulundu",
                                             b.repr()
                                         ),
-                                        tokenc.line,
-                                        tokenc.col,
-                                        tokenc.file,
+                                        { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                         None,
                                     ),
-                                    SupportedLanguage::English => ErrorGenerator::error(
+                                    SupportedLanguage::English => Error::new(
                                         "UnexpectedToken",
                                         &format!("expected identifier, but found `{}`", b.repr()),
-                                        tokenc.line,
-                                        tokenc.col,
-                                        tokenc.file,
+                                        { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                         None,
                                     ),
                                 },
@@ -2105,13 +1872,12 @@ impl Run {
         if stack.len() > 0 && !unsafe { SUPRESS_WARN } && !repl {
             match get_lang() {
                 SupportedLanguage::Turkish => {
-                    ErrorGenerator::warning(
+                    Error::warning(
                         "KümeBoşDeğil",
                         "küme boş değil, eğer nedeninden şüphe ediyorsanız kodunuzu kontrol etmeniz önerilir",
-                        0,
-                        0,
-                        file
-                    )();
+                        { traceback.push((0, 0, file, None)); traceback },
+                        None
+                    );
                     print!("    kümede kalan değişkenler({:?}) [", stack.len());
                     for (i, o) in stack.iter_vec().iter().rev().take(3).rev().enumerate() {
                         let o = match o {
@@ -2136,13 +1902,12 @@ impl Run {
                     println!("]");
                 }
                 SupportedLanguage::English => {
-                    ErrorGenerator::warning(
+                    Error::warning(
                         "StackNotEmpty",
                         "stack is not empty, if you aren't sure about why, you might want to take a look at you code",
-                        0,
-                        0,
-                        file
-                    )();
+                        { traceback.push((0, 0, file, None)); traceback },
+                        None
+                    ).warn();
                     print!("    variables left in the stack({:?}) [", stack.len());
                     for (i, o) in stack.iter_vec().iter().rev().take(3).rev().enumerate() {
                         let o = match o {

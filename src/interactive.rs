@@ -1,4 +1,5 @@
-use crate::errwarn::ErrorGenerator;
+use std::collections::HashMap;
+use crate::error::Error;
 use crate::lexer::Lexer;
 use crate::parser::Parser;
 use crate::runtime::Run;
@@ -73,23 +74,56 @@ impl QuietLevel {
     }
 }
 
+#[derive(Debug)]
+pub struct InteractiveOptions {
+    reset_buf_on_run: bool,
+    aliases: HashMap<String, String>,
+}
+impl Default for InteractiveOptions {
+    fn default() -> Self {
+        Self {
+            reset_buf_on_run: true,
+            aliases: HashMap::new(),
+        }
+    }
+}
+
 pub struct Interactive {
     line: usize,
     quiet: QuietLevel,
+    opt: InteractiveOptions,
 }
 impl Default for Interactive {
     fn default() -> Self {
         Self {
             line: 1,
             quiet: QuietLevel::None,
+            opt: InteractiveOptions::default(),
         }
     }
 }
 impl Interactive {
-    pub fn new(quiet: QuietLevel) -> Self {
+    pub fn new(quiet: QuietLevel, opt: InteractiveOptions) -> Self {
         Self {
             quiet,
+            opt,
             ..Default::default()
+        }
+    }
+    pub fn resolve_alias(&self, alias: &String) -> Option<String> {
+        match self.opt.aliases.get(alias) {
+            Some(al) => {
+                if matches!(al.as_str(), "yürüt" | "çık" | "ayar" | "takma-ad" | "reset-buf") {
+                    Some(al.clone())
+                } else {
+                    self.resolve_alias(al)
+                }
+            },
+            None => if matches!(alias.as_str(), "yürüt" | "çık" | "ayar" | "takma-ad" | "reset-buf") {
+                Some(alias.clone())
+            } else {
+                None
+            },
         }
     }
     pub fn start(&mut self) {
@@ -124,63 +158,96 @@ impl Interactive {
             };
             let rl = editor.readline(&pr);
             match rl {
-                Ok(buf) => match buf.as_str() {
-                    "#çık" => break,
-                    "#yürüt" => {
-                        let (mut memcs, _) = Run::new(
-                            match match Parser::from_lexer(&mut Lexer::new(fbuf.clone()), ".".to_string()) {
-                                Ok(parser) => parser,
-                                Err(e) => {
-                                    e.eprint();
-                                    continue;
-                                }
-                            }.parse() {
-                                Ok(ptk) => ptk,
-                                Err(e) => { e.eprint(); continue; }
+                Ok(buf) => {
+                    if buf.starts_with('#') {
+                        let (cmd, args): (String, Vec<String>) = {
+                            let mut t = buf[1..].split_whitespace().map(String::from);
+                            let cmd = t.next().unwrap();
+                            (cmd, t.collect())
+                        };
+                        match self.resolve_alias(&cmd) {
+                            Some(c) => match c.as_str() {
+                                "çık" => break,
+                                "yürüt" => {
+                                    let (mut memcs, _) = Run::new(
+                                        match match Parser::from_lexer(&mut Lexer::new(fbuf.clone()), ".".to_string()) {
+                                            Ok(parser) => parser,
+                                            Err(e) => {
+                                                e.error_print();
+                                                continue;
+                                            }
+                                        }.parse() {
+                                            Ok(ptk) => ptk,
+                                            Err(e) => { e.error_print(); continue; }
+                                        },
+                                    )
+                                    .run("<trli>".to_string(), None, true)
+                                    .unwrap_or_else(|(s, h, e)| {
+                                        e.error_print();
+                                        (s, h)
+                                    });
+                                    println!();
+                                    if memcs.len() > 0 {
+                                        println!("=> {:?}", memcs.iter_vec());
+                                    }
+                                    if self.opt.reset_buf_on_run {
+                                        fbuf = String::new();
+                                        self.line = 1;
+                                    }
+                                },
+                                "takma-ad" => {
+                                    if args.len() == 1 {
+                                        if let Some(al) = self.resolve_alias(&args[0]) {
+                                            println!("{} -> {al}", args[0]);
+                                        } else {
+                                            match get_lang() {
+                                                SupportedLanguage::Turkish => eprintln!("takma-ad: {} bulunamadı.", args[0]),
+                                                SupportedLanguage::English => eprintln!("takma-ad: {} not found.", args[0]),
+                                            }
+                                        }
+                                    } else if args.len() >= 2 {
+                                        self.opt.aliases.insert(args[0].clone(), args[1].clone());
+                                    } else {
+                                        match get_lang() {
+                                            SupportedLanguage::Turkish => eprintln!("takma-ad: gereğinden daha az argüman"),
+                                            SupportedLanguage::English => eprintln!("takma-ad: less arguments than required"),
+                                        }
+                                    }
+                                },
+                                "reset-buf" => {
+                                    fbuf = String::new();
+                                    self.line = 1;
+                                },
+                                "ayar" => todo!(), // TODO
+                                _ => continue,
                             },
-                        )
-                        .run("<trli>".to_string(), None, true)
-                        .unwrap_or_else(|(s, h, e)| {
-                            e.eprint();
-                            (s, h)
-                        });
-                        println!();
-                        if memcs.len() > 0 {
-                            println!("=> {:?}", memcs.iter_vec());
+                            None => continue,
                         }
-                        fbuf = String::new();
-                        self.line = 1;
                     }
-                    _ => {
-                        editor.add_history_entry(&buf);
-                        fbuf.push_str(&buf);
-                        fbuf.push('\n');
-                        self.line += 1;
-                    }
-                },
+                    editor.add_history_entry(&buf);
+                    fbuf.push_str(&buf);
+                    fbuf.push('\n');
+                    self.line += 1;
+                }
                 Err(ReadlineError::Interrupted) => {
                     eprintln!("Ctrl+C");
                 }
                 Err(ReadlineError::Eof) => break,
                 Err(e) => match get_lang() {
-                    SupportedLanguage::Turkish => ErrorGenerator::error(
+                    SupportedLanguage::Turkish => Error::new(
                         "EditörHatası",
                         &format!("{}", e),
-                        self.line,
-                        0,
-                        "<trli>".to_string(),
+                        vec![(self.line, 0, "<trli>".to_string(), None)],
                         None,
                     ),
-                    SupportedLanguage::English => ErrorGenerator::error(
+                    SupportedLanguage::English => Error::new(
                         "EditorError",
                         &format!("{}", e),
-                        self.line,
-                        0,
-                        "<trli>".to_string(),
+                        vec![(self.line, 0, "<trli>".to_string(), None)],
                         None,
                     ),
                 }
-                .eprint(),
+                .error_print(),
             }
         }
         editor.save_history(".trlhistory").unwrap();

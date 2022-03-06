@@ -20,9 +20,11 @@ pub mod token;
 mod util;
 use util::{get_lang, SupportedLanguage};
 mod utilbin;
+#[cfg(feature = "fmt")]
+pub mod fmt;
 
-pub mod errwarn;
-use errwarn::ErrorGenerator;
+pub mod error;
+use error::Error;
 pub mod runtime;
 
 mod argsparser;
@@ -51,32 +53,32 @@ fn main() {
                     match util::read_file(&path) {
                         Ok(f) => f,
                         Err(e) => match get_lang() {    
-                            SupportedLanguage::Turkish => ErrorGenerator::error(
+                            SupportedLanguage::Turkish => Error::new(
                                 "DosyaHatası",
                                 &format!("{:?}", e),
-                                0, 0, path.display().to_string(),
+                                vec![(0, 0, path.display().to_string(), None)],
                                 None
                             ),
-                            SupportedLanguage::English => ErrorGenerator::error(
+                            SupportedLanguage::English => Error::new(
                                 "FSError",
                                 &format!("{:?}", e),
-                                0, 0, path.display().to_string(),
+                                vec![(0, 0, path.display().to_string(), None)],
                                 None,
                             ),
                         }.error(),
                     }
                 }
                 Err(e) => match get_lang() {    
-                    SupportedLanguage::Turkish => ErrorGenerator::error(
+                    SupportedLanguage::Turkish => Error::new(
                         "DosyaHatası",
                         &format!("{:?}", e),
-                        0, 0, path.display().to_string(),
+                        vec![(0, 0, path.display().to_string(), None)],
                         None
                     ),
-                    SupportedLanguage::English => ErrorGenerator::error(
+                    SupportedLanguage::English => Error::new(
                         "FSError",
                         &format!("{:?}", e),
-                        0, 0, path.display().to_string(),
+                        vec![(0, 0, path.display().to_string(), None)],
                         None,
                     ),
                 }.error(),
@@ -127,32 +129,32 @@ fn main() {
                     match util::read_file(&path) {
                         Ok(f) => f,
                         Err(e) => match get_lang() {    
-                            SupportedLanguage::Turkish => ErrorGenerator::error(
+                            SupportedLanguage::Turkish => Error::new(
                                 "DosyaHatası",
                                 &format!("{:?}", e),
-                                0, 0, path.display().to_string(),
+                                vec![(0, 0, path.display().to_string(), None)],
                                 None
                             ),
-                            SupportedLanguage::English => ErrorGenerator::error(
+                            SupportedLanguage::English => Error::new(
                                 "FSError",
                                 &format!("{:?}", e),
-                                0, 0, path.display().to_string(),
+                                vec![(0, 0, path.display().to_string(), None)],
                                 None,
                             ),
                         }.error(),
                     }
                 }
                 Err(e) => match get_lang() {    
-                    SupportedLanguage::Turkish => ErrorGenerator::error(
+                    SupportedLanguage::Turkish => Error::new(
                         "DosyaHatası",
                         &format!("{:?}", e),
-                        0, 0, path.display().to_string(),
+                        vec![(0, 0, path.display().to_string(), None)],
                         None
                     ),
-                    SupportedLanguage::English => ErrorGenerator::error(
+                    SupportedLanguage::English => Error::new(
                         "FSError",
                         &format!("{:?}", e),
-                        0, 0, path.display().to_string(),
+                        vec![(0, 0, path.display().to_string(), None)],
                         None,
                     ),
                 }.error(),
@@ -169,18 +171,18 @@ fn main() {
                 println!("{:#?}", lexed);
             }
 
-            let mut parser = match Parser::from_lexer(&mut lexer, args.file.clone()) {
+            let parser = match Parser::from_lexer(&mut lexer, args.file.clone()) {
                 Ok(p) => p,
                 Err(e) => e.error(),
             };
+            let parsed = parser.clone().parse().unwrap_or_else(|e| e.error());
             if args.prs_out {
-                let parsed = parser.clone().parse().unwrap_or_else(|e| e.error());
-                println!("{:#?}", parsed);
+                println!("{:#?}", &parsed);
             }
 
-            let mut run = runtime::Run::new(parser.parse().unwrap_or_else(|e| e.error()));
+            let mut run = runtime::Run::new(parsed);
             run.run(args.file, None, false)
-                .unwrap_or_else(|(_, _, a)| a.error());
+                .unwrap_or_else(|(s, h, a)| { a.auto(); (s, h) });
         }
         argsparser::Subcommands::RunBytes => {
             let path = PathBuf::from(args.file.clone());
@@ -189,7 +191,7 @@ fn main() {
 
             let mut run = runtime::Run::new(parsed);
             run.run(args.file, None, false)
-                .unwrap_or_else(|(_, _, a)| a.error());
+                .unwrap_or_else(|(s, h, a)| { a.auto(); (s, h) });
         }
         argsparser::Subcommands::Command => {
             runtime::Run::new(
@@ -199,9 +201,68 @@ fn main() {
                 }.parse().unwrap_or_else(|e| e.error()),
             )
             .run(".".to_string(), None, false)
-            .unwrap_or_else(|(_, _, a)| a.error());
+            .unwrap_or_else(|(s, h, a)| { a.auto(); (s, h) });
         }
         #[cfg(feature = "interactive")]
-        argsparser::Subcommands::Interact => interactive::Interactive::new(args.quiet).start(),
+        argsparser::Subcommands::Interact => interactive::Interactive::new(args.quiet, interactive::InteractiveOptions::default()).start(),
+        #[cfg(feature = "fmt")]
+        argsparser::Subcommands::Format => {
+            // TODO: if specified accept args.outfile
+            let mut path = PathBuf::from(args.file.clone());
+            let mut lexer = Lexer::new(match util::read_file(&path) {
+                Ok(f) => f,
+                Err(util::FSErr::IsADir) => {
+                    path.push("giriş.trl");
+                    match util::read_file(&path) {
+                        Ok(f) => f,
+                        Err(e) => match get_lang() {    
+                            SupportedLanguage::Turkish => Error::new(
+                                "DosyaHatası",
+                                &format!("{:?}", e),
+                                vec![(0, 0, path.display().to_string(), None)],
+                                None
+                            ),
+                            SupportedLanguage::English => Error::new(
+                                "FSError",
+                                &format!("{:?}", e),
+                                vec![(0, 0, path.display().to_string(), None)],
+                                None,
+                            ),
+                        }.error(),
+                    }
+                }
+                Err(e) => match get_lang() {    
+                    SupportedLanguage::Turkish => Error::new(
+                        "DosyaHatası",
+                        &format!("{:?}", e),
+                        vec![(0, 0, path.display().to_string(), None)],
+                        None
+                    ),
+                    SupportedLanguage::English => Error::new(
+                        "FSError",
+                        &format!("{:?}", e),
+                        vec![(0, 0, path.display().to_string(), None)],
+                        None,
+                    ),
+                }.error(),
+            });
+            let canon_path = match canonicalize(path) {
+                Ok(a) => a.as_path().display().to_string(),
+                Err(e) => panic!("`{}` adlı dosya yüklenemedi: {}", args.file.clone(), e),
+            };
+            let lexed = lexer
+                .do_post_proc(false)
+                .tokenize(&mut vec![canon_path.clone()], canon_path)
+                .unwrap_or_else(|e| e.error());
+            if args.lex_out {
+                println!("{:#?}", &lexed);
+            }
+
+            let fmtr = fmt::Fmt::new(lexed)
+                .line_ending(args.line_ending)
+                .indent(args.indent);
+            let res = fmtr.fmt();
+            println!("{res}");
+        }
     }
 }

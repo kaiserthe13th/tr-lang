@@ -10,11 +10,13 @@ pub mod parser;
 pub use parser::Parser;
 
 pub mod bytecode;
-pub mod errwarn;
+pub mod error;
 pub mod mem;
 pub(crate) mod store;
 pub mod token;
 pub(crate) mod util;
+#[cfg(feature = "fmt")]
+pub mod fmt;
 
 pub mod runtime;
 pub use runtime::Run;

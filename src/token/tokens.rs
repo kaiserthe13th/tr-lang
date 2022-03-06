@@ -149,6 +149,64 @@ impl LexerToken {
             precedence,
         }
     }
+    pub fn repr(&self) -> String {
+        use tokentypes::LexerTokenType as TokTyp;
+        match self.typ {
+            TokTyp::Artı => "+".to_string(),
+            TokTyp::ArtıArtı => "++".to_string(),
+            TokTyp::At => "at".to_string(),
+            TokTyp::Doğru => "doğru".to_string(),
+            TokTyp::Yanlış => "yanlış".to_string(),
+            TokTyp::Bölü => "/".to_string(),
+            TokTyp::BüyükEşittir => ">=".to_string(),
+            TokTyp::Büyüktür => ">".to_string(),
+            TokTyp::De => "de".to_string(),
+            TokTyp::Değildir => "!".to_string(),
+            TokTyp::Döndür => "dön".to_string(),
+            TokTyp::Eksi => "-".to_string(),
+            TokTyp::EksiEksi => "--".to_string(),
+            TokTyp::EOF => "EOF".to_string(),
+            TokTyp::EşitDeğildir => "!=".to_string(),
+            TokTyp::Eşittir => "=".to_string(),
+            TokTyp::Girdi => "girdi".to_string(),
+            TokTyp::Identifier => self.lexeme.clone(),
+            TokTyp::İken => "iken".to_string(),
+            TokTyp::İkiNoktaNokta => ":.".to_string(),
+            TokTyp::İse => "ise".to_string(),
+            TokTyp::İşlev => "işlev".to_string(),
+            TokTyp::Kopya => "kpy".to_string(),
+            TokTyp::Koy => "->".to_string(),
+            TokTyp::KüçükEşittir => "<=".to_string(),
+            TokTyp::Küçüktür => "<".to_string(),
+            TokTyp::Modulo => "%".to_string(),
+            TokTyp::Sayı => {
+                let val: f64 = self.lexeme.parse().unwrap();
+                match val.fract() == 0.0 {
+                    true => format!("{:.0?}", val),
+                    false => format!("{:?}", val),
+                }
+            }
+            TokTyp::Son => "son".to_string(),
+            TokTyp::Takas => "tks".to_string(),
+            TokTyp::Tipinde => "@".to_string(),
+            TokTyp::Ve => "ve".to_string(),
+            TokTyp::Veya => "veya".to_string(),
+            TokTyp::Yazı => format!("{:?}", self.lexeme),
+            TokTyp::Yoksa => "yoksa".to_string(),
+            TokTyp::Çarpı => "*".to_string(),
+            TokTyp::Üst => "üst".to_string(),
+            TokTyp::Ver => "ver".to_string(),
+            TokTyp::ParenL => "(".to_string(),
+            TokTyp::ParenR => ")".to_string(),
+            TokTyp::Comma => ",".to_string(),
+            TokTyp::Yükle => "yükle".to_string(),
+            TokTyp::Hiç => "hiç".to_string(),
+            TokTyp::Blok => "blok".to_string(),
+            TokTyp::İkiNokta => ":".to_string(),
+            TokTyp::InScopeParentL => "(".to_string(),
+            TokTyp::InScopeParentR => ")".to_string(),
+        }
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
