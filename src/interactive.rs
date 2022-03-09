@@ -192,7 +192,7 @@ impl Interactive {
                                     }
                                     if self.opt.reset_buf_on_run {
                                         fbuf = String::new();
-                                        self.line = 1;
+                                        self.line = 0;
                                     }
                                 },
                                 "takma-ad" => {
@@ -216,7 +216,7 @@ impl Interactive {
                                 },
                                 "reset-buf" => {
                                     fbuf = String::new();
-                                    self.line = 1;
+                                    self.line = 0;
                                 },
                                 "ayar" => todo!(), // TODO
                                 _ => continue,
