@@ -3,8 +3,8 @@ use std::error;
 use std::fmt;
 use std::process::exit;
 
-#[derive(Debug)]
-struct Position {
+#[derive(Debug, Clone)]
+pub struct Position {
     line: usize,
     col: usize,
     file: String,
@@ -27,6 +27,22 @@ pub struct Error {
     is_warning: bool,
 }
 impl Error {
+    pub fn name(&self) -> String {
+        self.name.to_string()
+    }
+    pub fn explanation(&self) -> String {
+        self.explanation.to_string()
+    }
+    pub fn traceback(&self) -> Vec<Position> {
+        self.traceback.to_vec()
+    }
+    pub fn after_note(&self) -> Option<String> {
+        self.after_note.to_owned()
+    }
+    pub fn is_warning(&self) -> bool {
+        self.is_warning
+    }
+
     pub fn error(&self) -> ! {
         self.error_print();
         exit(1);
