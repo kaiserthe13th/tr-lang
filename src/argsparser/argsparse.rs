@@ -56,6 +56,7 @@ pub fn parse_args() -> Options {
     let mut line_ending = LineEnding::LF;
     #[cfg(all(feature = "fmt", windows))]
     let mut line_ending = LineEnding::CRLF;
+    #[cfg(feature = "fmt")]
     let mut indent = IndentOptions::Spaces(4);
 
     let (mut help, mut version) = (false, false);
@@ -102,12 +103,16 @@ pub fn parse_args() -> Options {
         args.remove(0);
         s
     } else {
-        Subcommands::Interact
+        #[cfg(feature = "interactive")]
+        { Subcommands::Interact }
+        #[cfg(not(feature = "interactive"))]
+        utilbin::print_help(1, name)
     };
 
     let mut outs = false;
     let mut license = false;
 
+    #[cfg(feature = "interactive")]
     let file = if let Subcommands::Interact = sub_cmd {
         "".to_string()
     } else {
@@ -115,8 +120,16 @@ pub fn parse_args() -> Options {
         args.remove(0);
         file
     };
+    #[cfg(not(feature = "interactive"))]
+    let file = {
+        let file = args.get(0).expect("couldn't get <FILE>").to_string();
+        args.remove(0);
+        file
+    };
 
+    #[cfg(feature = "fmt")]
     let mut change_line_ending = false;
+    #[cfg(feature = "fmt")]
     let mut change_indent = false;
     for arg in args {
         match arg.as_str() {
@@ -125,6 +138,7 @@ pub fn parse_args() -> Options {
                 outs = false;
                 outfile.replace(a.to_string());
             }
+            #[cfg(feature = "fmt")]
             a if change_line_ending => {
                 match a {
                     "lf" => line_ending = LineEnding::LF,
@@ -132,6 +146,7 @@ pub fn parse_args() -> Options {
                     _ => utilbin::print_help(1, name),
                 }
             }
+            #[cfg(feature = "fmt")]
             a if change_indent => {
                 indent = if a.chars().all(|a| a.is_ascii_digit()) {
                     let spc = a.parse().unwrap();
@@ -162,10 +177,12 @@ pub fn parse_args() -> Options {
             #[cfg(feature = "interactive")]
             "-qqq" => quiet.inc_by(3),
             "--" => argv_m = true,
-            "--line-ending" => {
+            #[cfg(feature = "fmt")]
+            "--lending" | "--satson" => {
                 change_line_ending = true;
             },
-            "-i" | "--indent" => {
+            #[cfg(feature = "fmt")]
+            "-i" | "--indent" | "--girinti" => {
                 change_indent = true;
             }
             a => util::error_print("unknown argument", format!("{}", a)),
