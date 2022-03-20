@@ -633,7 +633,6 @@ impl Run {
                                 )),
                         }
                     );
-                    io::stdout().flush().unwrap();
                     self.current += 1;
                 }
                 TokenType::Artı => {
@@ -1564,6 +1563,7 @@ impl Run {
                     self.current += 1;
                 }
                 TokenType::Girdi => {
+                    io::stdout().flush().unwrap();
                     let mut buf = String::new();
                     io::stdin().read_line(&mut buf).unwrap();
                     stack.push(Object::Yazı(buf.trim_end().to_string()));
