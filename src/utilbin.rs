@@ -55,15 +55,26 @@ pub fn print_help(exit_code: i32, prog_name: String) -> ! {
             println!("    b byt      DOSYA'yı bytecode'a dönüstür");
             println!("    yb yürbyt  bytecode DOSYA'sını yürüt");
             println!("    k komut    KOMUT'u yürüt");
+            #[cfg(feature = "interactive")]
+            println!("    i inter    interaktif konsolu aç");
+            #[cfg(feature = "fmt")]
+            println!("    f fmt      programı formatla (deneysel)");
             println!("");
             println!("SEÇENEKLER:");
             println!("    -h -y --yardım         yardım göster ve çık");
             println!("    -V -s --sürüm          sürümü göster ve çık");
             println!("    -o -ç --çıkış <DOSYA>  çıkışta buraya bytecode yaz");
             println!("    -l --lexer-çıktısı     lex sürecinden sonra lexer'ın çıktısını göster");
+            #[cfg(feature = "interactive")]
             println!(
                 "    -p --parser-çıktısı    parse sürecinden sonra parser'ın çıktısını göster"
             );
+            #[cfg(feature = "interactive")]
+            println!("    -q --sessiz            1 kadar sessizleştir [0]");
+            #[cfg(feature = "fmt")]
+            println!("    -i --indent --girinti  format için girinti ver {{ tabs | [space sayısı] }}");
+            #[cfg(feature = "fmt")]
+            println!("    --lending --satson     format için satır sonu ver {{ lf | crlf }}");
             println!("    -L --license --lisans  projenin lisansını göster ve çık");
             println!("    --                     bundan sonra argv ekleyin");
         }
@@ -78,6 +89,10 @@ pub fn print_help(exit_code: i32, prog_name: String) -> ! {
             println!("    b byt      output bytecode for FILE");
             println!("    yb yürbyt  run bytecode FILE");
             println!("    k komut    run CMD");
+            #[cfg(feature = "interactive")]
+            println!("    i inter    open interactive console");
+            #[cfg(feature = "fmt")]
+            println!("    f fmt      format program (experimental)");
             println!("");
             println!("OPTIONS:");
             println!("    -h -y --yardım         print help and exit");
@@ -85,6 +100,12 @@ pub fn print_help(exit_code: i32, prog_name: String) -> ! {
             println!("    -o -ç --çıkış <file>   write bytecode at <file>");
             println!("    -l --lexer-çıktısı     after lexing show lexed tokens");
             println!("    -p --parser-çıktısı    after parsing show parsed tokens");
+            #[cfg(feature = "interactive")]
+            println!("    -q --sessiz            quiet the output by 1 [0]");
+            #[cfg(feature = "fmt")]
+            println!("    -i --indent --girinti  give indentation for format {{ tabs | [number of spaces] }}");
+            #[cfg(feature = "fmt")]
+            println!("    --lending --satson     give line ending for format {{ lf | crlf }}");
             println!("    -L --license --lisans  print license and exit");
             println!("    --                     add argv after this");
         }
