@@ -1,0 +1,14 @@
+dil: tr_TR.UTF-8
+testler:
+- testler/test-*.trl
+bekle:
+  testler/test-hatalı.trl:
+  - KümedeYeterliDeğişkenYok
+varmap:
+  testler/test-varmap.trl:
+    stack: [1, 2, 3]
+    ad-alanı: 
+      a: 123
+      b: "Orman"
+      c: true
+
