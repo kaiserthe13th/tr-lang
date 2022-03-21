@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use crate::error::Error;
 use crate::lexer::Lexer;
 use crate::parser::Parser;
-use crate::runtime::Run;
+use crate::runtime::{Run, RunConfig};
 use crate::store::VERSION;
 use crate::util::{get_lang, SupportedLanguage};
 use lazy_static::lazy_static;
@@ -181,7 +181,11 @@ impl Interactive {
                                             Err(e) => { e.error_print(); continue; }
                                         },
                                     )
-                                    .run("<trli>".to_string(), None, true)
+                                    .run(RunConfig {
+                                        file: "<trli>".to_string(),
+                                        repl: true,
+                                        ..Default::default()
+                                    })
                                     .unwrap_or_else(|(s, h, e)| {
                                         e.error_print();
                                         (s, h)

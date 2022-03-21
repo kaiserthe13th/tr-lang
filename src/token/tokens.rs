@@ -21,6 +21,7 @@ pub mod tokentypes {
         Eşittir,
         EşitDeğildir,
         Değildir,
+        Sına,
         Kopya,
         Takas,
         Döndür,
@@ -85,6 +86,7 @@ pub mod tokentypes {
         Eşittir,
         EşitDeğildir,
         Değildir,
+        Sına,
         // Replaced with `İse` `Yoksa` and `Son`
         // `İse` `Yoksa` ve `Son` ile değiştirildi
         /*
@@ -169,6 +171,7 @@ impl LexerToken {
             TokTyp::EşitDeğildir => "!=".to_string(),
             TokTyp::Eşittir => "=".to_string(),
             TokTyp::Girdi => "girdi".to_string(),
+            TokTyp::Sına => "sına".to_string(),
             TokTyp::Identifier => self.lexeme.clone(),
             TokTyp::İken => "iken".to_string(),
             TokTyp::İkiNoktaNokta => ":.".to_string(),
@@ -243,6 +246,7 @@ impl ParserToken {
             TokTyp::De => "de".to_string(),
             TokTyp::Değildir => "!".to_string(),
             TokTyp::Döndür => "dön".to_string(),
+            TokTyp::Sına => "sına".to_string(),
             TokTyp::Eksi => "-".to_string(),
             TokTyp::EksiEksi => "--".to_string(),
             TokTyp::EOF => "EOF".to_string(),

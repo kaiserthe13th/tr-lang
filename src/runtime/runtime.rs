@@ -1,6 +1,5 @@
 use crate::error::Error;
 use crate::mem::{HashMemory, Map, Object, StackMemory};
-use crate::store::globarg::SUPRESS_WARN;
 use crate::token::{tokentypes::ParserTokenType as TokenType, ParserToken as Token};
 use crate::util::{get_lang, SupportedLanguage};
 use std::io::{self, prelude::*};
@@ -8,6 +7,23 @@ use std::io::{self, prelude::*};
 pub struct Run {
     program: Vec<Token>,
     pub(crate) current: usize,
+}
+
+pub struct RunConfig {
+    pub mem: (StackMemory, HashMemory),
+    pub repl: bool,
+    pub file: String,
+    pub supress_warnings: bool,
+}
+impl Default for RunConfig {
+    fn default() -> Self {
+        Self {
+            mem: (StackMemory::new(), HashMemory::new()),
+            repl: false,
+            file: ".".to_string(),
+            supress_warnings: true,
+        }
+    }
 }
 
 impl Run {
@@ -20,15 +36,10 @@ impl Run {
 
     pub fn run(
         &mut self,
-        file: String,
-        mem: Option<(StackMemory, HashMemory)>,
-        repl: bool,
+        config: RunConfig,
     ) -> Result<(StackMemory, HashMemory), (StackMemory, HashMemory, Error)> {
-        let (mut stack, mut hashs) = if let Some((s, h)) = mem {
-            (s, h)
-        } else {
-            (StackMemory::new(), HashMemory::new())
-        };
+        let (mut stack, mut hashs) = config.mem;
+        let file = config.file;
         // let mut warnings: Vec<Box<dyn FnOnce()>> = vec![]; // for later use
         let mut current_namespace: Vec<String> = vec![];
         let mut traceback: Vec<(usize, usize, String, Option<String>)> = vec![];
@@ -967,6 +978,69 @@ impl Run {
                         unreachable!()
                     }
                 }
+                TokenType::Sına  => {
+                    let a = match stack.pop() {
+                        Some(a) => a,
+                        None => return Err((stack, hashs, match get_lang() {
+                            SupportedLanguage::Turkish => {
+                                Error::new(
+                                        "KümedeYeterliDeğişkenYok",
+                                        &format!("kümede yeterli değişken bulunmadığından dolayı `{}` operatörü uygulanamamıştır", tokenc.repr()),
+                                        { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
+                                        None,
+                                    )
+                            }
+                            SupportedLanguage::English => {
+                                Error::new(
+                                        "NotEnoughVarsInStack",
+                                        &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
+                                        { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
+                                        None,
+                                    )
+                            }
+                        })),
+                    };
+                    match a {
+                        Object::Bool(b) => {
+                            if b {
+                                self.current += 1;
+                            } else {
+                                return Err((stack, hashs, match get_lang() {
+                                    SupportedLanguage::Turkish => Error::new(
+                                        "BaşarısızSınama",
+                                        "Sınama başarısız oldu",
+                                        { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
+                                        None,
+                                    ),
+                                    SupportedLanguage::English => Error::new(
+                                        "UnsuccessfulTest",
+                                        "Test was unsuccessful",
+                                        { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
+                                        None,
+                                    ),
+                                }));
+                            }
+                        }
+                        b => return Err((
+                             stack,
+                             hashs,
+                             match get_lang() {
+                                 SupportedLanguage::Turkish => Error::new(
+                                     "BeklenmedikTip",
+                                     &format!("bool beklenmişti ancak `{:?}` bulundu", b),
+                                     { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
+                                     None,
+                                 ),
+                                 SupportedLanguage::English => Error::new(
+                                     "UnexpectedType",
+                                     &format!("expected bool but found `{:?}`", b),
+                                     { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
+                                     None,
+                                 ),
+                             },
+                        )),
+                    }
+                }
                 TokenType::Kopya => {
                     let last = match stack.pop() {
                         Some(a) => a,
@@ -1869,7 +1943,7 @@ impl Run {
             }
         }
 
-        if stack.len() > 0 && !unsafe { SUPRESS_WARN } && !repl {
+        if stack.len() > 0 && !config.supress_warnings && !config.repl {
             match get_lang() {
                 SupportedLanguage::Turkish => {
                     Error::warning(

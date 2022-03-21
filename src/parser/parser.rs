@@ -576,6 +576,12 @@ impl Parser {
                     ptoken.col,
                     ptoken.file.clone(),
                 )),
+                LexTokenType::Sına => parsed.push(Token::new(
+                    TokenType::Sına,
+                    ptoken.line,
+                    ptoken.col,
+                    ptoken.file.clone(),
+                )),
                 LexTokenType::Döndür => parsed.push(Token::new(
                     TokenType::Döndür,
                     ptoken.line,

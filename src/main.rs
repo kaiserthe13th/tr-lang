@@ -181,7 +181,11 @@ fn main() {
             }
 
             let mut run = runtime::Run::new(parsed);
-            run.run(args.file, None, false)
+            run.run(runtime::RunConfig {
+                file: args.file,
+                supress_warnings: args.supress_warnings,
+                ..Default::default()
+            })
                 .unwrap_or_else(|(s, h, a)| { a.auto(); (s, h) });
         }
         argsparser::Subcommands::RunBytes => {
@@ -190,7 +194,11 @@ fn main() {
             let parsed = bytecode::from_bytecode(&con[..]);
 
             let mut run = runtime::Run::new(parsed);
-            run.run(args.file, None, false)
+            run.run(runtime::RunConfig {
+                file: args.file,
+                supress_warnings: args.supress_warnings,
+                ..Default::default()
+            })
                 .unwrap_or_else(|(s, h, a)| { a.auto(); (s, h) });
         }
         argsparser::Subcommands::Command => {
@@ -200,7 +208,10 @@ fn main() {
                     Err(e) => e.error(),
                 }.parse().unwrap_or_else(|e| e.error()),
             )
-            .run(".".to_string(), None, false)
+            .run(runtime::RunConfig {
+                supress_warnings: args.supress_warnings,
+                ..Default::default()
+            })
             .unwrap_or_else(|(s, h, a)| { a.auto(); (s, h) });
         }
         #[cfg(feature = "interactive")]

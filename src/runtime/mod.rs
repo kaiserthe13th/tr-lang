@@ -1,3 +1,7 @@
 mod runtime;
 
-pub use runtime::Run;
+pub use runtime::{
+    Run,
+    RunConfig,
+};
+

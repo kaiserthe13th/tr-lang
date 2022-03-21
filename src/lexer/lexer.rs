@@ -809,6 +809,12 @@ impl Lexer {
                             self.line, self.col, file.clone(),
                             Precedence::None,
                         )),
+                        "sına" => tokens.push(Token::new(
+                            TokenType::Sına,
+                            "sına".to_string(),
+                            self.line, self.col, file.clone(),
+                            Precedence::Reserved,
+                        )),
                         "tks" => tokens.push(Token::new(
                             TokenType::Takas,
                             "tks".to_string(),

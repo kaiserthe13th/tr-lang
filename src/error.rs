@@ -87,7 +87,7 @@ impl Error {
         eprintln!("    {}: {}", self.name, self.explanation);
         if let Some(note) = self.after_note.clone() {
             for line in note.lines() {
-                println!("    {line}");
+                eprintln!("    {line}");
             }
         }
     }

@@ -2,7 +2,6 @@
 use crate::interactive::QuietLevel;
 #[cfg(feature = "fmt")]
 use crate::fmt::{LineEnding, IndentOptions};
-use crate::store::globarg::*;
 use crate::util;
 use crate::utilbin;
 use std::env;
@@ -33,6 +32,7 @@ pub struct Options {
     pub prs_out: bool,
     pub argv: Vec<String>,
     pub license: bool,
+    pub supress_warnings: bool,
     #[cfg(feature = "interactive")]
     pub quiet: QuietLevel,
     #[cfg(feature = "fmt")]
@@ -48,6 +48,7 @@ pub fn parse_args() -> Options {
     args.remove(0);
 
     let mut argv_m = false;
+    let mut supress_warnings = false;
     let mut argv: Vec<String> = vec![];
 
     #[cfg(feature = "interactive")]
@@ -161,9 +162,7 @@ pub fn parse_args() -> Options {
             "-h" | "-y" | "--yardım" => help = true,
             "-V" | "-s" | "--sürüm" => version = true,
             "-l" | "--lexer-çıktısı" => lex_out = true,
-            "-u" | "--uyarıları-engelle" => unsafe {
-                SUPRESS_WARN = true;
-            },
+            "-u" | "--uyarıları-engelle" => supress_warnings = true,
             "-p" | "--parser-çıktısı" => prs_out = true,
             "-o" | "-ç" | "--çıkış" => {
                 outs = true;
@@ -201,6 +200,7 @@ pub fn parse_args() -> Options {
         file,
         sub_cmd,
         license,
+        supress_warnings,
         help_exitc: 0,
         #[cfg(feature = "interactive")]
         quiet,
