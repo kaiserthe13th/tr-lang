@@ -3,7 +3,7 @@ import tempfile
 import time
 from subprocess import STDOUT, check_output
 from sys import stderr
-from typing import Callable, List, Union
+from typing import Callable, List, Optional, Union
 from colorama import init as colorinit, Fore, Style
 
 colorinit(autoreset=True)
@@ -14,7 +14,11 @@ beg = time.time_ns()
 failed = []
 
 
-def test(test_name: str, expected: Union[str, List[str], Callable], input: str = None):
+def test(
+    test_name: str,
+    expected: Union[str, List[str], Callable],
+    input: Optional[str] = None,
+):
     print(f"{Fore.BLUE+Style.BRIGHT}running", test_name, "...", end=" ")
     t0 = time.time_ns()
     rf = str(
@@ -44,7 +48,7 @@ def test(test_name: str, expected: Union[str, List[str], Callable], input: str =
         print("found:", rf, sep="\n")
         print("expected one of:")
         for i, j in enumerate(expected):
-            print("Expectation",i+1)
+            print("Expectation", i + 1)
             print(j)
         failed.append(test_name)
     else:
@@ -57,13 +61,13 @@ test("hello-world", expected="Hello, World!\n")
 test("merhaba-dünya", expected="Merhaba, Dünya!\n")
 test(
     "variables",
-    expected="[WARNING] tests/variables.trl, Line 0, Column 0\n"
+    expected="\n[WARNING] tests/variables.trl, Line 0, Column 0\n"
     "    StackNotEmpty: stack is not empty, if you aren't sure about why, you might want to take a look at you code\n"
     '    variables left in the stack(5) [1.1, "A long\\nstring", doğru]\n',
 )
 test(
     "değişkenler",
-    expected="[WARNING] tests/değişkenler.trl, Line 0, Column 0\n"
+    expected="\n[WARNING] tests/değişkenler.trl, Line 0, Column 0\n"
     "    StackNotEmpty: stack is not empty, if you aren't sure about why, you might want to take a look at you code\n"
     '    variables left in the stack(5) [1.1, "Uzun bir\\nyazı", doğru]\n',
 )
@@ -86,10 +90,7 @@ test("if-else", expected="true\n")
 test("ise-yoksa", expected="doğru\n")
 test(
     "block",
-    expected=[
-        '3\n4\n{"a": 3, "b": 4}\n7\n',
-        '3\n4\n{"b": 4, "a": 3}\n7\n'
-    ],
+    expected=['3\n4\n{"a": 3, "b": 4}\n7\n', '3\n4\n{"b": 4, "a": 3}\n7\n'],
 )
 test("type-conv", expected="Enter a number: 124.321\ndoğru\n", input="1")
 test(
