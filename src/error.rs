@@ -50,7 +50,7 @@ impl Error {
     pub fn warn(&self) {
         self.print(match get_lang() {
             SupportedLanguage::Turkish => ("UYARI", "Satır", "Sütun"),
-            SupportedLanguage::English => ("WARNING", "Satır", "Sütun"),
+            SupportedLanguage::English => ("WARNING", "Line", "Column"),
         })
     }
     pub fn error_print(&self) {

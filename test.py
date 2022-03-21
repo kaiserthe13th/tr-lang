@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 import tempfile
 import time
-from os import mkdir
 from subprocess import STDOUT, check_output
 from sys import stderr
-from shutil import rmtree
 from typing import Callable, List, Union
 from colorama import init as colorinit, Fore, Style
 
@@ -113,5 +111,7 @@ else:
     )
     for t in failed:
         print(f"{t} {Fore.RED}failed")
+    print(f"{Fore.BLUE+Style.BRIGHT}removing {Style.RESET_ALL+Fore.YELLOW}{TMPD}")
+    exit(1)
 
 print(f"{Fore.BLUE+Style.BRIGHT}removing {Style.RESET_ALL+Fore.YELLOW}{TMPD}")
