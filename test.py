@@ -2,11 +2,11 @@
 import tempfile
 import time
 from subprocess import STDOUT, check_output
-from sys import stderr
+from sys import stderr, argv as args
 from typing import Callable, List, Optional, Union
 from colorama import init as colorinit, Fore, Style
 
-colorinit(autoreset=True)
+colorinit(autoreset=True, strip=False if '--color' in args or '-c' in args else None)
 TMPD = tempfile.TemporaryDirectory(prefix="tr-lang.test").name
 print(f"{Fore.BLUE+Style.BRIGHT}writing to {Style.RESET_ALL+Fore.YELLOW}{TMPD}")
 
@@ -36,8 +36,6 @@ def test(
         print(f"{Fore.GREEN+Style.BRIGHT}success")
     elif isinstance(expected, list) and rf in expected:
         print(f"{Fore.GREEN+Style.BRIGHT}success")
-    elif isinstance(expected, Callable) and expected(rf):
-        print(f"{Fore.GREEN+Style.BRIGHT}success")
     elif isinstance(expected, str):
         print(f"{Fore.RED+Style.BRIGHT}failure{Style.RESET_ALL}", file=stderr)
         print("found:", rf, sep="\n")
@@ -52,9 +50,12 @@ def test(
             print(j)
         failed.append(test_name)
     else:
-        print(f"{Fore.RED+Style.BRIGHT}failure{Style.RESET_ALL}", file=stderr)
-        print("found:", rf, sep="\n")
-        print("found didn't pass through", expected)
+        if expected(rf):
+            print(f"{Fore.GREEN+Style.BRIGHT}success")
+        else:
+            print(f"{Fore.RED+Style.BRIGHT}failure{Style.RESET_ALL}", file=stderr)
+            print("found:", rf, sep="\n")
+            print("found didn't pass through", expected)
 
 
 test("hello-world", expected="Hello, World!\n")
