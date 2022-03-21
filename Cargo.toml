@@ -14,7 +14,8 @@ categories = ["compilers", "parser-implementations"]
 exclude = [
     "tests/",
     "target/",
-    "highlight/"
+    "highlight/",
+    "turlu/"
 ]
 
 [lib]
