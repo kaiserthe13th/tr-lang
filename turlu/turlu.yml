@@ -4,9 +4,10 @@ testler:
 bekle:
   testler/test-hatalı.trl:
   - KümedeYeterliDeğişkenYok
+  testler/test-sına-fail.trl:
+  - BaşarısızSınama
 varmap:
   testler/test-varmap.trl:
-    stack: [1, 2, 3]
     ad-alanı: 
       a: 123
       b: "Orman"

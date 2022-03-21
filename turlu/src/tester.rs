@@ -1,12 +1,9 @@
 use std::{error::Error, fs, path::{Path, PathBuf}};
 use tr_lang::{
     error::Error as TrlError,
-    mem::{HashMemory, Object, StackMemory},
+    mem::{HashMemory, StackMemory},
     Lexer, Parser, Run,
-    token::{
-        ParserToken,
-        tokentypes::ParserTokenType,
-    },
+    runtime::RunConfig,
 };
 use wax::Glob;
 
@@ -16,7 +13,7 @@ pub enum TestError {
     PreRuntimeError(TrlError),
 }
 
-pub fn test_file(path: &Path) -> Result<Vec<(StackMemory, HashMemory)>, TestError> {
+pub fn test_file(path: &Path) -> Result<Option<(StackMemory, HashMemory)>, TestError> {
     let contents = fs::read_to_string(path);
     match contents {
         Ok(ctx) => {
@@ -27,42 +24,17 @@ pub fn test_file(path: &Path) -> Result<Vec<(StackMemory, HashMemory)>, TestErro
             match parsed {
                 Ok(psd) => {
                     let mut run = Run::new(psd.clone());
-                    let r = run.run(path.display().to_string(), None, false);
+                    let r = run.run(RunConfig {
+                        file: path.display().to_string(),
+                        supress_warnings: true,
+                        ..Default::default()
+                    });
                     match r {
-                        Ok((_stm, mut hsm)) => {
-                            let mut test_fns = vec![];
-
-                            let hs = hsm.clone().into_keys();
-                            let varnames = hs.iter().filter(|a| a.starts_with("test-"));
-                            for var in varnames {
-                                let o = hsm.get(&var).unwrap();
-                                match o {
-                                    Object::İşlev(pos) => {
-                                        test_fns.push(*pos);
-                                    }
-                                    _ => (),
-                                }
-                            }
-                            let mut mems = vec![];
-                            for test in test_fns {
-                                let mut pt = psd.clone();
-                                pt.push(ParserToken::new(
-                                    ParserTokenType::Identifier { id: match &psd.get(test + 1).unwrap().typ {
-                                        ParserTokenType::Identifier { id } => id.clone(),
-                                        _ => unreachable!(), // Should Error out before this
-                                    }},
-                                    0, 0, "<test>".to_string(),
-                                ));
-                                let mut runt = Run::new(pt);
-                                mems.push(runt.run(path.display().to_string(), None, false)
-                                    .map_err(|(s, h, e)| TestError::Failed(s, h, e))?);
-                            }
-                            Ok(mems)
-                        }
+                        Ok(mem) => Ok(Some(mem)),
                         Err((s, h, e)) => Err(TestError::Failed(s, h, e)),
                     }
                 }
-                Err(ref _e) => parsed.map(|_| vec![]).map_err(TestError::PreRuntimeError),
+                Err(ref _e) => parsed.map(|_| None).map_err(TestError::PreRuntimeError),
             }
         }
         Err(e) => Err(TestError::FSError(Box::new(e))),

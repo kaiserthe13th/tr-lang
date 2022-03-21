@@ -24,7 +24,6 @@ use std::env;
 struct VarMap {
     #[serde(rename = "ad-alanı")]
     ad_alanı: Option<HashMap<String, Value>>,
-    stack: Option<Vec<Value>>,
 }
 
 trait IntoObject {
@@ -61,18 +60,25 @@ struct Config {
 fn main() -> Result<(), Box<dyn Error>> {
     let mut ecode = 0;
 
-    let config: Config = yml::from_str(&fs::read_to_string("turlu.yml")?)?;
+    let mut config: Config = yml::from_str(&fs::read_to_string("turlu.yml")?)?;
     env::set_var("LANG", config.dil.unwrap_or(env::var("LANG").unwrap_or("en_GB.UTF-8".to_string())));
-    bunt::println!("{$blue+bold}testler aranıyor...{/$}");
     let tests = tester::find_tests(config.testler).expect("testler bulunamadı");
     bunt::println!("{$white}{[blue]:?} bulundu{/$}", tests.iter().map(|a|a.display()).collect::<Vec<_>>());
     for test in tests.iter() {
         bunt::println!("\n{$white}{[blue+bold]:?} yürütülüyor{/$}", test.display());
         if let Some(path) = config.bekle.as_ref()
-            .map(|a| a.keys()
-                 .find_map(|t| is_same_file(&test, t).map(|b| if b { Some(t.to_string()) } else { None }).ok())
-            ).flatten().flatten() {
+            .map(|a| {
+                let mut b = a.keys().collect::<Vec<_>>();
+                b.sort();
+                let c = b.iter().find_map(|t| {
+                    is_same_file(&test, t)
+                        .map(|b| if b { Some(t.to_string()) } else { None })
+                        .ok()
+                }).flatten();
+                c
+            }).flatten() {
             let merrs: Vec<String> = config.bekle.as_ref().unwrap().get(&path).unwrap().to_vec();
+            config.bekle.as_mut().unwrap().remove(&path).unwrap();
             match tester::test_file(test) {
                 Ok(_) => {
                     bunt::eprintln!(
@@ -98,8 +104,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 Err(TestError::FSError(e)) => return Err(e),
                 Err(TestError::PreRuntimeError(e)) => {
                     if merrs.into_iter().any(|a| a == e.name()) {
-                        bunt::print!("\n({})", e.name());
-                        bunt::println!("{$green+bold}başarılı{/$}");
+                        bunt::println!("\n{$green+bold}başarılı{/$} ({})", e.name());
                     } else {
                         e.error_print();
                         bunt::eprintln!("{$red+bold}başarısız{/$}");
@@ -110,22 +115,10 @@ fn main() -> Result<(), Box<dyn Error>> {
         } else {
             match tester::test_file(test) {
                 Ok(v) => {
+                    let v: Vec<_> = v.into_iter().map(|(_, w)| w).collect();
                     if let Some(vm) = &config.varmap {
-                        for (mut sm, mut hm) in v {
-                            let mut stat = if let Some(s) = &vm.stack {
-                                s.iter()
-                                    .map(|a| a.clone().into_object())
-                                    .zip(sm.iter_vec().iter())
-                                    .all(|(a, b)| a.eşittir(b.clone())
-                                        .map(|o| match o {
-                                            Object::Bool(b) => b,
-                                            _ => unreachable!(),
-                                        })
-                                        .map_err(|_| false)
-                                        .unwrap_or_else(|a|a)
-                                    )
-                            } else { true };
-                            stat = stat && if let Some(h) = &vm.ad_alanı {
+                        for mut hm in v {
+                            let stat = if let Some(h) = &vm.ad_alanı {
                                 h.iter().all(|(k,v)|
                                     if let Some(w) = hm.get(k) {
                                         v.clone().into_object().eşittir(w.clone())
