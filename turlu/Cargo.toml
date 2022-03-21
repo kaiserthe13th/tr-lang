@@ -11,7 +11,7 @@ path = "src/lib.rs"
 crate-type = ["lib"]
 
 [dependencies]
-tr-lang = { path = "..", default-features = false }
+tr-lang = { git = "https://github.com/kaiserthe13th/tr-lang" , default-features = false }
 bunt = "0.2.6"
 wax = "0.4.0"
 serde = { version = "1.0", features = ["derive"] }
