@@ -12,6 +12,7 @@
 ![PyPI](https://img.shields.io/pypi/v/tr-lang-py?label=tr-lang-py)
 ![Platforms](https://img.shields.io/badge/platform-windows%20%7C%20macos%20%7C%20linux-blue)
 ![GitHub branch checks state](https://img.shields.io/github/checks-status/kaiserthe13th/tr-lang/master)
+[![Tests](https://github.com/kaiserthe13th/tr-lang/actions/workflows/test.yml/badge.svg)](https://github.com/kaiserthe13th/tr-lang/actions/workflows/test.yml)
 
 ### Made with ❤️ in 🇹🇷
 
