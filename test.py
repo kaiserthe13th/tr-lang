@@ -4,6 +4,7 @@ import time
 from subprocess import STDOUT, check_output
 from sys import stderr, argv as args
 from os.path import join as join_paths
+import os
 from typing import Callable, List, Optional, Union
 from colorama import init as colorinit, Fore, Style
 
@@ -13,6 +14,8 @@ print(f"{Fore.BLUE+Style.BRIGHT}writing to {Style.RESET_ALL+Fore.YELLOW}{TMPD}")
 
 beg = time.time_ns()
 failed = []
+
+DCR_SYM = '&' if os.name == 'nt' else ';'
 
 
 def test(
@@ -24,7 +27,7 @@ def test(
     t0 = time.time_ns()
     rf = str(
         check_output(
-            f"{join_paths('.', 'target', 'debug', 'tr-lang')} y {join_paths('tests', f'{test_name}.trl')}; exit 0",
+            f"{join_paths('.', 'target', 'debug', 'tr-lang')} y {join_paths('tests', f'{test_name}.trl')} {DCR_SYM} exit 0",
             shell=True,
             stderr=STDOUT,
             input=bytes(input, encoding="utf8") if input else input,
