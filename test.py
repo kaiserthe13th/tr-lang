@@ -8,7 +8,10 @@ import os
 from typing import Callable, List, Optional, Union
 from colorama import init as colorinit, Fore, Style
 
-colorinit(autoreset=True, strip=False if '--color' in args or '-c' in args else None)
+COLOR=False if '--color' in args or '-c' in args else None
+NO_COLOR='--no-color' in args or '-n' in args
+
+colorinit(strip=NO_COLOR or COLOR)
 TMPD = tempfile.TemporaryDirectory(prefix="tr-lang.test").name
 print(f"{Fore.BLUE+Style.BRIGHT}writing to {Style.RESET_ALL+Fore.YELLOW}{TMPD}")
 
@@ -23,7 +26,7 @@ def test(
     expected: Union[str, List[str], Callable],
     input: Optional[str] = None,
 ):
-    print(f"{Fore.BLUE+Style.BRIGHT}running", test_name, "...", end=" ")
+    print(f"{Fore.BLUE+Style.BRIGHT}running{Style.RESET_ALL}", test_name, "...", end=" ")
     t0 = time.time_ns()
     rf = str(
         check_output(
@@ -35,11 +38,11 @@ def test(
         encoding="utf8",
     )
     T = time.time_ns() - t0
-    print(f"{Fore.BLUE}took", T // 1000000, "miliseconds", end=" :: ")
+    print(f"{Fore.BLUE}took{Style.RESET_ALL}", T // 1000000, "miliseconds", end=" :: ")
     if isinstance(expected, str) and rf == expected:
-        print(f"{Fore.GREEN+Style.BRIGHT}success")
+        print(f"{Fore.GREEN+Style.BRIGHT}success{Style.RESET_ALL}")
     elif isinstance(expected, list) and rf in expected:
-        print(f"{Fore.GREEN+Style.BRIGHT}success")
+        print(f"{Fore.GREEN+Style.BRIGHT}success{Style.RESET_ALL}")
     elif isinstance(expected, str):
         print(f"{Fore.RED+Style.BRIGHT}failure{Style.RESET_ALL}", file=stderr)
         print("found:", rf, sep="\n")
@@ -55,7 +58,7 @@ def test(
         failed.append(test_name)
     else:
         if expected(rf):
-            print(f"{Fore.GREEN+Style.BRIGHT}success")
+            print(f"{Fore.GREEN+Style.BRIGHT}success{Style.RESET_ALL}")
         else:
             print(f"{Fore.RED+Style.BRIGHT}failure{Style.RESET_ALL}", file=stderr)
             print("found:", rf, sep="\n")
@@ -105,15 +108,15 @@ test(
 )
 
 print(
-    f"script {Fore.BLUE+Style.BRIGHT}took",
+    f"script {Fore.BLUE+Style.BRIGHT}took{Style.RESET_ALL}",
     (time.time_ns() - beg) // 1000000,
     "miliseconds total",
 )
 if not failed:
-    print(f"{Fore.GREEN+Style.BRIGHT}all tests passed")
+    print(f"{Fore.GREEN+Style.BRIGHT}all tests passed{Style.RESET_ALL}")
 else:
     print(
-        f"{Fore.BLUE}{len(failed)}{Style.RESET_ALL} tests {Fore.RED+Style.BRIGHT}failed"
+        f"{Fore.BLUE}{len(failed)}{Style.RESET_ALL} tests {Fore.RED+Style.BRIGHT}failed{Style.RESET_ALL}"
     )
     for t in failed:
         print(f"{t} {Fore.RED}failed")
