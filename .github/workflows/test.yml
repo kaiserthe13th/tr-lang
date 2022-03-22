@@ -10,13 +10,16 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
+  build_and_test:
+    name: >
+      Build and test tr-lang on ${{ matrix.os }} using Python ${{ matrix.python-version }}
 
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
 
     strategy:
       matrix:
         python-version: [ '3.8', '3.9' ]
+        os: [windows-latest, ubuntu-latest, macos-latest]
 
     steps:
     - uses: actions/checkout@v2
