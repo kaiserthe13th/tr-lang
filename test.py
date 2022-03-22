@@ -69,15 +69,27 @@ test("hello-world", expected="Hello, World!\n")
 test("merhaba-dünya", expected="Merhaba, Dünya!\n")
 test(
     "variables",
-    expected="\n[WARNING] tests/variables.trl, Line 0, Column 0\n"
-    "    StackNotEmpty: stack is not empty, if you aren't sure about why, you might want to take a look at you code\n"
-    '    variables left in the stack(5) [1.1, "A long\\nstring", doğru]\n',
+    expected=[
+        "\n[WARNING] tests/variables.trl, Line 0, Column 0\n"
+        "    StackNotEmpty: stack is not empty, if you aren't sure about why, you might want to take a look at you code\n"
+        '    variables left in the stack(5) [1.1, "A long\\nstring", doğru]\n',
+        
+        "\n[WARNING] tests/variables.trl, Line 0, Column 0\n"
+        "    StackNotEmpty: stack is not empty, if you aren't sure about why, you might want to take a look at you code\n"
+        '    variables left in the stack(5) [1.1, "A long\\r\\nstring", doğru]\n',
+    ],
 )
 test(
     "değişkenler",
-    expected="\n[WARNING] tests/değişkenler.trl, Line 0, Column 0\n"
-    "    StackNotEmpty: stack is not empty, if you aren't sure about why, you might want to take a look at you code\n"
-    '    variables left in the stack(5) [1.1, "Uzun bir\\nyazı", doğru]\n',
+    expected=[
+        "\n[WARNING] tests/değişkenler.trl, Line 0, Column 0\n"
+        "    StackNotEmpty: stack is not empty, if you aren't sure about why, you might want to take a look at you code\n"
+        '    variables left in the stack(5) [1.1, "Uzun bir\\nyazı", doğru]\n',
+        
+        "\n[WARNING] tests/değişkenler.trl, Line 0, Column 0\n"
+        "    StackNotEmpty: stack is not empty, if you aren't sure about why, you might want to take a look at you code\n"
+        '    variables left in the stack(5) [1.1, "Uzun bir\\r\\nyazı", doğru]\n',
+    ],
 )
 test("scope", expected="31")
 test("order", expected="11")
