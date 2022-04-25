@@ -11,6 +11,7 @@
 ![Visual Studio Marketplace Sürümü](https://img.shields.io/visual-studio-marketplace/v/kaiserthe13th.tr-lang?label=vscode%20eklentisinin%20sürümü)
 ![PyPI](https://img.shields.io/pypi/v/tr-lang-py?label=tr-lang-py)
 ![Platformlar](https://img.shields.io/badge/platform-windows%20%7C%20macos%20%7C%20linux-blue)
+[![Testler](https://github.com/kaiserthe13th/tr-lang/actions/workflows/test.yml/badge.svg)](https://github.com/kaiserthe13th/tr-lang/actions/workflows/test.yml)
 
 ### ❤️ ile 🇹🇷 de yapılmıştır
 
