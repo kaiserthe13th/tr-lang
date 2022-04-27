@@ -26,6 +26,8 @@ impl Default for RunConfig {
     }
 }
 
+pub type Trace = (usize, usize, String, Option<String>);
+
 impl Run {
     pub fn new(program: Vec<Token>) -> Self {
         Self {
@@ -42,7 +44,7 @@ impl Run {
         let file = config.file;
         // let mut warnings: Vec<Box<dyn FnOnce()>> = vec![]; // for later use
         let mut current_namespace: Vec<String> = vec![];
-        let mut traceback: Vec<(usize, usize, String, Option<String>)> = vec![];
+        let mut traceback: Vec<Trace> = vec![];
 
         while self.program.len() > self.current {
             let tokenc = self.program.get(self.current).unwrap().clone();
@@ -77,7 +79,7 @@ impl Run {
                                         }
                                     ),
                                     SupportedLanguage::English => Error::new(
-                                        "UnknownIdentifier",
+                                        "BilinmeyenTanımlayıcı",
                                         &format!("unknown identifier: `{}`, this identifier could not be found", tok.repr()),
                                         { traceback.push((tok.line, tok.col, tok.file.clone(), None)); traceback },
                                         {
@@ -105,7 +107,7 @@ impl Run {
                                     None,
                                 ),
                                 SupportedLanguage::English => Error::new(
-                                    "UnexpectedToken",
+                                    "BeklenmedikSimge",
                                     &format!(
                                         "expected identifier, but found `{}`",
                                         tok.repr()
@@ -138,7 +140,7 @@ impl Run {
                                         }
                                         SupportedLanguage::English => {
                                             Error::new(
-                                                "NotEnoughVarsInStack",
+                                                "KümedeYeterliDeğişkenYok",
                                                 &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                                 { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                                 None,
@@ -173,7 +175,7 @@ impl Run {
                                                             }
                                                         ),
                                                         SupportedLanguage::English => Error::new(
-                                                            "UnknownIdentifier",
+                                                            "BilinmeyenTanımlayıcı",
                                                             &format!(
                                                                 "unknown identifier: `{}`, this identifier could not be found",
                                                                 tok.repr()
@@ -215,7 +217,7 @@ impl Run {
                                                                 None,
                                                             ),
                                                             SupportedLanguage::English => Error::new(
-                                                                "UnexpectedToken",
+                                                                "BeklenmedikSimge",
                                                                 &format!(
                                                                     "expected `)`, but found nothing",
                                                                 ),
@@ -244,7 +246,7 @@ impl Run {
                                                                 None,
                                                             ),
                                                             SupportedLanguage::English => Error::new(
-                                                                "UnexpectedToken",
+                                                                "BeklenmedikSimge",
                                                                 &format!(
                                                                     "expected `)`, but found `{}`",
                                                                     next.repr()
@@ -270,7 +272,7 @@ impl Run {
                                                         None,
                                                     ),
                                                     SupportedLanguage::English => Error::new(
-                                                        "UnexpectedToken",
+                                                        "BeklenmedikSimge",
                                                         &format!(
                                                             "expected `)`, but found `{}`",
                                                             tok.repr()
@@ -293,7 +295,7 @@ impl Run {
                                                 None,
                                             ),
                                             SupportedLanguage::English => Error::new(
-                                                "UnexpectedType",
+                                                "BeklenmedikTip",
                                                 &format!("expected map but found `{:?}`", b),
                                                 { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                                 None,
@@ -329,7 +331,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                            "NotEnoughVarsInStack",
+                            "KümedeYeterliDeğişkenYok",
                             &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                             { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                             None,
@@ -364,7 +366,7 @@ impl Run {
                                                 }
                                             ),
                                             SupportedLanguage::English => Error::new(
-                                                "UnknownIdentifier",
+                                                "BilinmeyenTanımlayıcı",
                                                 &format!("unknown identifier: `{}`, this identifier could not be found", tokenc.repr()),
                                                 { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                                 {
@@ -436,7 +438,7 @@ impl Run {
                                                 None,
                                             ),
                                             SupportedLanguage::English => Error::new(
-                                                "UnexpectedToken",
+                                                "BeklenmedikSimge",
                                                 &format!(
                                                     "expected identifier, but found `{}`",
                                                     id.repr()
@@ -461,7 +463,7 @@ impl Run {
                                         None,
                                     ),
                                     SupportedLanguage::English => Error::new(
-                                        "UnexpectedType",
+                                        "BeklenmedikTip",
                                         &format!("expected map but found `{:?}`", b),
                                         { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                         None,
@@ -507,7 +509,7 @@ impl Run {
                                         None,
                                     ),
                                     SupportedLanguage::English => Error::new(
-                                        "UnexpectedToken",
+                                        "BeklenmedikSimge",
                                         &format!("expected identifier, but found `{}`", id.repr()),
                                         { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                         None,
@@ -537,7 +539,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                            "NotEnoughVarsInStack",
+                            "KümedeYeterliDeğişkenYok",
                             &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                             { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                             None,
@@ -582,7 +584,7 @@ impl Run {
                                         None,
                                     ),
                                     SupportedLanguage::English => Error::new(
-                                        "UnexpectedToken",
+                                        "BeklenmedikSimge",
                                         &format!("expected identifier, but found `{}`", id.repr()),
                                         { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                         None,
@@ -634,7 +636,7 @@ impl Run {
                                         }
                                         SupportedLanguage::English => {
                                             Error::new(
-                                "NotEnoughVarsInStack",
+                                "KümedeYeterliDeğişkenYok",
                                 &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                 { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                 None,
@@ -660,7 +662,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                                "NotEnoughVarsInStack",
+                                "KümedeYeterliDeğişkenYok",
                                 &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                 { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                 None,
@@ -681,7 +683,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                                "NotEnoughVarsInStack",
+                                "KümedeYeterliDeğişkenYok",
                                 &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                 { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                 None,
@@ -709,7 +711,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                                    "NotEnoughVarsInStack",
+                                    "KümedeYeterliDeğişkenYok",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
@@ -737,7 +739,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                                    "NotEnoughVarsInStack",
+                                    "KümedeYeterliDeğişkenYok",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
@@ -758,7 +760,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                                    "NotEnoughVarsInStack",
+                                    "KümedeYeterliDeğişkenYok",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
@@ -786,7 +788,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                                    "NotEnoughVarsInStack",
+                                    "KümedeYeterliDeğişkenYok",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
@@ -814,7 +816,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                                    "NotEnoughVarsInStack",
+                                    "KümedeYeterliDeğişkenYok",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
@@ -835,7 +837,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                                    "NotEnoughVarsInStack",
+                                    "KümedeYeterliDeğişkenYok",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
@@ -863,7 +865,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                                    "NotEnoughVarsInStack",
+                                    "KümedeYeterliDeğişkenYok",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
@@ -884,7 +886,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                                    "NotEnoughVarsInStack",
+                                    "KümedeYeterliDeğişkenYok",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
@@ -928,7 +930,7 @@ impl Run {
                                 }
                                 SupportedLanguage::English => {
                                     Error::new(
-                                            "NotEnoughVarsInStack",
+                                            "KümedeYeterliDeğişkenYok",
                                             &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                             { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                             None,
@@ -958,7 +960,7 @@ impl Run {
                                         }
                                         SupportedLanguage::English => {
                                             Error::new(
-                                                    "NotEnoughVarsInStack",
+                                                    "KümedeYeterliDeğişkenYok",
                                                     &format!("because there weren't enough variables in the stack, the keyword `{}` couldn't be used", tokenc.repr()),
                                                     { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                                     None,
@@ -992,7 +994,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                                        "NotEnoughVarsInStack",
+                                        "KümedeYeterliDeğişkenYok",
                                         &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                         { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                         None,
@@ -1013,7 +1015,7 @@ impl Run {
                                         None,
                                     ),
                                     SupportedLanguage::English => Error::new(
-                                        "UnsuccessfulTest",
+                                        "BaşarısızSınama",
                                         "Test was unsuccessful",
                                         { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                         None,
@@ -1032,7 +1034,7 @@ impl Run {
                                      None,
                                  ),
                                  SupportedLanguage::English => Error::new(
-                                     "UnexpectedType",
+                                     "BeklenmedikTip",
                                      &format!("expected bool but found `{:?}`", b),
                                      { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                      None,
@@ -1055,7 +1057,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                                    "NotEnoughVarsInStack",
+                                    "KümedeYeterliDeğişkenYok",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
@@ -1081,7 +1083,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                                    "NotEnoughVarsInStack",
+                                    "KümedeYeterliDeğişkenYok",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
@@ -1102,7 +1104,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                                    "NotEnoughVarsInStack",
+                                    "KümedeYeterliDeğişkenYok",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
@@ -1130,7 +1132,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                                    "NotEnoughVarsInStack",
+                                    "KümedeYeterliDeğişkenYok",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
@@ -1151,7 +1153,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                                    "NotEnoughVarsInStack",
+                                    "KümedeYeterliDeğişkenYok",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
@@ -1179,7 +1181,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                                    "NotEnoughVarsInStack",
+                                    "KümedeYeterliDeğişkenYok",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
@@ -1200,7 +1202,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                                    "NotEnoughVarsInStack",
+                                    "KümedeYeterliDeğişkenYok",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
@@ -1228,7 +1230,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                                    "NotEnoughVarsInStack",
+                                    "KümedeYeterliDeğişkenYok",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
@@ -1249,7 +1251,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                                    "NotEnoughVarsInStack",
+                                    "KümedeYeterliDeğişkenYok",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
@@ -1277,7 +1279,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                                    "NotEnoughVarsInStack",
+                                    "KümedeYeterliDeğişkenYok",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
@@ -1298,7 +1300,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                                    "NotEnoughVarsInStack",
+                                    "KümedeYeterliDeğişkenYok",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
@@ -1326,7 +1328,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                                    "NotEnoughVarsInStack",
+                                    "KümedeYeterliDeğişkenYok",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
@@ -1347,7 +1349,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                                    "NotEnoughVarsInStack",
+                                    "KümedeYeterliDeğişkenYok",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
@@ -1375,7 +1377,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                                    "NotEnoughVarsInStack",
+                                    "KümedeYeterliDeğişkenYok",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
@@ -1413,7 +1415,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                                    "NotEnoughVarsInStack",
+                                    "KümedeYeterliDeğişkenYok",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
@@ -1434,7 +1436,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                                    "NotEnoughVarsInStack",
+                                    "KümedeYeterliDeğişkenYok",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
@@ -1462,7 +1464,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                                    "NotEnoughVarsInStack",
+                                    "KümedeYeterliDeğişkenYok",
                                     &format!("because there weren't enough variables in the stack, the keyword `{}` couldn't be used", tokenc.repr()),
                                     { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
@@ -1483,7 +1485,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                                    "NotEnoughVarsInStack",
+                                    "KümedeYeterliDeğişkenYok",
                                     &format!("because there weren't enough variables in the stack, the keyword `{}` couldn't be used", tokenc.repr()),
                                     { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
@@ -1509,7 +1511,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                                    "NotEnoughVarsInStack",
+                                    "KümedeYeterliDeğişkenYok",
                                     &format!("because there weren't enough variables in the stack, the keyword `{}` couldn't be used", tokenc.repr()),
                                     { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
@@ -1530,7 +1532,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                                    "NotEnoughVarsInStack",
+                                    "KümedeYeterliDeğişkenYok",
                                     &format!("because there weren't enough variables in the stack, the keyword `{}` couldn't be used", tokenc.repr()),
                                     { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
@@ -1551,7 +1553,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                                    "NotEnoughVarsInStack",
+                                    "KümedeYeterliDeğişkenYok",
                                     &format!("because there weren't enough variables in the stack, the keyword `{}` couldn't be used", tokenc.repr()),
                                     { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
@@ -1578,7 +1580,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                                    "NotEnoughVarsInStack",
+                                    "KümedeYeterliDeğişkenYok",
                                     &format!("because there weren't enough variables in the stack, the keyword `{}` couldn't be used", tokenc.repr()),
                                     { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
@@ -1602,7 +1604,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                                    "NotEnoughVarsInStack",
+                                    "KümedeYeterliDeğişkenYok",
                                     &format!("because there weren't enough variables in the stack, the keyword `{}` couldn't be used", tokenc.repr()),
                                     { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
@@ -1623,7 +1625,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                                    "NotEnoughVarsInStack",
+                                    "KümedeYeterliDeğişkenYok",
                                     &format!("because there weren't enough variables in the stack, the keyword `{}` couldn't be used", tokenc.repr()),
                                     { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
@@ -1707,7 +1709,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                                        "UnknownIdentifier",
+                                        "BilinmeyenTanımlayıcı",
                                         &format!("unknown identifier: `{}`, this identifier could not be found", tokenc.repr()),
                                         { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                         {
@@ -1739,7 +1741,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                                    "NotEnoughVarsInStack",
+                                    "KümedeYeterliDeğişkenYok",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
@@ -1766,7 +1768,7 @@ impl Run {
                                             None,
                                         ),
                                         SupportedLanguage::English => Error::new(
-                                            "UnexpectedToken",
+                                            "BeklenmedikSimge",
                                             &format!("expected Identifier but found {:?}", t),
                                             { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                             None,
@@ -1793,7 +1795,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                                    "NotEnoughVarsInStack",
+                                    "KümedeYeterliDeğişkenYok",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
@@ -1814,7 +1816,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                                    "NotEnoughVarsInStack",
+                                    "KümedeYeterliDeğişkenYok",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
@@ -1844,7 +1846,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                                    "NotEnoughVarsInStack",
+                                    "KümedeYeterliDeğişkenYok",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
@@ -1865,7 +1867,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                                    "NotEnoughVarsInStack",
+                                    "KümedeYeterliDeğişkenYok",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
@@ -1895,7 +1897,7 @@ impl Run {
                             }
                             SupportedLanguage::English => {
                                 Error::new(
-                                    "NotEnoughVarsInStack",
+                                    "KümedeYeterliDeğişkenYok",
                                     &format!("because there weren't enough variables in the stack, the operator `{}` couldn't be used", tokenc.repr()),
                                     { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                     None,
@@ -1929,7 +1931,7 @@ impl Run {
                                         None,
                                     ),
                                     SupportedLanguage::English => Error::new(
-                                        "UnexpectedToken",
+                                        "BeklenmedikSimge",
                                         &format!("expected identifier, but found `{}`", b.repr()),
                                         { traceback.push((tokenc.line, tokenc.col, tokenc.file, None)); traceback },
                                         None,

@@ -194,7 +194,7 @@ impl Parser {
                             None
                         ),
                         SupportedLanguage::English => Error::new(
-                            "SyntaxError",
+                            "SözdizimHatası",
                             "unclosed parenthesis",
                             vec![(ptoken.line, ptoken.col, ptoken.file.clone(), None)],
                             None
@@ -271,7 +271,7 @@ impl Parser {
                                     None,
                                 ),
                                 SupportedLanguage::English => Error::new(
-                                    "SyntaxError",
+                                    "SözdizimHatası",
                                     &format!(
                                         "unclosed block {:?}",
                                         a
@@ -358,8 +358,8 @@ impl Parser {
                                                 _ => {
                                                     let o = iknk.clone();
                                                     return Err(match get_lang() {
-                                                    SupportedLanguage::Turkish => Error::new(
-                                                        "SözdizimHatası",
+                                                        SupportedLanguage::Turkish => Error::new(
+                                                            "SözdizimHatası",
                                                             &format!(
                                                                 "kapatılmamış blok {:?}",
                                                                 o.repr()
@@ -368,7 +368,7 @@ impl Parser {
                                                             None,
                                                         ),
                                                         SupportedLanguage::English => Error::new(
-                                                            "SyntaxError",
+                                                            "SözdizimHatası",
                                                             &format!(
                                                                 "unclosed block {:?}",
                                                                 o.repr()
@@ -393,7 +393,7 @@ impl Parser {
                                                     None,
                                                 ),
                                                 SupportedLanguage::English => Error::new(
-                                                    "SyntaxError",
+                                                    "SözdizimHatası",
                                                     &format!(
                                                         "unclosed block {:?}",
                                                         a

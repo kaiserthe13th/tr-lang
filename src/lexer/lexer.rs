@@ -58,7 +58,7 @@ impl Lexer {
                                 None
                             ),
                             SupportedLanguage::English => Error::new(
-                                "UnexpectedToken",
+                                "BeklenmedikSimge",
                                 "expected <string> or `(` after `yükle` but couldn't find it",
                                 vec![(0, 0, file, None)],
                                 None
@@ -98,7 +98,7 @@ impl Lexer {
                                                 None
                                             ),
                                             SupportedLanguage::English => Error::new(
-                                                "FSError",
+                                                "DosyaHatası",
                                                 &format!("{:?}", e),
                                                 vec![(0, 0, path.display().to_string(), None)],
                                                 None,
@@ -114,7 +114,7 @@ impl Lexer {
                                         None
                                     ),
                                     SupportedLanguage::English => Error::new(
-                                        "FSError",
+                                        "DosyaHatası",
                                         &format!("{:?}", e),
                                         vec![(0, 0, path.display().to_string(), None)],
                                         None,
@@ -135,7 +135,7 @@ impl Lexer {
                                             None,
                                         ),
                                         SupportedLanguage::English => Error::new(
-                                            "UnexpectedToken",
+                                            "BeklenmedikSimge",
                                             "expected `*` or `->` after `yükle <string>` but couldn't find any",
                                             vec![(0, 0, file, None)],
                                             None,
@@ -166,7 +166,7 @@ impl Lexer {
                                                     None,
                                                 ),
                                                 SupportedLanguage::English => Error::new(
-                                                    "UnexpectedToken",
+                                                    "BeklenmedikSimge",
                                                     "expected identifier after `yükle <string> ->` but couldn't find it",
                                                     vec![(0, 0, file, None)],
                                                     None,
@@ -183,7 +183,7 @@ impl Lexer {
                                                     None,
                                                 ),
                                                 SupportedLanguage::English => Error::new(
-                                                    "UnexpectedToken",
+                                                    "BeklenmedikSimge",
                                                     "expected identifier after `yükle <string> ->` but couldn't find it",
                                                     vec![(0, 0, file, None)],
                                                     None,
@@ -209,7 +209,7 @@ impl Lexer {
                                             None,
                                         ),
                                         SupportedLanguage::English => Error::new(
-                                            "UnexpectedToken",
+                                            "BeklenmedikSimge",
                                             "expected `*` or `->` after `yükle <string>` but couldn't find any",
                                             vec![(next_token.line, next_token.col, next_token.file, None)],
                                             None,
@@ -257,7 +257,7 @@ impl Lexer {
                                             None
                                         ),
                                         SupportedLanguage::English => Error::new(
-                                            "UnexpectedToken",
+                                            "BeklenmedikSimge",
                                             &format!(
                                                 "expected identifier, `)` or `*` after `yükle (` but found {:?}",
                                                 c
@@ -276,7 +276,7 @@ impl Lexer {
                                 vec![(0, 0, file, None)], None
                             ),
                             SupportedLanguage::English => Error::new(
-                                "UnexpectedToken",
+                                "BeklenmedikSimge",
                                 "expected `<string>` or `(` after `yükle` but couldn't find any",
                                 vec![(0, 0, file, None)], None
                             ),
@@ -398,7 +398,7 @@ impl Lexer {
                                         vec![(self.line, self.col, file, None)], None,
                                     ),
                                     SupportedLanguage::English => Error::new(
-                                        "SyntaxError",
+                                        "SözdizimHatası",
                                         "Numbers can't have more than one dot int them",
                                         vec![(self.line, self.col, file, None)], None,
                                     ),
@@ -466,7 +466,7 @@ impl Lexer {
                                 if self.current > self.source.len() {
                                     return Err(match get_lang() {
                                         SupportedLanguage::English => Error::new(
-                                            "SyntaxError",
+                                            "SözdizimHatası",
                                             "unterminated comment",
                                             vec![(self.line, self.col, file, None)], None,
                                         ),
@@ -492,7 +492,7 @@ impl Lexer {
                                     } else {
                                         return Err(match get_lang() {
                                             SupportedLanguage::English => Error::new(
-                                                "SyntaxError",
+                                                "SözdizimHatası",
                                                 "unterminated comment",
                                                 vec![(self.line, self.col, file, None)], None,
                                             ),
