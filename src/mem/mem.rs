@@ -73,6 +73,14 @@ impl StackMemory {
         }
         s
     }
+
+    pub fn destroy_ffi_objects(&mut self) {
+        for i in self.iter_vec().iter_mut() {
+            if let Object::FfiObject(o) = i {
+                o.destroy();
+            }
+        }
+    }
 }
 
 impl HashMemory {

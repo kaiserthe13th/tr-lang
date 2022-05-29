@@ -1,5 +1,6 @@
 use crate::error::Error;
 use crate::util::{get_lang, SupportedLanguage};
+use crate::ffi::{FfiObject, FfiFunction};
 use std::collections::HashMap;
 use std::fmt;
 
@@ -42,6 +43,8 @@ pub enum Object {
     Liste(List),
     Harita(Map),
     Hiç,
+    FfiObject(Box<dyn FfiObject>),
+    FfiFunction(FfiFunction),
 }
 
 impl fmt::Debug for Object {
@@ -60,9 +63,11 @@ impl fmt::Debug for Object {
             },
             Self::Yazı(s) => write!(f, "{}", s)?,
             Self::İşlev(loc) => write!(f, "<işlev: {:?}>", loc)?,
+            Self::FfiFunction(_) => write!(f, "<ffi işlev>")?,
             Self::Liste(ls) => write!(f, "{:?}", ls)?,
             Self::Harita(map) => write!(f, "{:?}", map)?,
             Self::Hiç => write!(f, "hiç")?,
+            Self::FfiObject(o) => write!(f, "{}", o.repr())?,
         }
         Ok(())
     }
@@ -76,17 +81,21 @@ impl Object {
         match self {
             Self::Sayı(f) => match a {
                 Self::Sayı(a) => Ok(Self::Bool(f == &a)),
+                Self::FfiObject(o) => o.equal(self.clone(), &vec![]),
                 b => panic!("{:?} `=` {:?} operatörü desteklemiyor", f, b),
             },
             Self::Bool(b) => match a {
                 Self::Bool(a) => Ok(Self::Bool(b == &a)),
+                Self::FfiObject(o) => o.equal(self.clone(), &vec![]),
                 c => panic!("{:?} `=` {:?} operatörü desteklemiyor", b, c),
             },
             Self::Yazı(s) => match a {
                 Self::Yazı(a) => Ok(Self::Bool(s == &a)),
+                Self::FfiObject(o) => o.equal(self.clone(), &vec![]),
                 c => panic!("{:?} `=` {:?} operatörü desteklemiyor", s, c),
             },
-            Self::İşlev(_) => unreachable!(),
+            Self::İşlev(_) | Self::FfiFunction(_) => unreachable!(),
+            Self::FfiObject(o) => o.equal(a, &vec![]),
             Self::Liste(l) => match a {
                 Self::Liste(m) => Ok(Self::Bool(
                     l.ls.len() == m.ls.len()
@@ -97,6 +106,7 @@ impl Object {
                             }
                         }),
                 )),
+                Self::FfiObject(o) => o.equal(self.clone(), &vec![]),
                 c => panic!("{:?} `=` {:?} operatörü desteklemiyor", l, c),
             },
             Self::Harita(m) => match a {
@@ -115,6 +125,7 @@ impl Object {
                                 }
                         }),
                 )),
+                Self::FfiObject(o) => o.equal(self.clone(), &vec![]),
                 c => panic!("{:?} `=` {:?} operatörü desteklemiyor", m, c),
             },
             Self::Hiç => match a {
@@ -127,17 +138,21 @@ impl Object {
         match self {
             Self::Sayı(f) => match a {
                 Self::Sayı(a) => Ok(Self::Bool(f != &a)),
+                Self::FfiObject(o) => o.not_equal(self.clone(), &vec![]),
                 b => panic!("{:?} `!=` {:?} operatörü desteklemiyor", f, b),
             },
             Self::Bool(b) => match a {
                 Self::Bool(a) => Ok(Self::Bool(b != &a)),
+                Self::FfiObject(o) => o.not_equal(self.clone(), &vec![]),
                 c => panic!("{:?} `!=` {:?} operatörü desteklemiyor", b, c),
             },
             Self::Yazı(s) => match a {
                 Self::Yazı(a) => Ok(Self::Bool(s != &a)),
+                Self::FfiObject(o) => o.not_equal(self.clone(), &vec![]),
                 c => panic!("{:?} `!=` {:?} operatörü desteklemiyor", s, c),
             },
-            Self::İşlev(_) => unreachable!(),
+            Self::İşlev(_) | Self::FfiFunction(_) => unreachable!(),
+            Self::FfiObject(o) => o.not_equal(a, &vec![]),
             Self::Liste(l) => match a {
                 Self::Liste(m) => Ok(Self::Bool(
                     l.ls.len() != m.ls.len()
@@ -148,6 +163,7 @@ impl Object {
                             }
                         }),
                 )),
+                Self::FfiObject(o) => o.equal(self.clone(), &vec![]),
                 c => panic!("{:?} `!=` {:?} operatörü desteklemiyor", l, c),
             },
             Self::Harita(m) => match a {
@@ -166,6 +182,7 @@ impl Object {
                                 }
                         }),
                 )),
+                Self::FfiObject(o) => o.equal(self.clone(), &vec![]),
                 c => panic!("{:?} `!=` {:?} operatörü desteklemiyor", m, c),
             },
             Self::Hiç => match a {
@@ -178,8 +195,10 @@ impl Object {
         match self {
             Self::Sayı(f) => match a {
                 Self::Sayı(a) => Ok(Self::Bool(f > &a)),
+                Self::FfiObject(o) => o.greater(self.clone(), &vec![]),
                 b => panic!("{:?} `>` {:?} operatörü desteklemiyor", f, b),
             },
+            Self::FfiObject(o) => o.greater(self.clone(), &vec![]),
             b => panic!("{:?} `>` operatörünü desteklemiyor", b),
         }
     }
@@ -187,8 +206,10 @@ impl Object {
         match self {
             Self::Sayı(f) => match a {
                 Self::Sayı(a) => Ok(Self::Bool(f >= &a)),
+                Self::FfiObject(o) => o.greater_eq(self.clone(), &vec![]),
                 b => panic!("{:?} `>=` {:?} operatörü desteklemiyor", f, b),
             },
+            Self::FfiObject(o) => o.greater_eq(self.clone(), &vec![]),
             b => panic!("{:?} `>=` operatörünü desteklemiyor", b),
         }
     }
@@ -196,8 +217,10 @@ impl Object {
         match self {
             Self::Sayı(f) => match a {
                 Self::Sayı(a) => Ok(Self::Bool(f < &a)),
+                Self::FfiObject(o) => o.lesser(self.clone(), &vec![]),
                 b => panic!("{:?} `<` {:?} operatörü desteklemiyor", f, b),
             },
+            Self::FfiObject(o) => o.lesser(self.clone(), &vec![]),
             b => panic!("{:?} `<` operatörünü desteklemiyor", b),
         }
     }
@@ -205,15 +228,18 @@ impl Object {
         match self {
             Self::Sayı(f) => match a {
                 Self::Sayı(a) => Ok(Self::Bool(f <= &a)),
+                Self::FfiObject(o) => o.lesser_eq(self.clone(), &vec![]),
                 b => panic!("{:?} `<=` {:?} operatörü desteklemiyor", f, b),
             },
+            Self::FfiObject(o) => o.lesser_eq(self.clone(), &vec![]),
             b => panic!("{:?} `<=` operatörünü desteklemiyor", b),
         }
     }
     pub fn değildir(&self) -> ObjectResult {
         match self {
             Self::Bool(f) => Ok(Self::Bool(!f)),
-            b => panic!("{:?} `<` operatörünü desteklemiyor", b),
+            Self::FfiObject(o) => o.not(&vec![]),
+            b => panic!("{:?} `!` operatörünü desteklemiyor", b),
         }
     }
     // Matematik
@@ -221,6 +247,7 @@ impl Object {
         match self {
             Self::Sayı(f) => match a {
                 Self::Sayı(a) => Ok(Self::Sayı(f + a)),
+                Self::FfiObject(o) => o.lesser_eq(self.clone(), &vec![]),
                 a => panic!("{:?} `+` {:?} desteklenmiyor", f, a),
             },
             Self::Yazı(s) => match a {
@@ -230,6 +257,7 @@ impl Object {
                     buf.push_str(b.as_str());
                     Ok(Self::Yazı(buf))
                 }
+                Self::FfiObject(o) => o.lesser_eq(self.clone(), &vec![]),
                 f => panic!("{:?} `+` {:?} desteklenmiyor", s, f),
             },
             Self::Liste(l) => match a {
@@ -238,11 +266,13 @@ impl Object {
                     l.ls.append(&mut m.ls);
                     Ok(Self::Liste(l))
                 }
+                Self::FfiObject(o) => o.add(self.clone(), &vec![]),
                 f => panic!("{:?} `+` {:?} desteklenmiyor", l, f),
             },
             Self::Bool(b) => panic!("{:?} `+` operatörünü desteklemiyor", b),
+            Self::FfiObject(o) => o.add(a, &vec![]),
             Self::Harita(m) => panic!("{:?} `+` operatörünü desteklemiyor", m),
-            Self::İşlev(_) => unreachable!(),
+            Self::İşlev(_) | Self::FfiFunction(_) => unreachable!(),
             Self::Hiç => panic!("hiç `+` operatörünü desteklemiyor"),
         }
     }
@@ -250,8 +280,10 @@ impl Object {
         match self {
             Self::Sayı(f) => match a {
                 Self::Sayı(a) => Ok(Self::Sayı(f - a)),
+                Self::FfiObject(o) => o.substract(self.clone(), &vec![]),
                 b => panic!("{:?} `-` {:?} operatörü desteklemiyor", f, b),
             },
+            Self::FfiObject(o) => o.substract(a, &vec![]),
             b => panic!("{:?} `-` operatörünü desteklemiyor", b),
         }
     }
@@ -408,10 +440,11 @@ impl Object {
                 },
                 Self::Sayı(n) => Ok(Self::Yazı(if n.fract() == 0. { format!("{:.0?}", n) } else { format!("{:?}", n) })),
                 Self::Yazı(_) => Ok(self.clone()),
-                Self::İşlev(_) => unreachable!(),
+                Self::İşlev(_) | Self::FfiFunction(_) => unreachable!(),
                 Self::Liste(l) => Ok(Self::Yazı(format!("{:?}", l))),
                 Self::Harita(m) => Ok(Self::Yazı(format!("{:?}", m))),
                 Self::Hiç => Ok(Self::Yazı("hiç".to_string())),
+                Self::FfiObject(_) => todo!(),
             },
             "bool" | "boolean" => match self {
                 Self::Bool(_) => Ok(self.clone()),
@@ -443,7 +476,8 @@ impl Object {
                         ),
                     }),
                 },
-                Self::İşlev(_) => unreachable!(),
+                Self::İşlev(_) | Self::FfiFunction(_) => unreachable!(),
+                Self::FfiObject(_) => todo!(),
                 Self::Liste(_) | Self::Harita(_) => panic!("unsupported conversion"),
             },
             "sayı" => match self {
@@ -474,7 +508,8 @@ impl Object {
                         ),
                     }),
                 },
-                Self::İşlev(_) => unreachable!(),
+                Self::İşlev(_) | Self::FfiFunction(_) => unreachable!(),
+                Self::FfiObject(_) => todo!(),
                 Self::Liste(_) | Self::Harita(_) => panic!("unsupported conversion"),
             },
             a => Err(match get_lang() {
@@ -498,3 +533,4 @@ impl Object {
         }
     }
 }
+

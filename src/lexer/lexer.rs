@@ -78,6 +78,7 @@ impl Lexer {
                             } else {
                                 path.set_file_name(next_token.lexeme);
                             }
+                            let mut so_lookup = false;
                             let source = match read_file(&path) {
                                 Ok(f) => {
                                     tmp_visited.push(path.display().to_string());
@@ -106,6 +107,10 @@ impl Lexer {
                                         }),
                                     }
                                 },
+                                Err(FSErr::Other(std::io::ErrorKind::InvalidData)) => {
+                                    so_lookup = true;
+                                    "".to_string()
+                                },
                                 Err(e) => return Err(match get_lang() {    
                                     SupportedLanguage::Turkish => Error::new(
                                         "DosyaHatası",
@@ -122,8 +127,19 @@ impl Lexer {
                                 }),
                             };
                             if !in_vec(&path.display().to_string(), &visited.clone()) {
-                                let mut nl = Lexer::new(source);
-                                let res = nl.tokenize(visited, path.display().to_string());
+                                let res = if !so_lookup {
+                                    let mut nl = Lexer::new(source);
+                                    nl.tokenize(visited, path.display().to_string())
+                                } else {
+                                    Ok(vec![Token::new(
+                                        TokenType::LibSymbol(path.display().to_string()),
+                                        "".to_string(),
+                                        0,
+                                        0,
+                                        file.clone(),
+                                        Precedence::Reserved,
+                                    )])
+                                };
 
                                 let next_token = match prog.get(current + 2) {
                                     Some(e) => e.clone(),
@@ -293,7 +309,7 @@ impl Lexer {
     }
     /// The tokenizer; it will try to tokenize the source code,
     ///
-    /// If it encounters errors it will send `Err(tr_lang::errwarn::Error)` back
+    /// If it encounters errors it will send `Err(tr_lang::error::Error)` back
     pub fn tokenize(&mut self, visited: &mut Vec<String>, file: String) -> Result<Vec<Token>, Error> {
         let mut tokens: Vec<Token> = vec![];
 

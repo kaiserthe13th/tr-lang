@@ -1,4 +1,7 @@
+use dlopen::symbor::Library;
+
 use crate::error::Error;
+use crate::ffi::{load_library, terminate_library};
 use crate::mem::{HashMemory, Map, Object, StackMemory};
 use crate::token::{tokentypes::ParserTokenType as TokenType, ParserToken as Token};
 use crate::util::{get_lang, SupportedLanguage};
@@ -45,12 +48,26 @@ impl Run {
         // let mut warnings: Vec<Box<dyn FnOnce()>> = vec![]; // for later use
         let mut current_namespace: Vec<String> = vec![];
         let mut traceback: Vec<Trace> = vec![];
+        let mut loaded_libraries: Vec<(Library, String)> = vec![];
 
         while self.program.len() > self.current {
             let tokenc = self.program.get(self.current).unwrap().clone();
             let token = self.program.get_mut(self.current).unwrap();
 
             match token.typ.clone() {
+                TokenType::LibSymbol(s) => {
+                    let lib = load_library(&s, &mut stack, &mut hashs);
+                    match lib {
+                        Ok(lib) => loaded_libraries.push((lib, s)),
+                        Err(e) => return Err((stack, hashs, Error::new(
+                            "DinamikYüklemeHatası",
+                            &format!("{}", e),
+                            traceback,
+                            None,
+                        ))),
+                    }
+                    self.current += 1;
+                },
                 TokenType::InScopeParentL => {
                     stack.new_stack();
 
@@ -388,8 +405,18 @@ impl Run {
                                         | Object::Sayı(_)
                                         | Object::Yazı(_)
                                         | Object::Liste(_)
+                                        | Object::FfiObject(_)
                                         | Object::Harita(_) => {
                                             stack.push(o.clone());
+                                            self.current += 2;
+                                        }
+                                        Object::FfiFunction(f) => {
+                                            let res = f.call(&mut stack, &mut hashs);
+                                            match res {
+                                                Ok(Some(o)) => stack.push(o),
+                                                Ok(_) => (),
+                                                Err(e) => return Err((stack, hashs, e)),
+                                            }
                                             self.current += 2;
                                         }
                                         Object::İşlev(tp) => {
@@ -1653,8 +1680,18 @@ impl Run {
                         | Object::Sayı(_)
                         | Object::Yazı(_)
                         | Object::Liste(_)
+                        | Object::FfiObject(_)
                         | Object::Harita(_) => {
                             stack.push(val.clone());
+                            self.current += 1;
+                        }
+                        Object::FfiFunction(f) => {
+                            let res = f.call(&mut stack, &mut hashs);
+                            match res {
+                                Ok(Some(o)) => stack.push(o),
+                                Ok(_) => (),
+                                Err(e) => return Err((stack, hashs, e)),
+                            }
                             self.current += 1;
                         }
                         Object::İşlev(tp) => {
@@ -1945,6 +1982,23 @@ impl Run {
             }
         }
 
+        let mut edt = Ok(());
+        for i in loaded_libraries.into_iter() {
+            if let Err(e) = terminate_library(&i.1, i.0, &mut stack, &mut hashs) {
+                if let Ok(()) = edt {
+                    edt = Err(e);
+                }
+            }
+        }
+        if let Err(e) = edt {
+            return Err((stack, hashs, Error::new(
+                "DinamikYüklemeHatası",
+                &format!("{}", e),
+                traceback,
+                None,
+            )));
+        }
+
         if stack.len() > 0 && !config.supress_warnings && !config.repl {
             match get_lang() {
                 SupportedLanguage::Turkish => {
@@ -1963,7 +2017,8 @@ impl Run {
                             | Object::Sayı(_)
                             | Object::Liste(_)
                             | Object::Harita(_) => format!("{:?}", o),
-                            Object::İşlev(_) => unreachable!(),
+                            Object::FfiObject(o) => o.repr(),
+                            Object::İşlev(_) | Object::FfiFunction(_) => unreachable!(),
                         };
                         if i > 0 {
                             print!(", {}", o);
@@ -1993,7 +2048,8 @@ impl Run {
                             | Object::Sayı(_)
                             | Object::Liste(_)
                             | Object::Harita(_) => format!("{:?}", o),
-                            Object::İşlev(_) => unreachable!(),
+                            Object::FfiObject(o) => o.repr(),
+                            Object::İşlev(_) | Object::FfiFunction(_) => unreachable!(),
                         };
                         if i > 0 {
                             print!(", {}", o);

@@ -245,7 +245,7 @@ impl Interactive {
                         None,
                     ),
                     SupportedLanguage::English => Error::new(
-                        "EditorError",
+                        "EditörHatası",
                         &format!("{}", e),
                         vec![(self.line, 0, "<trli>".to_string(), None)],
                         None,

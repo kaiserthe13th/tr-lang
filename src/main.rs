@@ -27,6 +27,8 @@ pub mod error;
 use error::Error;
 pub mod runtime;
 
+pub mod ffi;
+
 mod argsparser;
 #[cfg(feature = "interactive")]
 mod interactive;

@@ -450,6 +450,12 @@ impl Parser {
                         _ => unimplemented!(),
                     };
                 }
+                LexTokenType::LibSymbol(ref s) => parsed.push(Token::new(
+                    TokenType::LibSymbol(s.clone()),
+                    ptoken.line,
+                    ptoken.col,
+                    ptoken.file.clone(),
+                )),
                 LexTokenType::Doğru => parsed.push(Token::new(
                     TokenType::Bool { val: true },
                     ptoken.line,

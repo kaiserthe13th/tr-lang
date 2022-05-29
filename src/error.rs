@@ -2,8 +2,9 @@ use crate::util::{get_lang, SupportedLanguage};
 use std::error;
 use std::fmt;
 use std::process::exit;
+use serde::{Serialize, Deserialize};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Position {
     line: usize,
     col: usize,
@@ -18,7 +19,7 @@ impl Position {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Error {
     name: String,
     explanation: String,

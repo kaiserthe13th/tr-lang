@@ -50,6 +50,7 @@ pub mod tokentypes {
         BlokSonlandır,
         InScopeParentL,
         InScopeParentR,
+        LibSymbol(String),
         EOF,
     }
 
@@ -109,6 +110,7 @@ pub mod tokentypes {
         Blok,
         InScopeParentL,
         InScopeParentR,
+        LibSymbol(String),
         EOF,
     }
 }
@@ -203,6 +205,7 @@ impl LexerToken {
             TokTyp::ParenR => ")".to_string(),
             TokTyp::Comma => ",".to_string(),
             TokTyp::Yükle => "yükle".to_string(),
+            TokTyp::LibSymbol(_) => "yükle".to_string(),
             TokTyp::Hiç => "hiç".to_string(),
             TokTyp::Blok => "blok".to_string(),
             TokTyp::İkiNokta => ":".to_string(),
@@ -285,6 +288,7 @@ impl ParserToken {
             TokTyp::İkiNokta => ":".to_string(),
             TokTyp::InScopeParentL => "(".to_string(),
             TokTyp::InScopeParentR => ")".to_string(),
+            TokTyp::LibSymbol(_) => "yükle".to_string(),
         }
     }
 }
